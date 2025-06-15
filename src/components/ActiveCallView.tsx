@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX, Send } from 'lucide-react';
@@ -143,22 +144,25 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
                   <span className="text-xs mt-1">Stumm</span>
               </button>
             </div>
-            <div className="flex-grow flex flex-col items-center justify-center text-center">
+            <motion.div
+                drag
+                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                dragElastic={0.7}
+                onDragEnd={handleDragEnd}
+                className="flex-grow flex flex-col items-center justify-center text-center cursor-grab active:cursor-grabbing"
+                aria-label="Anruf annehmen oder Gesten verwenden"
+            >
               <p className="text-sm text-primary animate-pulse">Nach oben wischen, um mit KI anzunehmen</p>
-              <motion.button
-                  drag
-                  dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                  dragElastic={0.7}
-                  onDragEnd={handleDragEnd}
-                  onClick={onAcceptCallManually}
-                  className="w-20 h-20 my-8 rounded-full bg-green-500/80 hover:bg-green-500 flex items-center justify-center transition-transform hover:scale-105 cursor-grab active:cursor-grabbing"
+              <motion.div
+                  onTap={onAcceptCallManually}
+                  className="w-20 h-20 my-8 rounded-full bg-green-500/80 hover:bg-green-500 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
                   whileTap={{ scale: 1.1 }}
-                  aria-label="Anruf annehmen oder Gesten verwenden"
+                  aria-label="Anruf annehmen"
               >
                   <Phone size={32} className="text-white" />
-              </motion.button>
+              </motion.div>
               <p className="text-sm text-muted-foreground">Zum Ablehnen zur Seite oder nach unten wischen</p>
-            </div>
+            </motion.div>
           </div>
         ) : (
           <div className="flex justify-around items-center pt-4">
