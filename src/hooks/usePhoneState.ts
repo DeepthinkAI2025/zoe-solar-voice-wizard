@@ -1,13 +1,16 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useSettings } from './useSettings';
 import { useAgentManagement } from './useAgentManagement';
 import { useCallManagement } from './useCallManagement';
 import { useContactManagement } from './useContactManagement';
+import type { CallHistoryItem } from '@/types/call';
 
 export const usePhoneState = () => {
   const [activeTab, setActiveTab] = useState('dialpad');
   const [contactToEditId, setContactToEditId] = useState<string | null>(null);
+  const [showAgentSelector, setShowAgentSelector] = useState<string | null>(null);
+  const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
   
   const settings = useSettings();
   const agentManagement = useAgentManagement();
@@ -31,6 +34,43 @@ export const usePhoneState = () => {
     setContactToEditId(null);
   };
 
+  const isCallMinimized = callManagement.activeCall?.isMinimized ?? false;
+
+  const setIsCallMinimized = useCallback((minimized: boolean) => {
+    if (minimized) {
+      callManagement.minimizeCall();
+    } else {
+      callManagement.maximizeCall();
+    }
+  }, [callManagement]);
+
+  const handleStartCall = useCallback((number: string) => {
+    setShowAgentSelector(number);
+  }, []);
+
+  const handleAgentSelect = useCallback((agentId: string) => {
+    if (showAgentSelector) {
+        callManagement.startAiCall(showAgentSelector, agentId);
+        setShowAgentSelector(null);
+    }
+  }, [showAgentSelector, callManagement]);
+
+  const handleStartCallManually = useCallback((number: string) => {
+      callManagement.startManualCall(number);
+  }, [callManagement]);
+  
+  const handleAcceptCallWithAI = useCallback(() => {
+    const defaultAgent = agentManagement.agents.find(a => a.isDefault) || agentManagement.agents[0];
+    if (defaultAgent) {
+        callManagement.acceptCall(defaultAgent.id);
+    }
+  }, [agentManagement.agents, callManagement]);
+
+  const handleScheduleCall = useCallback(() => {
+    // Placeholder
+    console.log("Scheduling call...");
+  }, []);
+
   return {
     activeTab,
     setActiveTab,
@@ -41,5 +81,16 @@ export const usePhoneState = () => {
     ...agentManagement,
     ...contactManagement,
     ...callManagement,
+    showAgentSelector,
+    setShowAgentSelector,
+    selectedCall,
+    setSelectedCall,
+    isCallMinimized,
+    setIsCallMinimized,
+    handleStartCall,
+    handleAgentSelect,
+    handleStartCallManually,
+    handleAcceptCallWithAI,
+    handleScheduleCall,
   };
 };

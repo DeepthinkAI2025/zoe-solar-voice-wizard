@@ -1,16 +1,13 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { aiAgents, contacts as mockContacts } from '@/data/mock';
-
-type Agent = (typeof aiAgents)[0];
-type Contact = (typeof mockContacts)[0];
+import type { AgentWithSettings } from './useAgentManagement';
+import type { Contact } from './useContactManagement';
 
 interface CallManagementProps {
   silentModeEnabled: boolean;
-  workingHoursStart: string;
-  workingHoursEnd: string;
+  workingHoursStart: number;
+  workingHoursEnd: number;
   autoAnswerEnabled: boolean;
-  agents: Agent[];
+  agents: AgentWithSettings[];
   globalSystemInstructions: string;
   contacts: Contact[];
 }
@@ -59,7 +56,7 @@ export const useCallManagement = ({
   }, [activeCall]);
 
   const startIncomingCall = useCallback((number: string) => {
-    const contact = contacts.find(c => c.phone === number);
+    const contact = contacts.find(c => c.number === number);
     const incomingCall = {
       number,
       contactName: contact?.name,
@@ -83,6 +80,32 @@ export const useCallManagement = ({
       }, 2000);
     }
   }, [contacts, autoAnswerEnabled, agents, acceptCall]);
+
+  const startAiCall = useCallback((number: string, agentId: string) => {
+    const contact = contacts.find(c => c.number === number);
+    const newCall = {
+      number,
+      contactName: contact?.name,
+      status: 'active' as const,
+      agentId,
+      isMinimized: false
+    };
+    setActiveCall(newCall);
+    startTimer();
+  }, [contacts]);
+
+  const startManualCall = useCallback((number: string) => {
+    const contact = contacts.find(c => c.number === number);
+    const newCall = {
+      number,
+      contactName: contact?.name,
+      status: 'active' as const,
+      agentId: undefined,
+      isMinimized: false
+    };
+    setActiveCall(newCall);
+    startTimer();
+  }, [contacts]);
 
   const minimizeCall = useCallback(() => {
     if (activeCall) {
@@ -133,6 +156,8 @@ export const useCallManagement = ({
     minimizeCall,
     maximizeCall,
     startIncomingCall,
+    startAiCall,
+    startManualCall,
     forwardCall,
     interveneInCall,
   };

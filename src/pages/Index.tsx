@@ -1,3 +1,4 @@
+
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -14,7 +15,7 @@ const Index = () => {
   const {
     activeTab,
     setActiveTab,
-    callState,
+    activeCall,
     showAgentSelector,
     selectedCall,
     agents,
@@ -25,19 +26,18 @@ const Index = () => {
     handleAgentToggle,
     handleUpdateAgentName,
     handleAcceptCallWithAI,
-    handleAcceptCallManually,
-    handleEndCall,
-    handleIntervene,
+    acceptCallManually,
+    endCall,
+    interveneInCall,
     handleScheduleCall,
     setShowAgentSelector,
     setSelectedCall,
     handleStartCallManually,
-    isUiForwarding,
-    handleForward,
-    // New state
+    isForwarding,
+    forwardCall,
     isCallMinimized,
     setIsCallMinimized,
-    callDuration,
+    duration,
     // Settings
     autoAnswerEnabled,
     workingHoursStart,
@@ -73,11 +73,11 @@ const Index = () => {
     ? contacts.find(c => c.number === showAgentSelector)?.name
     : undefined;
   
-  const activeCallContactName = callState?.number
-    ? contacts.find(c => c.number === callState.number)?.name
+  const activeCallContactName = activeCall?.number
+    ? contacts.find(c => c.number === activeCall.number)?.name
     : undefined;
   
-  const activeCallAgent = callState?.agentId ? agents.find(a => a.id === callState.agentId) : undefined;
+  const activeCallAgent = activeCall?.agentId ? agents.find(a => a.id === activeCall.agentId) : undefined;
 
   const renderContent = () => {
     switch (activeTab) {
@@ -123,7 +123,7 @@ const Index = () => {
         return <Dialpad 
           onCall={handleStartCall}
           onCallManually={handleStartCallManually}
-          onSchedule={handleStartCall}
+          onSchedule={handleScheduleCall}
         />;
     }
   };
@@ -156,30 +156,30 @@ const Index = () => {
         />
       )}
 
-      {callState && !isCallMinimized && (
+      {activeCall && !isCallMinimized && (
         <ActiveCallView 
-            {...callState} 
-            duration={callDuration}
+            {...activeCall} 
+            duration={duration}
             agents={agents}
             contactName={activeCallContactName}
-            onEndCall={handleEndCall}
+            onEndCall={endCall}
             onAcceptCall={handleAcceptCallWithAI}
-            onAcceptCallManually={handleAcceptCallManually}
-            onForward={handleForward}
-            onIntervene={handleIntervene}
-            isForwarding={isUiForwarding}
+            onAcceptCallManually={acceptCallManually}
+            onForward={forwardCall}
+            onIntervene={interveneInCall}
+            isForwarding={isForwarding}
             onMinimize={() => setIsCallMinimized(true)}
         />
       )}
       
-      {callState && isCallMinimized && (
+      {activeCall && isCallMinimized && (
         <CallWidget
-          callState={callState}
+          callState={activeCall}
           contactName={activeCallContactName}
           agent={activeCallAgent}
-          duration={callDuration}
+          duration={duration}
           onMaximize={() => setIsCallMinimized(false)}
-          onEndCall={handleEndCall}
+          onEndCall={endCall}
         />
       )}
 
