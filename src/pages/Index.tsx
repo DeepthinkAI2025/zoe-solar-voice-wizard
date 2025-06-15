@@ -10,6 +10,7 @@ import { callHistory } from '@/data/mock';
 import AppHeader from '@/components/AppHeader';
 import AppContent from '@/components/AppContent';
 import { AnimatePresence, motion } from 'framer-motion';
+import AppSwitcher from '@/components/AppSwitcher';
 
 const Index = () => {
   const phoneState = usePhoneState();
@@ -39,6 +40,7 @@ const Index = () => {
         activeTab={phoneState.activeTab}
         onSwitchApp={phoneState.switchApp}
       />
+      <AppSwitcher onClick={phoneState.switchApp} activeApp={phoneState.activeApp} />
       <main className="flex-grow flex flex-col overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
