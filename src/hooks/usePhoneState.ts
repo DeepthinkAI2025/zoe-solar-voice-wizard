@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useSettings } from './useSettings';
 import { useAgentManagement } from './useAgentManagement';
@@ -11,6 +10,7 @@ export const usePhoneState = () => {
   const [contactToEditId, setContactToEditId] = useState<string | null>(null);
   const [agentSelectorState, setAgentSelectorState] = useState<{ number: string; context?: string } | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
+  const [agentToFocusInSettings, setAgentToFocusInSettings] = useState<string | null>(null);
   
   const settings = useSettings();
   const agentManagement = useAgentManagement();
@@ -58,6 +58,16 @@ export const usePhoneState = () => {
     }
   }, [agentSelectorState, callManagement]);
 
+  const handleUpdateAgentName = (agentId: string, newName: string) => {
+    if (newName === '___EDIT_AGENT_IN_SETTINGS___') {
+        setAgentToFocusInSettings(agentId);
+        setActiveTab('settings');
+        closeAgentSelector();
+    } else {
+        agentManagement.handleUpdateAgentName(agentId, newName);
+    }
+  };
+
   const handleStartCallManually = useCallback((number: string) => {
       callManagement.startManualCall(number);
   }, [callManagement]);
@@ -95,5 +105,8 @@ export const usePhoneState = () => {
     handleStartCallManually,
     handleAcceptCallWithAI,
     handleScheduleCall,
+    handleUpdateAgentName, // Override
+    agentToFocusInSettings,
+    setAgentToFocusInSettings,
   };
 };

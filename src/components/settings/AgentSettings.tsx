@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -23,6 +22,8 @@ interface AgentSettingsProps {
   onGlobalSystemInstructionsChange: (instructions: string) => void;
   onUpdateAgentDetails: (agentId: string, details: Partial<Omit<AgentWithSettings, 'id' | 'icon' | 'active'>>) => void;
   onStartVoiceClone: (agentId: string) => void;
+  openAgentIds: string[];
+  onOpenAgentIdsChange: (ids: string[]) => void;
 }
 
 export const AgentSettings: React.FC<AgentSettingsProps> = ({
@@ -34,6 +35,8 @@ export const AgentSettings: React.FC<AgentSettingsProps> = ({
   onGlobalSystemInstructionsChange,
   onUpdateAgentDetails,
   onStartVoiceClone,
+  openAgentIds,
+  onOpenAgentIdsChange,
 }) => {
   return (
     <div className="space-y-4 p-4 bg-secondary rounded-lg">
@@ -65,7 +68,12 @@ export const AgentSettings: React.FC<AgentSettingsProps> = ({
       </div>
 
       <div className="pt-4 border-t border-border mt-4">
-        <Accordion type="multiple" className="w-full space-y-4">
+        <Accordion 
+            type="multiple" 
+            className="w-full space-y-4"
+            value={openAgentIds}
+            onValueChange={onOpenAgentIdsChange}
+        >
           {agents.map((agent) => (
             <AccordionItem value={agent.id} key={agent.id} className={cn(
               "border-none rounded-lg transition-all duration-300",

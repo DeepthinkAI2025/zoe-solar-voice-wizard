@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
@@ -27,8 +26,6 @@ interface AgentSelectorProps {
 const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, contactName, agents, onToggleAgent, onUpdateAgentName, isVmActive, onToggleVm, onScheduleCall, context }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
-  const [editingAgentId, setEditingAgentId] = useState<string | null>(null);
-  const [editingName, setEditingName] = useState('');
   const [isScheduling, setIsScheduling] = useState(false);
 
   useEffect(() => {
@@ -63,13 +60,6 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
     if (selectedAgentId) {
       onScheduleCall(selectedAgentId, notes, date);
     }
-  };
-
-  const handleNameUpdate = () => {
-    if (editingAgentId && editingName.trim()) {
-      onUpdateAgentName(editingAgentId, editingName.trim());
-    }
-    setEditingAgentId(null);
   };
 
   return (
@@ -138,36 +128,20 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
                   <Icon name={agent.icon} size={20} className="text-primary" />
               </div>
               <div className="flex-grow">
-                {editingAgentId === agent.id ? (
-                    <Input
-                        value={editingName}
-                        onChange={(e) => setEditingName(e.target.value)}
-                        onBlur={handleNameUpdate}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') handleNameUpdate();
-                            if (e.key === 'Escape') setEditingAgentId(null);
+                <div className="flex items-center gap-2">
+                    <p className="font-semibold text-white">{agent.name}</p>
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onUpdateAgentName(agent.id, '___EDIT_AGENT_IN_SETTINGS___');
                         }}
-                        className="bg-white/10 border-primary h-8 text-white w-full"
-                        autoFocus
-                        onClick={(e) => e.stopPropagation()}
-                    />
-                ) : (
-                    <div className="flex items-center gap-2">
-                        <p className="font-semibold text-white">{agent.name}</p>
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingAgentId(agent.id);
-                                setEditingName(agent.name);
-                            }}
-                            className="text-muted-foreground hover:text-white"
-                            aria-label={`Namen von ${agent.name} bearbeiten`}
-                            disabled={!agent.active}
-                        >
-                            <Pencil size={14} />
-                        </button>
-                    </div>
-                )}
+                        className="text-muted-foreground hover:text-white"
+                        aria-label={`Einstellungen für ${agent.name} bearbeiten`}
+                        disabled={!agent.active}
+                    >
+                        <Pencil size={14} />
+                    </button>
+                </div>
                 <p className="text-sm text-muted-foreground mt-1">({agent.purpose})</p>
               </div>
             </div>

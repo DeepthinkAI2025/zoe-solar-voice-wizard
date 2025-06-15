@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 import { VoiceCloneDialog } from '@/components/VoiceCloneDialog';
 import { AppearanceSettings } from '../settings/AppearanceSettings';
@@ -25,13 +25,24 @@ interface SettingsScreenProps {
   globalSystemInstructions: string;
   onGlobalSystemInstructionsChange: (instructions: string) => void;
   onUpdateAgentDetails: (agentId: string, details: Partial<Omit<AgentWithSettings, 'id' | 'icon' | 'active'>>) => void;
+  agentToFocusInSettings: string | null;
+  setAgentToFocusInSettings: (id: string | null) => void;
 }
 
 
 const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
   const [cloningAgentId, setCloningAgentId] = useState<string | null>(null);
+  const [openAgentIds, setOpenAgentIds] = useState<string[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (props.agentToFocusInSettings) {
+      setOpenAgentIds([props.agentToFocusInSettings]);
+      props.setAgentToFocusInSettings(null);
+      // Optional: Scroll into view logic could be added here
+    }
+  }, [props.agentToFocusInSettings, props.setAgentToFocusInSettings]);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
@@ -102,6 +113,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
         onGlobalSystemInstructionsChange={props.onGlobalSystemInstructionsChange}
         onUpdateAgentDetails={props.onUpdateAgentDetails}
         onStartVoiceClone={setCloningAgentId}
+        openAgentIds={openAgentIds}
+        onOpenAgentIdsChange={setOpenAgentIds}
       />
 
       {cloningAgentId && (
