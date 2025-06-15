@@ -1,3 +1,4 @@
+
 import { Phone, Delete, Bot, Calendar } from 'lucide-react';
 import React, { useState, useRef } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -79,7 +80,7 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
   };
 
   return (
-    <div className="flex flex-col h-full justify-between p-4 sm:p-6">
+    <div className="flex flex-col h-full justify-start gap-10 p-4 sm:p-6">
       <div className="h-28 flex items-center justify-center relative" onClick={handleDisplayClick}>
         <input
           ref={inputRef}
