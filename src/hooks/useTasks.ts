@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 
 export type Task = {
@@ -17,7 +17,24 @@ const initialTasks: Task[] = [
 ];
 
 export const useTasks = () => {
-    const [taskList, setTaskList] = useState(initialTasks);
+    const [taskList, setTaskList] = useState<Task[]>(() => {
+        try {
+            const savedTasks = localStorage.getItem('tasks');
+            return savedTasks ? JSON.parse(savedTasks) : initialTasks;
+        } catch (error) {
+            console.error("Konnte Aufgaben nicht aus dem Local Storage laden:", error);
+            return initialTasks;
+        }
+    });
+    
+    useEffect(() => {
+        try {
+            localStorage.setItem('tasks', JSON.stringify(taskList));
+        } catch (error) {
+            console.error("Konnte Aufgaben nicht im Local Storage speichern:", error);
+        }
+    }, [taskList]);
+
     const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
 
