@@ -57,10 +57,10 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
 
   const getFontSizeClass = () => {
     const length = number.length;
-    if (length > 18) return 'text-2xl';
-    if (length > 14) return 'text-3xl';
-    if (length > 10) return 'text-4xl';
-    return 'text-5xl';
+    if (length > 18) return 'text-xl';
+    if (length > 14) return 'text-2xl';
+    if (length > 10) return 'text-3xl';
+    return 'text-4xl';
   };
 
   const dialpadVariants = {
@@ -88,7 +88,7 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
           value={number}
           onChange={handleInputChange}
           placeholder="Nummer eingeben"
-          className={`w-full bg-transparent text-center tracking-wider text-foreground focus:outline-none placeholder:text-muted-foreground pr-12 transition-all duration-200 ${getFontSizeClass()} placeholder:text-3xl`}
+          className={`w-full bg-transparent text-center tracking-wider text-foreground focus:outline-none placeholder:text-muted-foreground pr-12 transition-all duration-200 ${getFontSizeClass()} placeholder:text-2xl`}
         />
         {number && (
           <motion.button 
