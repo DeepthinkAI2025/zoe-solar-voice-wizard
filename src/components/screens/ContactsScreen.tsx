@@ -157,10 +157,10 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
                 </div>
 
                   <div className="flex flex-col gap-0 flex-shrink-0 -my-1">
-                    <Button variant="ghost" size="icon" className="w-9 h-9" disabled={!canCallback} onClick={(e) => { e.stopPropagation(); onStartCallManually(numberToUse); }}>
+                    <Button variant="ghost" size="icon" className="w-9 h-9 rounded-full" disabled={!canCallback} onClick={(e) => { e.stopPropagation(); onStartCallManually(numberToUse); }}>
                       <Phone size={16} />
                     </Button>
-                    <Button variant="ghost" size="icon" className="w-9 h-9" disabled={!canCallback} onClick={(e) => { 
+                    <Button variant="ghost" size="icon" className="w-9 h-9 rounded-full" disabled={!canCallback} onClick={(e) => { 
                         e.stopPropagation();
                         if (call.type === 'Verpasst') {
                           onStartCall(numberToUse, 'missed-call-callback');
