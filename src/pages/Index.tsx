@@ -1,3 +1,4 @@
+
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import AgentSelector from '@/components/AgentSelector';
@@ -8,7 +9,6 @@ import { usePhoneState } from '@/hooks/usePhoneState';
 import { callHistory } from '@/data/mock';
 import AppHeader from '@/components/AppHeader';
 import AppContent from '@/components/AppContent';
-import AppSwitcher from '@/components/AppSwitcher';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const Index = () => {
@@ -34,9 +34,11 @@ const Index = () => {
 
   return (
     <div ref={containerRef} className="h-screen w-full max-w-md mx-auto bg-background flex flex-col relative rounded-3xl border-4 border-border shadow-2xl shadow-primary/20 overflow-hidden">
-      <AppHeader />
-      <AppSwitcher onClick={phoneState.switchApp} activeApp={phoneState.activeApp} />
-
+      <AppHeader
+        activeApp={phoneState.activeApp}
+        activeTab={phoneState.activeTab}
+        onSwitchApp={phoneState.switchApp}
+      />
       <main className="flex-grow flex flex-col overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div

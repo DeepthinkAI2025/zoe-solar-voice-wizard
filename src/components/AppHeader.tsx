@@ -1,15 +1,34 @@
 
 import React from 'react';
+import type { NavItemId } from '@/hooks/usePhoneState';
+import AppSwitcher from './AppSwitcher';
 
-const AppHeader: React.FC = () => {
+const navItemLabels: Record<NavItemId, string> = {
+    'dialpad': 'Wähltastatur',
+    'history': 'Anrufliste',
+    'settings': 'Einstellungen',
+    'termine': 'Termine',
+    'aufgaben': 'Aufgaben',
+    'produkte': 'Produkte',
+    'ki-chat': 'KI-Chat',
+};
+
+interface AppHeaderProps {
+  activeApp: 'phone' | 'craftsman';
+  activeTab: NavItemId;
+  onSwitchApp: () => void;
+}
+
+const AppHeader: React.FC<AppHeaderProps> = ({ activeApp, activeTab, onSwitchApp }) => {
+  const title = navItemLabels[activeTab];
+
   return (
     <header className="flex-shrink-0 py-4 px-6 flex justify-between items-center">
       <img src="/lovable-uploads/5cbdb31b-130f-40f1-9ead-f812366683b2.png" alt="Zoe Logo" className="h-4" />
-      <img 
-        src="/lovable-uploads/526a4663-c366-4462-a3e2-2713130c98ff.png" 
-        alt="Fapro Logo" 
-        className="h-6"
-      />
+      <h1 className="text-lg font-semibold text-foreground">{title}</h1>
+      <div className="transform scale-90">
+        <AppSwitcher onClick={onSwitchApp} activeApp={activeApp} />
+      </div>
     </header>
   );
 };
