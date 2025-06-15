@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import CallScreen from '@/components/CallScreen';
 import { User, Phone, Bot, Search, PhoneMissed, PhoneOutgoing } from 'lucide-react';
@@ -119,6 +118,7 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
            const contact = contacts.find(c => c.number === call.number);
            const displayName = (call.name === 'Unbekannter Anrufer' || call.name === 'Unbekannt') && call.number !== 'Unbekannt' ? call.number : call.name;
            const isKnownContact = !!contact;
+           const canCallback = call.number !== 'Unbekannt';
 
            return (
              <div key={i} className="text-left p-3 rounded-lg bg-transparent transition-colors hover:bg-muted cursor-pointer" onClick={() => onCallSelect(call)}>
@@ -150,12 +150,11 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
                     )}
                 </div>
 
-                {call.number !== 'Unbekannt' && (
                   <div className="flex flex-col gap-0 flex-shrink-0 -my-1">
-                    <Button variant="ghost" size="icon" className="w-9 h-9" onClick={(e) => { e.stopPropagation(); onStartCallManually(call.number); }}>
+                    <Button variant="ghost" size="icon" className="w-9 h-9" disabled={!canCallback} onClick={(e) => { e.stopPropagation(); onStartCallManually(call.number); }}>
                       <Phone size={16} />
                     </Button>
-                    <Button variant="ghost" size="icon" className="w-9 h-9" onClick={(e) => { 
+                    <Button variant="ghost" size="icon" className="w-9 h-9" disabled={!canCallback} onClick={(e) => { 
                         e.stopPropagation();
                         if (call.type === 'Verpasst') {
                           onStartCall(call.number, 'missed-call-callback');
@@ -166,7 +165,6 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
                       <Bot size={16} />
                     </Button>
                   </div>
-                )}
               </div>
             </div>
            );

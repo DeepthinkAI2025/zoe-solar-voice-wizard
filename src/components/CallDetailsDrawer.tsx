@@ -33,16 +33,17 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
   if (!call) return null;
 
   const displayName = (call.name === 'Unbekannter Anrufer' || call.name === 'Unbekannt') && call.number && call.number !== 'Unbekannt' ? call.number : call.name;
+  const canCallback = call.number && call.number !== 'Unbekannt';
 
   const handleCallback = () => {
-    if (call?.number) {
+    if (canCallback && call.number) {
       onClose();
       onStartCallManually(call.number);
     }
   };
 
   const handleAiCallback = () => {
-    if (call?.number) {
+    if (canCallback && call.number) {
       onClose();
       onStartCall(call.number);
     }
@@ -58,8 +59,6 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
       return !prev;
     });
   };
-
-  const shouldShowCallbackButtons = call.number && call.number !== 'Unbekannt';
 
   return (
     <Drawer open={!!call} onOpenChange={(open) => {
@@ -116,18 +115,16 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
           )}
         </div>
         <DrawerFooter>
-          {shouldShowCallbackButtons && (
             <div className="grid grid-cols-2 gap-2 mb-2">
-              <Button variant="outline" className="w-full" onClick={handleCallback}>
+              <Button variant="outline" className="w-full" onClick={handleCallback} disabled={!canCallback}>
                 <Phone size={16} className="mr-2" />
                 Zurückrufen
               </Button>
-              <Button variant="outline" className="w-full" onClick={handleAiCallback}>
+              <Button variant="outline" className="w-full" onClick={handleAiCallback} disabled={!canCallback}>
                 <Bot size={16} className="mr-2" />
                 KI ruft zurück
               </Button>
             </div>
-          )}
           <DrawerClose asChild>
             <Button variant="outline" className="w-full">Schließen</Button>
           </DrawerClose>
