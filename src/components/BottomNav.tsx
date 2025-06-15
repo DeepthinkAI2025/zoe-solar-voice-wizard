@@ -19,7 +19,7 @@ const navItems = [
 const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, className }) => {
   return (
     <nav className={cn(
-      "relative flex justify-around items-center p-2 mx-auto mb-4 w-full max-w-sm rounded-3xl z-10",
+      "relative flex justify-around items-center p-2 mx-auto mb-4 w-11/12 max-w-sm rounded-3xl z-10",
       "backdrop-blur-xl dark:bg-black/30 bg-secondary/80",
       "border dark:border-white/10",
       "shadow-lg dark:shadow-2xl dark:shadow-black/20",
