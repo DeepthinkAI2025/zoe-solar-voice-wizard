@@ -38,9 +38,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
 
   useEffect(() => {
     if (props.agentToFocusInSettings) {
-      setOpenAgentIds([props.agentToFocusInSettings]);
-      props.setAgentToFocusInSettings(null);
-      // Optional: Scroll into view logic could be added here
+      const agentId = props.agentToFocusInSettings;
+      setOpenAgentIds([agentId]);
+
+      // Scroll to the agent card after a short delay to allow the UI to update
+      setTimeout(() => {
+        const element = document.getElementById(`agent-settings-${agentId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        // Reset the focus trigger after attempting to scroll
+        props.setAgentToFocusInSettings(null);
+      }, 300); // This delay should be enough for the accordion animation to complete
     }
   }, [props.agentToFocusInSettings, props.setAgentToFocusInSettings]);
 
