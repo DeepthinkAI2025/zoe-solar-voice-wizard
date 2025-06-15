@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import AiChatAnimation from '@/components/craftsman/AiChatAnimation';
 import { Input } from '@/components/ui/input';
@@ -213,7 +214,7 @@ const AiChatScreen = () => {
             </SelectTrigger>
             <SelectContent>
                 <SelectItem value="gemini">Gemini</SelectItem>
-                <SelectItem value="grok">Groq</SelectItem>
+                <SelectItem value="deepseek">DeepSeek</SelectItem>
                 <SelectItem value="openrouter">OpenRouter</SelectItem>
             </SelectContent>
         </Select>
@@ -225,7 +226,6 @@ const AiChatScreen = () => {
           <Send className="h-4 w-4" />
         </Button>
       </div>
-
       <AlertDialog open={isApiKeyModalOpen} onOpenChange={setIsApiKeyModalOpen}>
         <AlertDialogContent>
             <AlertDialogHeader>
@@ -242,12 +242,13 @@ const AiChatScreen = () => {
               gemini: e.target.value
             }))} type="password" />
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="grok-key">Groq</Label>
-                    <Input id="grok-key" placeholder="API-Schlüssel hier einfügen" value={tempApiKeys.grok} onChange={e => setTempApiKeys(k => ({
+                <div className="space-y-2">
+                    <Label htmlFor="deepseek-key">DeepSeek (OpenRouter)</Label>
+                    <Input id="deepseek-key" placeholder="API-Schlüssel hier einfügen" value={tempApiKeys.deepseek} onChange={e => setTempApiKeys(k => ({
               ...k,
-              grok: e.target.value
+              deepseek: e.target.value
             }))} type="password" />
+                    <div className="text-xs text-muted-foreground">Alternativ funktioniert auch der OpenRouter Schlüssel.</div>
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="openrouter-key">OpenRouter</Label>

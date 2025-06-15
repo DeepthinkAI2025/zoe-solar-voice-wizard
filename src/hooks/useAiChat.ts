@@ -1,12 +1,13 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { manufacturers, Product } from '@/data/products';
 
-export type AiProvider = 'gemini' | 'grok' | 'openrouter';
+export type AiProvider = 'gemini' | 'deepseek' | 'openrouter';
 
 export interface ApiKeys {
     gemini: string;
-    grok: string;
+    deepseek: string;
     openrouter: string;
 }
 
@@ -25,13 +26,13 @@ const senderToOpenAiRole = (sender: 'user' | 'ai'): 'user' | 'assistant' => {
 };
 
 export const useAiChat = () => {
-    const [apiKeys, setApiKeys] = useState<ApiKeys>({ gemini: '', grok: '', openrouter: '' });
+    const [apiKeys, setApiKeys] = useState<ApiKeys>({ gemini: '', deepseek: '', openrouter: '' });
     const { toast } = useToast();
 
     useEffect(() => {
         const storedKeys: ApiKeys = {
             gemini: localStorage.getItem('google_ai_api_key') || '',
-            grok: localStorage.getItem('grok_api_key') || '',
+            deepseek: localStorage.getItem('deepseek_api_key') || '',
             openrouter: localStorage.getItem('openrouter_api_key') || '',
         };
         setApiKeys(storedKeys);
@@ -40,7 +41,7 @@ export const useAiChat = () => {
     const saveApiKeys = (keys: Partial<ApiKeys>) => {
         const newKeys = { ...apiKeys, ...keys };
         if (keys.gemini !== undefined) localStorage.setItem('google_ai_api_key', keys.gemini);
-        if (keys.grok !== undefined) localStorage.setItem('grok_api_key', keys.grok);
+        if (keys.deepseek !== undefined) localStorage.setItem('deepseek_api_key', keys.deepseek);
         if (keys.openrouter !== undefined) localStorage.setItem('openrouter_api_key', keys.openrouter);
         
         setApiKeys(newKeys);
@@ -78,7 +79,9 @@ export const useAiChat = () => {
     };
 
     const getAiResponse = useCallback(async (messages: Message[], provider: AiProvider): Promise<string | null> => {
-        const apiKey = apiKeys[provider];
+        const apiKey = 
+            provider === 'deepseek' ? apiKeys.deepseek || apiKeys.openrouter : apiKeys[provider]; // deepseek kann auch openrouter key nehmen, fallback
+        
         if (!apiKey) {
             toast({
                 title: 'API-Schlüssel fehlt',
@@ -131,7 +134,7 @@ export const useAiChat = () => {
                         const functionArgs = functionCall.args || {};
                         console.log(`Gemini is calling function "${functionName}" with args:`, functionArgs);
                         const functionResponse = functionToCall(functionArgs.query);
-                        
+
                         const newContents = [
                             ...apiMessages,
                             { role: 'model' as const, parts: [part] },
@@ -157,7 +160,43 @@ export const useAiChat = () => {
                 }
                 return data.candidates[0].content.parts[0].text;
 
-            } else { // Groq and OpenRouter (OpenAI-compatible)
+            } else if (provider === 'deepseek') {
+                // DeepSeek via OpenRouter
+                let apiMessages = messages.map(msg => ({ role: senderToOpenAiRole(msg.sender), content: msg.text }));
+                const url = 'https://openrouter.ai/api/v1/chat/completions';
+                const model = 'deepseek/deepseek-r1-0528:free';
+
+                // OpenRouter erfordert "Referer" und "X-Title" optional
+                response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': window.location.origin,
+                        'X-Title': 'ZOE Solar Chat'
+                    },
+                    body: JSON.stringify({
+                        model,
+                        messages: [{ role: 'system', content: systemPrompt }, ...apiMessages.slice(-10)],
+                        temperature: 0.7,
+                    }),
+                });
+
+                let data = await response.json();
+                if (!response.ok) {
+                    console.error('DeepSeek API error:', data);
+                    const errorMessage = data.error?.message || 'Unbekannter API Fehler';
+                    throw new Error(errorMessage);
+                }
+
+                return data.choices?.[0]?.message?.content;
+
+            } else if (provider === 'openrouter') {
+                // OpenRouter with a freely selectable model (alt: "mistralai/mistral-7b-instruct" etc.)
+                let apiMessages = messages.map(msg => ({ role: senderToOpenAiRole(msg.sender), content: msg.text }));
+                const url = 'https://openrouter.ai/api/v1/chat/completions';
+                const model = 'mistralai/mistral-7b-instruct';
+
                 const openAiTools = [{
                     type: 'function' as const,
                     function: {
@@ -166,18 +205,7 @@ export const useAiChat = () => {
                         parameters: { type: 'object', properties: { query: { type: 'string', description: 'Der Suchbegriff, z.B. "ecoTEC" oder "Buderus".' } } },
                     },
                 }];
-                
-                let apiMessages = messages.map(msg => ({ role: senderToOpenAiRole(msg.sender), content: msg.text }));
-                
-                let url = '', model = '';
-                if (provider === 'grok') {
-                    url = 'https://api.groq.com/openai/v1/chat/completions';
-                    model = 'llama3-8b-8192';
-                } else if (provider === 'openrouter') {
-                    url = 'https://openrouter.ai/api/v1/chat/completions';
-                    model = 'mistralai/mistral-7b-instruct';
-                }
-                
+
                 let body = {
                     model,
                     messages: [ { role: 'system', content: systemPrompt }, ...apiMessages.slice(-10) ],
@@ -191,11 +219,11 @@ export const useAiChat = () => {
                     headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(body),
                 });
-                
+
                 let data = await response.json();
 
                 if (!response.ok) {
-                    console.error(`${provider} API error:`, data);
+                    console.error(`openrouter API error:`, data);
                     const errorMessage = data.error?.message || 'Unbekannter API Fehler';
                     throw new Error(errorMessage);
                 }
@@ -232,8 +260,8 @@ export const useAiChat = () => {
                     });
                     data = await response.json();
 
-                     if (!response.ok) {
-                        console.error(`${provider} API error (after tool call):`, data);
+                    if (!response.ok) {
+                        console.error(`openrouter API error (after tool call):`, data);
                         throw new Error(data.error?.message || 'Unbekannter API Fehler nach Tool-Aufruf');
                     }
                 }
@@ -252,7 +280,7 @@ export const useAiChat = () => {
         }
     }, [apiKeys, toast, searchProducts]);
 
-    const hasApiKey = (provider: AiProvider) => !!apiKeys[provider];
+    const hasApiKey = (provider: AiProvider) => !!apiKeys[provider] || (provider === 'deepseek' && !!apiKeys.openrouter);
 
     return {
         apiKeys,
