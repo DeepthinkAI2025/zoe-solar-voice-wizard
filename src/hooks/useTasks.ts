@@ -1,19 +1,28 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
+
+export type Subtask = {
+    id: number;
+    text: string;
+    completed: boolean;
+};
 
 export type Task = {
     id: number;
     text: string;
     priority: 'high' | 'medium' | 'low';
     completed: boolean;
+    subtasks?: Subtask[];
 };
 
 const initialTasks: Task[] = [
-    { id: 1, text: 'Material für Baustelle "Musterfrau" bestellen', priority: 'high', completed: false },
-    { id: 2, text: 'Angebot für "John Doe" erstellen', priority: 'medium', completed: false },
-    { id: 3, text: 'Rechnung für "Peter Pan" schreiben', priority: 'low', completed: true },
-    { id: 4, text: 'Werkzeug warten', priority: 'medium', completed: false },
+    { id: 1, text: 'Material für Baustelle "Musterfrau" bestellen', priority: 'high', completed: false, subtasks: [
+        { id: 101, text: 'Holzbalken 10x10cm', completed: false },
+        { id: 102, text: 'Schrauben 5x50mm', completed: true },
+    ] },
+    { id: 2, text: 'Angebot für "John Doe" erstellen', priority: 'medium', completed: false, subtasks: [] },
+    { id: 3, text: 'Rechnung für "Peter Pan" schreiben', priority: 'low', completed: true, subtasks: [] },
+    { id: 4, text: 'Werkzeug warten', priority: 'medium', completed: false, subtasks: [] },
 ];
 
 export const useTasks = () => {
@@ -68,6 +77,7 @@ export const useTasks = () => {
             text: text.trim(),
             priority: priority,
             completed: false,
+            subtasks: [],
         };
         setTaskList(prevTasks => [newTask, ...prevTasks]);
         setIsNewTaskDialogOpen(false);
@@ -100,6 +110,74 @@ export const useTasks = () => {
             });
         }
     };
+
+    const handleAddSubtask = (taskId: number, text: string) => {
+        if (!text.trim()) return;
+        const newSubtask: Subtask = {
+            id: Date.now(),
+            text: text.trim(),
+            completed: false,
+        };
+        setTaskList(prevTasks => prevTasks.map(task => 
+            task.id === taskId 
+            ? { ...task, subtasks: [...(task.subtasks || []), newSubtask] } 
+            : task
+        ));
+        toast({
+            title: "Unteraufgabe hinzugefügt",
+            description: `"${newSubtask.text}" wurde hinzugefügt.`,
+        });
+    };
+
+    const handleToggleSubtask = (taskId: number, subtaskId: number) => {
+        let subtaskText = '';
+        let subtaskCompleted = false;
+
+        const newTaskList = taskList.map(task => {
+            if (task.id === taskId) {
+                const newSubtasks = task.subtasks?.map(st => {
+                    if (st.id === subtaskId) {
+                        subtaskText = st.text;
+                        subtaskCompleted = !st.completed;
+                        return { ...st, completed: !st.completed };
+                    }
+                    return st;
+                });
+                return { ...task, subtasks: newSubtasks };
+            }
+            return task;
+        });
+        setTaskList(newTaskList);
+
+        if (subtaskText) {
+            toast({
+                title: `Unteraufgabe ${subtaskCompleted ? 'erledigt' : 'wieder geöffnet'}`,
+                description: `"${subtaskText}" wurde aktualisiert.`,
+            });
+        }
+    };
+
+    const handleDeleteSubtask = (taskId: number, subtaskId: number) => {
+        let subtaskText = '';
+        setTaskList(prevTasks => prevTasks.map(task => {
+            if (task.id === taskId) {
+                const subtaskToDelete = task.subtasks?.find(st => st.id === subtaskId);
+                if (subtaskToDelete) {
+                    subtaskText = subtaskToDelete.text;
+                }
+                return { ...task, subtasks: task.subtasks?.filter(st => st.id !== subtaskId) };
+            }
+            return task;
+        }));
+
+        if (subtaskText) {
+            toast({
+                title: "Unteraufgabe gelöscht",
+                description: `"${subtaskText}" wurde entfernt.`,
+                variant: "destructive"
+            });
+        }
+    };
     
     const openTasks = taskList.filter(t => !t.completed);
     const completedTasks = taskList.filter(t => t.completed);
@@ -115,5 +193,8 @@ export const useTasks = () => {
         handleDeleteTask,
         confirmDeleteTask,
         cancelDeleteTask,
+        handleAddSubtask,
+        handleToggleSubtask,
+        handleDeleteSubtask,
     };
 };

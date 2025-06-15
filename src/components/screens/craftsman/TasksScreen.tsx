@@ -19,6 +19,9 @@ const TasksScreen = () => {
         handleDeleteTask,
         confirmDeleteTask,
         cancelDeleteTask,
+        handleAddSubtask,
+        handleToggleSubtask,
+        handleDeleteSubtask,
     } = useTasks();
 
     return (
@@ -43,6 +46,9 @@ const TasksScreen = () => {
                             onToggle={handleToggle}
                             onDelete={confirmDeleteTask}
                             emptyMessage="Super! Keine offenen Aufgaben."
+                            onAddSubtask={handleAddSubtask}
+                            onToggleSubtask={handleToggleSubtask}
+                            onDeleteSubtask={handleDeleteSubtask}
                         />
                     </div>
                     
@@ -54,6 +60,9 @@ const TasksScreen = () => {
                                 onToggle={handleToggle}
                                 onDelete={confirmDeleteTask}
                                 emptyMessage=""
+                                onAddSubtask={handleAddSubtask}
+                                onToggleSubtask={handleToggleSubtask}
+                                onDeleteSubtask={handleDeleteSubtask}
                             />
                         </div>
                     )}

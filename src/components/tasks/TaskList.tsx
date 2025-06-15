@@ -9,9 +9,12 @@ interface TaskListProps {
     onToggle: (id: number) => void;
     onDelete: (id: number) => void;
     emptyMessage: string;
+    onAddSubtask: (taskId: number, text: string) => void;
+    onToggleSubtask: (taskId: number, subtaskId: number) => void;
+    onDeleteSubtask: (taskId: number, subtaskId: number) => void;
 }
 
-const TaskList = ({ tasks, onToggle, onDelete, emptyMessage }: TaskListProps) => {
+const TaskList = ({ tasks, onToggle, onDelete, emptyMessage, onAddSubtask, onToggleSubtask, onDeleteSubtask }: TaskListProps) => {
     return (
         <div className="space-y-3">
             <AnimatePresence>
@@ -22,6 +25,9 @@ const TaskList = ({ tasks, onToggle, onDelete, emptyMessage }: TaskListProps) =>
                             task={task}
                             onToggle={onToggle}
                             onDelete={onDelete}
+                            onAddSubtask={onAddSubtask}
+                            onToggleSubtask={onToggleSubtask}
+                            onDeleteSubtask={onDeleteSubtask}
                         />
                     ))
                 ) : (
