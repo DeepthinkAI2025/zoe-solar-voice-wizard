@@ -21,6 +21,7 @@ interface ActiveCallViewProps {
   agents: Agent[];
   startMuted?: boolean;
   onForward?: () => void;
+  onIntervene?: () => void;
   isForwarding?: boolean;
 }
 
@@ -33,7 +34,7 @@ const mockTranscript = [
   "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen.",
 ];
 
-const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, isForwarding }) => {
+const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, onIntervene, isForwarding }) => {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isRingerMuted, setIsRingerMuted] = useState(startMuted ?? false);
@@ -138,6 +139,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
             onToggleMute={() => setIsMuted(!isMuted)}
             agentId={agentId}
             onForward={onForward}
+            onIntervene={onIntervene}
             audioOutputs={audioOutputs}
             selectedAudioDevice={selectedAudioDevice}
             onAudioOutputChange={setAudioOutput}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import type { CallHistoryItem, CallState } from '@/types/call';
@@ -95,7 +94,6 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     };
   }, [callState, toast, autoAnswerEnabled, outboundCallActive, agents, globalSystemInstructions, contacts]);
 
-
   const handleStartCall = (number: string) => {
     setShowAgentSelector(number);
   };
@@ -161,6 +159,21 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     }
   };
 
+  const handleIntervene = () => {
+    if (callState && callState.agentId) {
+      toast({
+        title: "Sie übernehmen das Gespräch",
+        description: "Der KI-Agent wurde stumm geschaltet. Sie sprechen jetzt direkt mit dem Anrufer."
+      });
+      
+      console.log("--- USER INTERVENING ---");
+      console.log("KI-Agent wird stumm geschaltet, Benutzer übernimmt das Gespräch");
+      console.log("------------------------");
+      
+      setCallState(cs => cs ? { ...cs, agentId: undefined, notes: (cs.notes ? cs.notes + "\n" : "") + "Benutzer hat eingegriffen und übernommen." } : null);
+    }
+  };
+
   const handleEndCall = () => {
     setOutboundCallActive(false);
     setCallState(null);
@@ -198,6 +211,7 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     handleAcceptCallWithAI,
     handleAcceptCallManually,
     handleEndCall,
+    handleIntervene,
     handleScheduleCall,
     handleForward,
   };

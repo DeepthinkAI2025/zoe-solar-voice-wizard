@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { PhoneOff, Mic, MicOff, Share, type LucideIcon } from 'lucide-react';
+import { PhoneOff, Mic, MicOff, Share, UserCheck, type LucideIcon } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +19,7 @@ interface ActiveCallControlsProps {
   onToggleMute: () => void;
   agentId?: string;
   onForward?: () => void;
+  onIntervene?: () => void;
   audioOutputs: AudioDevice[];
   selectedAudioDevice: AudioDevice;
   onAudioOutputChange: (id: string) => void;
@@ -30,13 +31,14 @@ const ActiveCallControls: React.FC<ActiveCallControlsProps> = ({
   onToggleMute,
   agentId,
   onForward,
+  onIntervene,
   audioOutputs,
   selectedAudioDevice,
   onAudioOutputChange,
   onEndCall,
 }) => {
   return (
-    <div className="flex w-full items-center justify-center gap-6">
+    <div className="flex w-full items-center justify-center gap-4">
       <button onClick={onToggleMute} className="flex items-center justify-center w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-foreground transition-colors">
         {isMuted ? <MicOff size={28} /> : <Mic size={28} />}
       </button>
@@ -60,6 +62,12 @@ const ActiveCallControls: React.FC<ActiveCallControlsProps> = ({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {agentId && onIntervene && (
+        <button onClick={onIntervene} className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-600/80 hover:bg-blue-600 text-white transition-colors">
+          <UserCheck size={28} />
+        </button>
+      )}
 
       {!agentId && onForward && (
         <button onClick={onForward} className="flex items-center justify-center w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-foreground transition-colors">
