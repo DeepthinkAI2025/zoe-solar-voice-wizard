@@ -48,12 +48,13 @@ export const useCallManagement = ({
   }, [setActiveCall, startTimer]);
 
   const startIncomingCall = useCallback((number: string) => {
-    if (silentModeEnabled) {
-      const currentHour = new Date().getHours();
-      if (currentHour < workingHoursStart || currentHour >= workingHoursEnd) {
-        console.log("Silent mode on: Call ignored outside of working hours.");
-        return;
-      }
+    const currentHour = new Date().getHours();
+    const isOutsideWorkingHours = currentHour < workingHoursStart || currentHour >= workingHoursEnd;
+    
+    const shouldBeMuted = silentModeEnabled && isOutsideWorkingHours;
+
+    if (shouldBeMuted) {
+      console.log("Silent mode on: Call will be muted as it's outside of working hours.");
     }
 
     const contact = contacts.find(c => c.number === number);
@@ -61,11 +62,12 @@ export const useCallManagement = ({
       number,
       contactName: contact?.name,
       status: 'incoming' as const,
-      isMinimized: false
+      isMinimized: false,
+      startMuted: shouldBeMuted,
     };
     setActiveCall(incomingCall);
 
-    if (autoAnswerEnabled) {
+    if (autoAnswerEnabled && !isOutsideWorkingHours) {
       const defaultAgent = agents.find(a => a.isDefault) || agents[0];
       if (!defaultAgent) return;
       

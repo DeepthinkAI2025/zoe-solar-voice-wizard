@@ -7,6 +7,7 @@ export type ActiveCall = {
   agentId?: string;
   status: 'incoming' | 'active';
   isMinimized: boolean;
+  startMuted?: boolean;
 };
 
 export const useCallState = () => {

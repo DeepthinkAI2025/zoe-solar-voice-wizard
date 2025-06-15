@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Phone, PhoneOff, Volume2, VolumeX } from 'lucide-react';
@@ -21,7 +22,7 @@ const IncomingCallControls: React.FC<IncomingCallControlsProps> = ({
     <div className="flex-grow flex flex-col">
       <div className="flex justify-end px-6 mb-4">
         <button onClick={onToggleRingerMute} className="flex flex-col items-center text-muted-foreground hover:text-foreground transition-colors">
-            {isRingerMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
+            {isRingerMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
             <span className="text-xs mt-1">{isRingerMuted ? 'Ton an' : 'Stumm'}</span>
         </button>
       </div>
