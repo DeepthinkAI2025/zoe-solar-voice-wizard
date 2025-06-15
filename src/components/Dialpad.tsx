@@ -46,6 +46,13 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
     if (number) onSchedule(number);
   };
 
+  const getFontSizeClass = () => {
+    const length = number.length;
+    if (length > 14) return 'text-xl';
+    if (length > 11) return 'text-2xl';
+    return 'text-3xl';
+  };
+
   return (
     <div className="flex flex-col h-full justify-between p-6">
       <div className="h-28 flex items-center justify-center relative">
@@ -54,7 +61,7 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
           value={number}
           onChange={handleInputChange}
           placeholder="Nummer eingeben"
-          className="w-full bg-transparent text-center text-3xl tracking-wider text-white focus:outline-none placeholder:text-muted-foreground pr-12"
+          className={`w-full bg-transparent text-center tracking-wider text-white focus:outline-none placeholder:text-muted-foreground pr-12 transition-all duration-200 ${getFontSizeClass()}`}
         />
         {number && (
           <button onClick={handleDelete} className="absolute right-0 p-4 text-muted-foreground hover:text-white transition-colors">
@@ -107,3 +114,4 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
 };
 
 export default Dialpad;
+
