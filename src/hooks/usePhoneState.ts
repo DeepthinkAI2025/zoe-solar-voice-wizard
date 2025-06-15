@@ -7,7 +7,7 @@ import { useContactManagement } from './useContactManagement';
 import type { CallHistoryItem } from '@/types/call';
 
 export const usePhoneState = () => {
-  const [activeTab, setActiveTab] = useState('dialpad');
+  const [activeTab, setActiveTab] = useState<'dialpad' | 'history' | 'settings'>('dialpad');
   const [contactToEditId, setContactToEditId] = useState<string | null>(null);
   const [agentSelectorState, setAgentSelectorState] = useState<{ number: string; context?: string } | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);

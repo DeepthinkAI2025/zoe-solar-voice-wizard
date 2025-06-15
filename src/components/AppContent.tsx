@@ -4,7 +4,7 @@ import Dialpad from '@/components/Dialpad';
 import ContactsScreen from '@/components/screens/ContactsScreen';
 import SettingsScreen from '@/components/screens/SettingsScreen';
 import type { CallHistoryItem } from '@/types/call';
-import type { Agent } from '@/hooks/useAgentManagement';
+import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 import type { Contact } from '@/hooks/useContactManagement';
 
 interface AppContentProps {
@@ -15,8 +15,8 @@ interface AppContentProps {
   onStartCall: (number: string, context?: string) => void;
   onStartCallManually: (number: string) => void;
   contacts: Contact[];
-  addContact: (name: string, number: string) => void;
-  updateContact: (id: string, name: string, number: string) => void;
+  addContact: (contact: Omit<Contact, 'id'>) => void;
+  updateContact: (contact: Contact) => void;
   deleteContact: (id: string) => void;
   contactToEditId: string | null;
   onEditorClose: () => void;
@@ -24,22 +24,22 @@ interface AppContentProps {
   
   // Settings props
   autoAnswerEnabled: boolean;
-  onAutoAnswerToggle: () => void;
-  workingHoursStart: string;
-  onWorkingHoursStartChange: (time: string) => void;
-  workingHoursEnd: string;
-  onWorkingHoursEndChange: (time: string) => void;
+  onAutoAnswerToggle: (enabled: boolean) => void;
+  workingHoursStart: number;
+  onWorkingHoursStartChange: (hour: number) => void;
+  workingHoursEnd: number;
+  onWorkingHoursEndChange: (hour: number) => void;
   silentModeEnabled: boolean;
-  onSilentModeToggle: () => void;
+  onSilentModeToggle: (enabled: boolean) => void;
   handleInBackground: boolean;
-  onHandleInBackgroundToggle: () => void;
-  agents: Agent[];
+  onHandleInBackgroundToggle: (enabled: boolean) => void;
+  agents: AgentWithSettings[];
   isVmActive: boolean;
-  onVmToggle: () => void;
-  onToggleAgent: (agentId: string) => void;
+  onVmToggle: (active: boolean) => void;
+  onToggleAgent: (agentId: string, active: boolean) => void;
   globalSystemInstructions: string;
   onGlobalSystemInstructionsChange: (instructions: string) => void;
-  onUpdateAgentDetails: (agentId: string, details: Partial<Agent>) => void;
+  onUpdateAgentDetails: (agentId: string, details: Partial<Omit<AgentWithSettings, 'id' | 'icon' | 'active'>>) => void;
   agentToFocusInSettings: string | null;
   setAgentToFocusInSettings: (agentId: string | null) => void;
 
