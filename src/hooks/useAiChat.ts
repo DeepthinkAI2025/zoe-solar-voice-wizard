@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { manufacturers, Product } from '@/data/products';
@@ -133,16 +132,17 @@ export const useAiChat = () => {
                         console.log(`Gemini is calling function "${functionName}" with args:`, functionArgs);
                         const functionResponse = functionToCall(functionArgs.query);
                         
-                        apiMessages.push(
-                            { role: 'model', parts: [part] },
-                            { role: 'function', parts: [{ functionResponse: { name: functionName, response: { content: functionResponse } } }] }
-                        );
+                        const newContents = [
+                            ...apiMessages,
+                            { role: 'model' as const, parts: [part] },
+                            { role: 'function' as const, parts: [{ functionResponse: { name: functionName, response: { content: functionResponse } } }] }
+                        ];
 
                         response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                contents: apiMessages.slice(-10),
+                                contents: newContents.slice(-10),
                                 systemInstruction: { parts: [{ text: systemPrompt }] },
                                 generationConfig: { temperature: 0.7 },
                             }),
@@ -202,7 +202,7 @@ export const useAiChat = () => {
 
                 const messageFromApi = data.choices?.[0]?.message;
                 if (messageFromApi?.tool_calls) {
-                    apiMessages.push(messageFromApi);
+                    const newApiMessages = [...apiMessages, messageFromApi];
 
                     for (const toolCall of messageFromApi.tool_calls) {
                         const functionName = toolCall.function.name as keyof typeof availableTools;
@@ -211,15 +211,15 @@ export const useAiChat = () => {
                             const functionArgs = JSON.parse(toolCall.function.arguments);
                             console.log(`OpenAI compatible API is calling function "${functionName}" with args:`, functionArgs);
                             const functionResponse = functionToCall(functionArgs.query);
-                            apiMessages.push({
+                            newApiMessages.push({
                                 tool_call_id: toolCall.id,
                                 role: 'tool',
                                 content: functionResponse,
-                            });
+                            } as any);
                         }
                     }
 
-                    body.messages = [ { role: 'system', content: systemPrompt }, ...apiMessages.slice(-10) ];
+                    body.messages = [ { role: 'system', content: systemPrompt }, ...newApiMessages.slice(-10) ];
                     // @ts-ignore
                     delete body.tools;
                     // @ts-ignore
