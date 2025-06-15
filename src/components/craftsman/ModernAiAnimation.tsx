@@ -12,7 +12,7 @@ const ModernAiAnimation = ({ isListening }: ModernAiAnimationProps) => {
       {/* Moderner pulsierender Avatar */}
       <div className="relative">
         <motion.div
-          className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 flex items-center justify-center"
+          className="w-20 h-20 rounded-lg bg-gradient-to-br from-primary via-cyan-500 to-green-400 flex items-center justify-center"
           animate={isListening ? {
             scale: [1, 1.1, 1],
             rotate: [0, 5, -5, 0]
@@ -27,7 +27,7 @@ const ModernAiAnimation = ({ isListening }: ModernAiAnimationProps) => {
         >
           {/* KI-Symbol */}
           <motion.div
-            className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center"
+            className="w-8 h-8 rounded-md bg-white/20 backdrop-blur-sm flex items-center justify-center"
             animate={{
               opacity: [0.7, 1, 0.7]
             }}
@@ -47,7 +47,7 @@ const ModernAiAnimation = ({ isListening }: ModernAiAnimationProps) => {
         {/* Listening-Indikator */}
         {isListening && (
           <motion.div
-            className="absolute -inset-2 rounded-3xl border-2 border-red-400"
+            className="absolute -inset-2 rounded-xl border-2 border-red-400"
             animate={{
               opacity: [0.3, 1, 0.3],
               scale: [1, 1.1, 1]
@@ -82,7 +82,7 @@ const ModernAiAnimation = ({ isListening }: ModernAiAnimationProps) => {
           {[...Array(5)].map((_, i) => (
             <motion.div
               key={i}
-              className="w-1 bg-blue-500 rounded-full"
+              className="w-1 bg-primary rounded-full"
               animate={{
                 height: [4, 20, 4]
               }}
