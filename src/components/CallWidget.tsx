@@ -48,8 +48,8 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
       dragConstraints={dragConstraints}
       dragMomentum={false}
       className={cn(
-        "fixed top-6 left-1/2 -translate-x-1/2 p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80",
-        isMobile ? "w-48" : "w-[90%] max-w-sm"
+        "absolute top-6 left-1/2 -translate-x-1/2 p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80",
+        "w-[calc(100%-1.5rem)]"
       )}
     >
       <div 
