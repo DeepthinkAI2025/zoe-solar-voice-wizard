@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import type { CallHistoryItem, CallState } from '@/types/call';
@@ -69,7 +68,7 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     return () => {
       clearTimeout(autoAnswerTimeout);
     };
-  }, [callState?.status, callState?.number, toast, autoAnswerEnabled, workingHoursStart, workingHoursEnd]);
+  }, [callState, toast, autoAnswerEnabled, workingHoursStart, workingHoursEnd]);
 
 
   const handleStartCall = (number: string) => {
