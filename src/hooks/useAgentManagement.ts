@@ -10,16 +10,36 @@ type AgentWithSettings = (typeof initialAgents)[0] & {
 
 export const useAgentManagement = () => {
   const [agents, setAgents] = useState<AgentWithSettings[]>(() => {
-    const agentsWithSettings = initialAgents.map(a => ({
-      ...a,
-      purpose: a.id === 'general' ? 'Zentrale' : a.id === 'tech' ? 'Techniker' : '',
-      systemInstructions: a.id === 'general'
-        ? 'Du bist der primäre Ansprechpartner für allgemeine Anfragen. Leite technische Fragen an Thomas weiter.'
-        : a.id === 'tech'
-        ? 'Du bist der technische Support für Solaranlagen. Beantworte technische Fragen detailliert und präzise. Sei kurz und informativ.'
-        : '',
-      active: a.active || false
-    }));
+    const agentsWithSettings = initialAgents.map(a => {
+      let purpose = '';
+      let systemInstructions = '';
+
+      switch (a.id) {
+        case 'general':
+          purpose = 'Zentrale';
+          systemInstructions = 'Du bist der primäre Ansprechpartner für allgemeine Anfragen. Leite technische Fragen an Thomas weiter.';
+          break;
+        case 'tech':
+          purpose = 'Techniker';
+          systemInstructions = 'Du bist der technische Support für Solaranlagen. Beantworte technische Fragen detailliert und präzise. Sei kurz und informativ.';
+          break;
+        case 'lead':
+          purpose = 'Lead-Qualifizierung';
+          systemInstructions = 'Du bist für die Qualifizierung von Neukundenanfragen zuständig. Finde heraus, ob der Anrufer an einer Solaranlage interessiert ist und sammle erste wichtige Informationen wie Name, Adresse und Anliegen.';
+          break;
+        case 'legal':
+          purpose = 'Rechtsfragen';
+          systemInstructions = 'Du bist Dr. Ziegler und beantwortest grundlegende rechtliche Fragen im Zusammenhang mit Solaranlagen. Bei komplexen Themen oder spezifischer Rechtsberatung verweise auf einen menschlichen Anwalt.';
+          break;
+      }
+
+      return {
+        ...a,
+        purpose,
+        systemInstructions,
+        active: a.active || false,
+      };
+    });
 
     const firstActiveAgent = agentsWithSettings.find(a => a.active);
     if (firstActiveAgent) {
