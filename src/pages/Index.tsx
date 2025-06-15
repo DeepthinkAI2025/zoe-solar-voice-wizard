@@ -48,6 +48,12 @@ const Index = () => {
     }
   }
 
+  const handleAcceptCallManually = () => {
+    if (callState?.status === 'incoming') {
+      setCallState({ number: callState.number, status: 'active' });
+    }
+  };
+
   const handleEndCall = () => {
     setCallState(null);
   };
@@ -125,6 +131,7 @@ const Index = () => {
             {...callState} 
             onEndCall={handleEndCall}
             onAcceptCall={handleAcceptCallWithAI}
+            onAcceptCallManually={handleAcceptCallManually}
         />
       )}
     </div>

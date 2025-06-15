@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { PhoneOff, Mic, MicOff, Volume2, Bot } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX } from 'lucide-react';
 import { aiAgents } from '@/data/mock';
 import Icon from './Icon';
 
@@ -9,6 +10,7 @@ interface ActiveCallViewProps {
   agentId?: string;
   onEndCall: () => void;
   onAcceptCall?: () => void;
+  onAcceptCallManually?: () => void;
 }
 
 const mockTranscript = [
@@ -20,7 +22,7 @@ const mockTranscript = [
   "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen.",
 ];
 
-const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, onEndCall, onAcceptCall }) => {
+const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, onEndCall, onAcceptCall, onAcceptCallManually }) => {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [transcript, setTranscript] = useState<string[]>([]);
@@ -77,14 +79,33 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
       {/* Controls */}
       <div className="flex-shrink-0">
         {status === 'incoming' ? (
-          <div className="flex justify-around items-center">
-            <button onClick={onEndCall} className="w-20 h-20 rounded-full bg-red-600/80 hover:bg-red-600 flex items-center justify-center transition-transform hover:scale-105">
-              <PhoneOff size={32} className="text-white" />
-            </button>
-            <button onClick={onAcceptCall} className="w-20 h-20 rounded-full bg-primary/80 hover:bg-primary flex items-center justify-center transition-transform hover:scale-105">
-              <Bot size={32} className="text-primary-foreground" />
-              <span className="absolute text-xs bottom-2">KI</span>
-            </button>
+          <div>
+            <div className="flex justify-end px-6 mb-4">
+              <button className="flex flex-col items-center text-muted-foreground hover:text-white transition-colors">
+                  <VolumeX size={20} />
+                  <span className="text-xs mt-1">Stumm</span>
+              </button>
+            </div>
+            <div className="flex justify-around items-center px-8">
+              <div className="flex flex-col items-center gap-2">
+                <button onClick={onEndCall} className="w-20 h-20 rounded-full bg-red-600/80 hover:bg-red-600 flex items-center justify-center transition-transform hover:scale-105">
+                  <PhoneOff size={32} className="text-white" />
+                </button>
+                <span className="text-white text-sm">Ablehnen</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <button onClick={onAcceptCallManually} className="w-20 h-20 rounded-full bg-green-500/80 hover:bg-green-500 flex items-center justify-center transition-transform hover:scale-105">
+                  <Phone size={32} className="text-white" />
+                </button>
+                <span className="text-white text-sm">Annehmen</span>
+              </div>
+            </div>
+            <div className="text-center mt-8">
+              <button onClick={onAcceptCall} className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors">
+                <Bot size={20} />
+                <span>Mit KI-Agent antworten</span>
+              </button>
+            </div>
           </div>
         ) : (
           <div className="flex justify-around items-center">
