@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { Task } from '@/hooks/useTasks';
+import type { Task } from '@/types/task';
 
 const formSchema = z.object({
   text: z.string().min(2, { message: 'Aufgabe muss mindestens 2 Zeichen lang sein.' }),

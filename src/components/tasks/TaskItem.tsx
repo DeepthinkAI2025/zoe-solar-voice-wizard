@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
 import { ChevronRight, PlusCircle, Trash2, Pencil } from 'lucide-react';
-import type { Task } from '@/hooks/useTasks';
+import type { Task } from '@/types/task';
 import { getPriorityBadgeInfo } from './utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { Input } from '../ui/input';
