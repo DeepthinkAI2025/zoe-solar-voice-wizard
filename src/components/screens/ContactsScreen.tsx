@@ -43,6 +43,11 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
     handleCloseEditor();
   };
 
+  const handleDeleteContact = (contactId: string) => {
+    deleteContact(contactId);
+    handleCloseEditor();
+  };
+
   const handleCloseEditor = () => {
     setEditingContact(null);
     setIsCreating(false);
@@ -99,13 +104,14 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
            </div>
          ))}
       </CallScreen>
-      <ContactEditor 
-        isOpen={isCreating || !!editingContact}
-        onOpenChange={(isOpen) => !isOpen && handleCloseEditor()}
-        contact={editingContact}
-        onSave={handleSaveContact}
-        onDelete={deleteContact}
-      />
+      {(isCreating || !!editingContact) && (
+        <ContactEditor 
+          contact={editingContact ?? undefined}
+          onSave={handleSaveContact}
+          onClose={handleCloseEditor}
+          onDelete={handleDeleteContact}
+        />
+      )}
     </>
   );
 };

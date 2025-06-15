@@ -18,9 +18,10 @@ interface ContactEditorProps {
   contact?: Contact;
   onSave: (contact: Contact | Omit<Contact, 'id'>) => void;
   onClose: () => void;
+  onDelete?: (contactId: string) => void;
 }
 
-export const ContactEditor: React.FC<ContactEditorProps> = ({ contact, onSave, onClose }) => {
+export const ContactEditor: React.FC<ContactEditorProps> = ({ contact, onSave, onClose, onDelete }) => {
   const [formData, setFormData] = useState<Omit<Contact, 'id'>>({
     name: contact?.name || '',
     number: contact?.number || '',
@@ -34,6 +35,12 @@ export const ContactEditor: React.FC<ContactEditorProps> = ({ contact, onSave, o
       } else {
         onSave(formData);
       }
+    }
+  };
+
+  const handleDelete = () => {
+    if (contact && onDelete) {
+      onDelete(contact.id);
     }
   };
 
@@ -79,6 +86,11 @@ export const ContactEditor: React.FC<ContactEditorProps> = ({ contact, onSave, o
         </div>
 
         <div className="mt-8 flex justify-end gap-3">
+          {contact && onDelete && (
+            <Button variant="destructive" onClick={handleDelete} className="mr-auto">
+              Löschen
+            </Button>
+          )}
           <Button variant="ghost" onClick={onClose}>Abbrechen</Button>
           <Button onClick={handleSave} disabled={!formData.name || !formData.number}>Speichern</Button>
         </div>

@@ -24,8 +24,30 @@ export type Contact = {
   category: Category;
 };
 
+const mapMockTypeToCategory = (type: string): Category => {
+  switch (type.toLowerCase()) {
+    case 'kunde':
+      return 'kunde';
+    case 'lead':
+      return 'werbung';
+    case 'behörde':
+      return 'sonstige';
+    case 'lieferant':
+      return 'händler';
+    default:
+      return 'sonstige';
+  }
+};
+
 export const useContactManagement = () => {
-  const [contacts, setContacts] = useState<Contact[]>(initialContacts.map(c => ({...c, category: c.category || 'kunde' })));
+  const [contacts, setContacts] = useState<Contact[]>(
+    initialContacts.map((c, index) => ({
+      id: `contact-mock-${index}`,
+      name: c.name,
+      number: c.number,
+      category: mapMockTypeToCategory(c.type),
+    }))
+  );
   const { toast } = useToast();
 
   const addContact = (newContact: Omit<Contact, 'id'>) => {
@@ -59,4 +81,3 @@ export const useContactManagement = () => {
     deleteContact
   };
 };
-
