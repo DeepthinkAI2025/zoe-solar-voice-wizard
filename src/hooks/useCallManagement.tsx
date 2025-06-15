@@ -9,12 +9,18 @@ interface CallManagementProps {
   autoAnswerEnabled: boolean;
   agents: AgentWithSettings[];
   contacts: Contact[];
+  silentModeEnabled: boolean;
+  workingHoursStart: number;
+  workingHoursEnd: number;
 }
 
 export const useCallManagement = ({
   autoAnswerEnabled,
   contacts,
   agents,
+  silentModeEnabled,
+  workingHoursStart,
+  workingHoursEnd,
 }: CallManagementProps) => {
   const { activeCall, setActiveCall, isForwarding, setIsForwarding } = useCallState();
   const { duration, startTimer, stopTimer } = useCallTimer();
@@ -42,6 +48,14 @@ export const useCallManagement = ({
   }, [setActiveCall, startTimer]);
 
   const startIncomingCall = useCallback((number: string) => {
+    if (silentModeEnabled) {
+      const currentHour = new Date().getHours();
+      if (currentHour < workingHoursStart || currentHour >= workingHoursEnd) {
+        console.log("Silent mode on: Call ignored outside of working hours.");
+        return;
+      }
+    }
+
     const contact = contacts.find(c => c.number === number);
     const incomingCall = {
       number,
@@ -65,7 +79,7 @@ export const useCallManagement = ({
         });
       }, 2000);
     }
-  }, [contacts, autoAnswerEnabled, agents, setActiveCall, startTimer]);
+  }, [contacts, autoAnswerEnabled, agents, setActiveCall, startTimer, silentModeEnabled, workingHoursStart, workingHoursEnd]);
 
   const startAiCall = useCallback((number: string, agentId: string) => {
     const contact = contacts.find(c => c.number === number);
