@@ -1,201 +1,128 @@
+
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
-import Dialpad from '@/components/Dialpad';
 import AgentSelector from '@/components/AgentSelector';
 import ActiveCallView from '@/components/ActiveCallView';
 import CallWidget from '@/components/CallWidget';
 import CallDetailsDrawer from '@/components/CallDetailsDrawer';
 import { usePhoneState } from '@/hooks/usePhoneState';
-import ContactsScreen from '@/components/screens/ContactsScreen';
-import SettingsScreen from '@/components/screens/SettingsScreen';
 import { callHistory } from '@/data/mock';
-import type { CallHistoryItem } from '@/types/call';
+import AppHeader from '@/components/AppHeader';
+import AppContent from '@/components/AppContent';
 
 const Index = () => {
-  const {
-    activeTab,
-    setActiveTab,
-    activeCall,
-    agentSelectorState,
-    closeAgentSelector,
-    selectedCall,
-    agents,
-    isVmActive,
-    handleStartCall,
-    handleAgentSelect,
-    handleVmToggle,
-    handleAgentToggle,
-    handleUpdateAgentName,
-    handleAcceptCallWithAI,
-    acceptCallManually,
-    endCall,
-    interveneInCall,
-    handleScheduleCall,
-    setSelectedCall,
-    handleStartCallManually,
-    isForwarding,
-    forwardCall,
-    isCallMinimized,
-    setIsCallMinimized,
-    duration,
-    // Settings
-    autoAnswerEnabled,
-    workingHoursStart,
-    workingHoursEnd,
-    silentModeEnabled,
-    handleInBackground,
-    handleAutoAnswerToggle,
-    handleWorkingHoursStartChange,
-    handleWorkingHoursEndChange,
-    handleSilentModeToggle,
-    handleHandleInBackgroundToggle,
-    // Agent Settings
-    globalSystemInstructions,
-    setGlobalSystemInstructions,
-    handleUpdateAgentDetails,
-    // Contact Management
-    contacts,
-    addContact,
-    updateContact,
-    deleteContact,
-    // Contact Editor State
-    contactToEditId,
-    openContactEditor,
-    clearContactToEdit,
-    agentToFocusInSettings,
-    setAgentToFocusInSettings,
-  } = usePhoneState();
+  const phoneState = usePhoneState();
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const handleSelectContactFromHistory = (number: string) => {
-    const contact = contacts.find(c => c.number === number);
+    const contact = phoneState.contacts.find(c => c.number === number);
     if (contact) {
-      openContactEditor(contact.id);
+      phoneState.openContactEditor(contact.id);
     }
   };
 
-  const contactName = agentSelectorState?.number
-    ? contacts.find(c => c.number === agentSelectorState.number)?.name
+  const contactName = phoneState.agentSelectorState?.number
+    ? phoneState.contacts.find(c => c.number === phoneState.agentSelectorState.number)?.name
     : undefined;
   
-  const activeCallContactName = activeCall?.number
-    ? contacts.find(c => c.number === activeCall.number)?.name
+  const activeCallContactName = phoneState.activeCall?.number
+    ? phoneState.contacts.find(c => c.number === phoneState.activeCall.number)?.name
     : undefined;
   
-  const activeCallAgent = activeCall?.agentId ? agents.find(a => a.id === activeCall.agentId) : undefined;
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'history':
-        return <ContactsScreen 
-          callHistory={callHistory}
-          onCallSelect={(call: CallHistoryItem) => setSelectedCall(call)} 
-          onSelectContact={handleSelectContactFromHistory} 
-          onStartCall={handleStartCall} 
-          onStartCallManually={handleStartCallManually}
-          contacts={contacts}
-          addContact={addContact}
-          updateContact={updateContact}
-          deleteContact={deleteContact}
-          contactToEditId={contactToEditId}
-          onEditorClose={clearContactToEdit}
-        />;
-      case 'settings':
-        return <SettingsScreen
-          autoAnswerEnabled={autoAnswerEnabled}
-          onAutoAnswerToggle={handleAutoAnswerToggle}
-          workingHoursStart={workingHoursStart}
-          onWorkingHoursStartChange={handleWorkingHoursStartChange}
-          workingHoursEnd={workingHoursEnd}
-          onWorkingHoursEndChange={handleWorkingHoursEndChange}
-          silentModeEnabled={silentModeEnabled}
-          onSilentModeToggle={handleSilentModeToggle}
-          handleInBackground={handleInBackground}
-          onHandleInBackgroundToggle={handleHandleInBackgroundToggle}
-          // Agent Settings
-          agents={agents}
-          isVmActive={isVmActive}
-          onVmToggle={handleVmToggle}
-          onToggleAgent={handleAgentToggle}
-          globalSystemInstructions={globalSystemInstructions}
-          onGlobalSystemInstructionsChange={setGlobalSystemInstructions}
-          onUpdateAgentDetails={handleUpdateAgentDetails}
-          agentToFocusInSettings={agentToFocusInSettings}
-          setAgentToFocusInSettings={setAgentToFocusInSettings}
-        />;
-      case 'dialpad':
-      default:
-        return <Dialpad 
-          onCall={handleStartCall}
-          onCallManually={handleStartCallManually}
-          onSchedule={handleScheduleCall}
-        />;
-    }
-  };
+  const activeCallAgent = phoneState.activeCall?.agentId ? phoneState.agents.find(a => a.id === phoneState.activeCall.agentId) : undefined;
 
   return (
     <div ref={containerRef} className="h-screen w-full max-w-md mx-auto bg-background flex flex-col relative rounded-3xl border-4 border-border shadow-2xl shadow-primary/20">
-      <header className="flex-shrink-0 py-4 px-6 flex justify-between items-center">
-        <img src="/lovable-uploads/5cbdb31b-130f-40f1-9ead-f812366683b2.png" alt="Zoe Logo" className="h-12" />
-        <img src="/lovable-uploads/526a4663-c366-4462-a3e2-2713130c98ff.png" alt="Fapro Logo" className="h-12" />
-      </header>
+      <AppHeader />
 
       <main className="flex-grow flex flex-col overflow-hidden">
-        {renderContent()}
+        <AppContent
+          activeTab={phoneState.activeTab}
+          callHistory={callHistory}
+          onCallSelect={phoneState.setSelectedCall}
+          onSelectContact={handleSelectContactFromHistory}
+          onStartCall={phoneState.handleStartCall}
+          onStartCallManually={phoneState.handleStartCallManually}
+          contacts={phoneState.contacts}
+          addContact={phoneState.addContact}
+          updateContact={phoneState.updateContact}
+          deleteContact={phoneState.deleteContact}
+          contactToEditId={phoneState.contactToEditId}
+          onEditorClose={phoneState.clearContactToEdit}
+          autoAnswerEnabled={phoneState.autoAnswerEnabled}
+          onAutoAnswerToggle={phoneState.handleAutoAnswerToggle}
+          workingHoursStart={phoneState.workingHoursStart}
+          onWorkingHoursStartChange={phoneState.handleWorkingHoursStartChange}
+          workingHoursEnd={phoneState.workingHoursEnd}
+          onWorkingHoursEndChange={phoneState.handleWorkingHoursEndChange}
+          silentModeEnabled={phoneState.silentModeEnabled}
+          onSilentModeToggle={phoneState.handleSilentModeToggle}
+          handleInBackground={phoneState.handleInBackground}
+          onHandleInBackgroundToggle={phoneState.handleHandleInBackgroundToggle}
+          agents={phoneState.agents}
+          isVmActive={phoneState.isVmActive}
+          onVmToggle={phoneState.handleVmToggle}
+          onToggleAgent={phoneState.handleAgentToggle}
+          globalSystemInstructions={phoneState.globalSystemInstructions}
+          onGlobalSystemInstructionsChange={phoneState.setGlobalSystemInstructions}
+          onUpdateAgentDetails={phoneState.handleUpdateAgentDetails}
+          agentToFocusInSettings={phoneState.agentToFocusInSettings}
+          setAgentToFocusInSettings={phoneState.setAgentToFocusInSettings}
+          onSchedule={phoneState.handleScheduleCall}
+        />
       </main>
 
-      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} className="flex-shrink-0" />
+      <BottomNav activeTab={phoneState.activeTab} setActiveTab={phoneState.setActiveTab} className="flex-shrink-0" />
 
-      {agentSelectorState && (
+      {phoneState.agentSelectorState && (
         <AgentSelector 
-            agents={agents}
-            isVmActive={isVmActive}
-            onToggleVm={handleVmToggle}
-            onToggleAgent={handleAgentToggle}
-            onUpdateAgentName={handleUpdateAgentName}
-            onSelect={handleAgentSelect}
-            onScheduleCall={handleScheduleCall}
-            onClose={closeAgentSelector} 
-            numberToCall={agentSelectorState.number}
+            agents={phoneState.agents}
+            isVmActive={phoneState.isVmActive}
+            onToggleVm={phoneState.handleVmToggle}
+            onToggleAgent={phoneState.handleAgentToggle}
+            onUpdateAgentName={phoneState.handleUpdateAgentName}
+            onSelect={phoneState.handleAgentSelect}
+            onScheduleCall={phoneState.handleScheduleCall}
+            onClose={phoneState.closeAgentSelector} 
+            numberToCall={phoneState.agentSelectorState.number}
             contactName={contactName}
-            context={agentSelectorState.context}
+            context={phoneState.agentSelectorState.context}
         />
       )}
 
-      {activeCall && !isCallMinimized && (
+      {phoneState.activeCall && !phoneState.isCallMinimized && (
         <ActiveCallView 
-            {...activeCall} 
-            duration={duration}
-            agents={agents}
+            {...phoneState.activeCall} 
+            duration={phoneState.duration}
+            agents={phoneState.agents}
             contactName={activeCallContactName}
-            onEndCall={endCall}
-            onAcceptCall={handleAcceptCallWithAI}
-            onAcceptCallManually={acceptCallManually}
-            onForward={forwardCall}
-            onIntervene={interveneInCall}
-            isForwarding={isForwarding}
-            onMinimize={() => setIsCallMinimized(true)}
+            onEndCall={phoneState.endCall}
+            onAcceptCall={phoneState.handleAcceptCallWithAI}
+            onAcceptCallManually={phoneState.acceptCallManually}
+            onForward={phoneState.forwardCall}
+            onIntervene={phoneState.interveneInCall}
+            isForwarding={phoneState.isForwarding}
+            onMinimize={() => phoneState.setIsCallMinimized(true)}
         />
       )}
       
-      {activeCall && isCallMinimized && (
+      {phoneState.activeCall && phoneState.isCallMinimized && (
         <CallWidget
-          callState={activeCall}
+          callState={phoneState.activeCall}
           contactName={activeCallContactName}
           agent={activeCallAgent}
-          duration={duration}
-          onMaximize={() => setIsCallMinimized(false)}
-          onEndCall={endCall}
+          duration={phoneState.duration}
+          onMaximize={() => phoneState.setIsCallMinimized(false)}
+          onEndCall={phoneState.endCall}
           dragConstraints={containerRef}
         />
       )}
 
-
       <CallDetailsDrawer 
-        call={selectedCall} 
-        onClose={() => setSelectedCall(null)}
-        onStartCall={handleStartCall}
-        onStartCallManually={handleStartCallManually}
+        call={phoneState.selectedCall} 
+        onClose={() => phoneState.setSelectedCall(null)}
+        onStartCall={phoneState.handleStartCall}
+        onStartCallManually={phoneState.handleStartCallManually}
       />
     </div>
   );
