@@ -10,7 +10,11 @@ interface UseRemoteSttResult {
 }
 
 /**
- * Hook, um künftig /stt (Whisper) Backend-API auf eigener VM für Spracherkennung anzusprechen.
+ * Hook für STT (Whisper) über eigenen /stt Endpoint (Google Cloud VM)
+ *
+ * POST /stt
+ *   - Body: Audio (audio/wav, audio/webm oder mp3 als Blob)
+ *   - Response: { transcript: string }
  */
 export function useRemoteStt(): UseRemoteSttResult {
   const [isTranscribing, setIsTranscribing] = useState(false);
@@ -22,15 +26,23 @@ export function useRemoteStt(): UseRemoteSttResult {
     setTranscript('');
     setError(null);
 
-    // TODO: Backend-API, sobald bereit, aktivieren!
     try {
-      // const response = await fetch('https://<YOUR_VM_URL>/stt', {
-      //   method: 'POST',
-      //   body: audioBlob,
-      // });
-      // if (!response.ok) throw new Error('STT-Backend nicht erreichbar.');
-      // const data = await response.json();
-      // setTranscript(data.transcript || '');
+      // Bitte hier eure echte VM-URL eintragen!
+      const VM_URL = "https://<YOUR_VM_URL>";
+      // UNKOMMENTIEREN sobald Backend bereit!
+      /*
+      const response = await fetch(`${VM_URL}/stt`, {
+        method: 'POST',
+        headers: {
+          // Kein Content-Type: multipart/form-data, nur raw Blob
+        },
+        body: audioBlob,
+      });
+      if (!response.ok) throw new Error('STT-Backend nicht erreichbar.');
+      const data = await response.json();
+      setTranscript(data.transcript || '');
+      */
+      // Platzhalter für Demo:
       setTranscript('(Demo) Spracherkennung über /stt-Backend kommt bald.');
     } catch (err) {
       setError('Fehler beim Transkribieren: ' + (err instanceof Error ? err.message : err));
