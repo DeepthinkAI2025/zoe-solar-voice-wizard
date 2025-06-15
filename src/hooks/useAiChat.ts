@@ -196,7 +196,7 @@ export const useAiChat = () => {
                         const newContents = [
                             ...apiMessages,
                             { role: 'model' as const, parts: [part] },
-                            { role: 'function' as const, parts: [{ functionResponse: { name: functionName, response: { content: functionResponse } }] } ]
+                            { role: 'function' as const, parts: [{ functionResponse: { name: functionName, response: { content: functionResponse } }] }]
                         ];
 
                         response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
