@@ -10,7 +10,7 @@ import {
   DrawerClose,
 } from '@/components/ui/drawer';
 import { Button } from './ui/button';
-import { Play, FileText, Bot, Phone } from 'lucide-react';
+import { Play, FileText, Bot, Phone, X } from 'lucide-react';
 
 interface CallDetailsDrawerProps {
   call: {
@@ -48,11 +48,17 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
   return (
     <Drawer open={!!call} onClose={onClose} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent>
-        <DrawerHeader className="text-left">
+        <DrawerHeader className="text-left relative">
           <DrawerTitle>{call.name}</DrawerTitle>
           <DrawerDescription>
             {call.type} - {call.time}
           </DrawerDescription>
+          <DrawerClose asChild className="absolute right-4 top-4">
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Schließen</span>
+            </Button>
+          </DrawerClose>
         </DrawerHeader>
         <div className="p-4 space-y-6 max-h-[60vh] overflow-y-auto">
           {call.summary && (
@@ -85,7 +91,7 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
         </div>
         <DrawerFooter>
           {shouldShowCallbackButtons && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+            <div className="grid grid-cols-2 gap-2 mb-2">
               <Button variant="outline" className="w-full" onClick={handleCallback}>
                 <Phone size={16} className="mr-2" />
                 Zurückrufen
