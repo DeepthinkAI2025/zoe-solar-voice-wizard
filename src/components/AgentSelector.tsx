@@ -65,15 +65,15 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50">
       <div className="bg-background border border-border rounded-2xl p-6 w-[90%] max-w-md animate-slide-up relative flex flex-col max-h-[90vh]">
-        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-white">
+        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
           <X size={24} />
         </button>
-        <h2 className="text-xl font-bold text-white mb-2">KI-Agent auswählen</h2>
+        <h2 className="text-xl font-bold text-foreground mb-2">KI-Agent auswählen</h2>
         <div className="text-muted-foreground mb-6">
           {contactName ? (
             <>
               <p>
-                für Anruf an <span className="text-white font-semibold">{contactName}</span>
+                für Anruf an <span className="text-foreground font-semibold">{contactName}</span>
               </p>
               <p className="text-primary">({numberToCall})</p>
             </>
@@ -85,10 +85,10 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
           )}
         </div>
         
-        <div className="border border-border p-4 rounded-lg mb-6 bg-white/5">
+        <div className="border border-border p-4 rounded-lg mb-6 bg-secondary">
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="font-semibold text-white">VoIP VM</p>
+                    <p className="font-semibold text-foreground">VoIP VM</p>
                     <p className="text-sm text-muted-foreground mt-1">Globale KI-Verfügbarkeit</p>
                 </div>
                 <Switch
@@ -105,7 +105,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
               key={agent.id}
               onClick={() => agent.active && setSelectedAgentId(agent.id)}
               className={cn(
-                "relative flex flex-col p-4 rounded-lg bg-white/5 border transition-all text-left",
+                "relative flex flex-col p-4 rounded-lg bg-secondary border transition-all text-left",
                 selectedAgentId === agent.id ? 'border-primary' : 'border-transparent',
                 !agent.active && "opacity-60 cursor-not-allowed",
                 agent.active && "cursor-pointer"
@@ -129,13 +129,13 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
               </div>
               <div className="flex-grow">
                 <div className="flex items-center gap-2">
-                    <p className="font-semibold text-white">{agent.name}</p>
+                    <p className="font-semibold text-foreground">{agent.name}</p>
                     <button 
                         onClick={(e) => {
                             e.stopPropagation();
                             onUpdateAgentName(agent.id, '___EDIT_AGENT_IN_SETTINGS___');
                         }}
-                        className="text-muted-foreground hover:text-white"
+                        className="text-muted-foreground hover:text-foreground"
                         aria-label={`Einstellungen für ${agent.name} bearbeiten`}
                         disabled={!agent.active}
                     >
@@ -149,13 +149,13 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
         </div>
 
         <div className="mt-6 flex-shrink-0">
-            <label htmlFor="notes" className="text-sm font-medium text-white mb-2 block">Gesprächsinformationen (optional)</label>
+            <label htmlFor="notes" className="text-sm font-medium text-foreground mb-2 block">Gesprächsinformationen (optional)</label>
             <Textarea 
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Was soll der KI-Agent wissen? z.B. Kontext zum Anruf, Kundennummer, etc."
-                className="bg-white/5 border-white/10"
+                className="bg-secondary border-border"
                 disabled={!selectedAgentId}
             />
         </div>
