@@ -98,23 +98,26 @@ export const useAiChat = () => {
                     content: msg.text,
                 }));
 
-                const body: {model: string, messages: any[], temperature: number, stream?: boolean} = {
+                let url = '';
+                let model = '';
+
+                if (provider === 'grok') {
+                    // Assuming user means Groq API (groq.com), which is OpenAI-compatible
+                    url = 'https://api.groq.com/openai/v1/chat/completions';
+                    model = 'llama3-8b-8192';
+                } else if (provider === 'openrouter') {
+                    url = 'https://openrouter.ai/api/v1/chat/completions';
+                    model = 'mistralai/mistral-7b-instruct'; // A sensible default
+                }
+                
+                const body = {
+                    model,
                     messages: [
                         { role: 'system', content: systemPrompt },
                         ...apiMessages.slice(-10)
                     ],
                     temperature: 0.7,
                 };
-
-                let url = '';
-                if (provider === 'grok') {
-                    // Assuming user means Groq API (groq.com), which is OpenAI-compatible
-                    url = 'https://api.groq.com/openai/v1/chat/completions';
-                    body.model = 'llama3-8b-8192';
-                } else if (provider === 'openrouter') {
-                    url = 'https://openrouter.ai/api/v1/chat/completions';
-                    body.model = 'mistralai/mistral-7b-instruct'; // A sensible default
-                }
                 
                 response = await fetch(url, {
                     method: 'POST',
