@@ -46,6 +46,13 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
     }
   }, [agents, context]);
 
+  const sortedAgents = [...agents].sort((a, b) => {
+    if (a.active === b.active) {
+      return 0;
+    }
+    return a.active ? -1 : 1;
+  });
+
   const handleSelectAndCall = () => {
     if (selectedAgentId) {
       onSelect(selectedAgentId, notes);
@@ -103,7 +110,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
         </div>
         
         <div className="grid grid-cols-2 gap-4 overflow-y-auto overflow-x-hidden pr-2 flex-grow">
-          {agents.map(agent => (
+          {sortedAgents.map(agent => (
             <div
               key={agent.id}
               onClick={() => agent.active && setSelectedAgentId(agent.id)}
