@@ -1,6 +1,11 @@
 
 /// <reference types="vite/client" />
 
+interface SpeechRecognitionAlternative {
+  readonly transcript: string;
+  readonly confidence: number;
+}
+
 interface SpeechRecognitionResult {
     readonly isFinal: boolean;
     readonly [index: number]: SpeechRecognitionAlternative;
