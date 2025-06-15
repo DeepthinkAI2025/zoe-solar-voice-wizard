@@ -48,7 +48,7 @@ const CallWidget: React.FC<CallWidgetProps> = ({
   }} exit={{
     y: -200,
     opacity: 0
-  }} drag onDragEnd={handleDragEnd} dragConstraints={dragConstraints} dragMomentum={false} className="p-4">
+  }} drag onDragEnd={handleDragEnd} dragConstraints={dragConstraints} dragMomentum={false} className="px-4 pt-2 pb-8">
       <div className={cn("flex gap-3 cursor-pointer w-full", isMobile ? "flex-col items-center text-center min-h-[72px] justify-center" : "items-center")} onClick={onMaximize}>
         {agent ? <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 animate-pulse">
             <Mic size={16} />
