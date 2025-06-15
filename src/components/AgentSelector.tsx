@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
@@ -67,17 +66,21 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
           <X size={24} />
         </button>
         <h2 className="text-xl font-bold text-white mb-2">KI-Agent auswählen</h2>
-        <p className="text-muted-foreground mb-6">
-          für Anruf an{' '}
+        <div className="text-muted-foreground mb-6">
           {contactName ? (
             <>
-              <span className="text-white font-semibold">{contactName}</span>
-              <span className="text-primary ml-1.5">({numberToCall})</span>
+              <p>
+                für Anruf an <span className="text-white font-semibold">{contactName}</span>
+              </p>
+              <p className="text-primary">({numberToCall})</p>
             </>
           ) : (
-            <span className="text-primary">{numberToCall}</span>
+            <>
+              <p>für Anruf an</p>
+              <p className="text-primary">{numberToCall}</p>
+            </>
           )}
-        </p>
+        </div>
         
         <div className="border border-border p-4 rounded-lg mb-6 bg-white/5">
             <div className="flex items-center justify-between">
