@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from "@/components/ui/use-toast";
+import { manufacturers, Product } from '@/data/products';
 
 export type AiProvider = 'gemini' | 'grok' | 'openrouter';
 
@@ -47,6 +48,36 @@ export const useAiChat = () => {
         toast({ title: 'API-Schlüssel gespeichert.' });
     };
 
+    const searchProducts = useCallback((query?: string): string => {
+        console.log(`Searching for products with query: "${query}"`);
+        if (!query || query.trim() === '') {
+            const allProducts = manufacturers.flatMap(m => m.products);
+            return JSON.stringify(allProducts.slice(0, 5).map(p => ({ name: p.name, description: p.description })));
+        }
+        const lowercasedQuery = query.toLowerCase();
+        const results: Product[] = [];
+        for (const manufacturer of manufacturers) {
+            for (const product of manufacturer.products) {
+                if (
+                    product.name.toLowerCase().includes(lowercasedQuery) ||
+                    product.description.toLowerCase().includes(lowercasedQuery) ||
+                    manufacturer.name.toLowerCase().includes(lowercasedQuery)
+                ) {
+                    results.push(product);
+                }
+            }
+        }
+        
+        if (results.length === 0) {
+            return JSON.stringify({ info: "Keine Produkte für diese Anfrage gefunden." });
+        }
+        return JSON.stringify(results.map(p => ({ name: p.name, description: p.description })));
+    }, []);
+
+    const availableTools = {
+        search_products: searchProducts,
+    };
+
     const getAiResponse = useCallback(async (messages: Message[], provider: AiProvider): Promise<string | null> => {
         const apiKey = apiKeys[provider];
         if (!apiKey) {
@@ -58,15 +89,20 @@ export const useAiChat = () => {
             return null;
         }
 
-        const systemPrompt = "Du bist Zoe, eine freundliche und hilfsbereite KI-Assistentin für Handwerker der Firma ZOE Solar. Deine Expertise liegt im Bereich Solartechnik und Photovoltaik. Antworte auf Deutsch. Sei präzise und kurz.";
+        const systemPrompt = "Du bist Zoe, eine freundliche und hilfsbereite KI-Assistentin für Handwerker der Firma ZOE Solar. Deine Expertise liegt im Bereich Solartechnik und Photovoltaik. Antworte auf Deutsch. Sei präzise und kurz. Du kannst die Produktdatenbank mit der Funktion 'search_products' durchsuchen, um Fragen zu Produkten zu beantworten. Gib die Suchergebnisse in einer für den Benutzer lesbaren Form zurück, z.B. als Liste.";
 
         try {
             let response: Response;
             if (provider === 'gemini') {
-                const apiMessages = messages.map(msg => ({
-                    role: senderToGeminiRole(msg.sender),
-                    parts: [{ text: msg.text }],
-                }));
+                const geminiTools = [{
+                    functionDeclarations: [{
+                        name: 'search_products',
+                        description: 'Durchsuche die Produktdatenbank nach Name, Beschreibung oder Hersteller. Wenn kein Suchbegriff angegeben wird, werden alle Produkte zurückgegeben.',
+                        parameters: { type: 'OBJECT', properties: { query: { type: 'STRING', description: 'Der Suchbegriff, z.B. "ecoTEC" oder "Buderus".' } } },
+                    }]
+                }];
+                
+                let apiMessages = messages.map(msg => ({ role: senderToGeminiRole(msg.sender), parts: [{ text: msg.text }] }));
 
                 response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
                     method: 'POST',
@@ -75,65 +111,133 @@ export const useAiChat = () => {
                         contents: apiMessages.slice(-10),
                         systemInstruction: { parts: [{ text: systemPrompt }] },
                         generationConfig: { temperature: 0.7 },
+                        tools: geminiTools,
                     }),
                 });
 
-                const data = await response.json();
+                let data = await response.json();
                 if (!response.ok) {
                     console.error('Google Gemini API error:', data);
                     const errorMessage = data.error?.message || 'Unbekannter API Fehler';
                     throw new Error(errorMessage);
                 }
-                if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                    if (data.promptFeedback?.blockReason) {
-                        throw new Error(`Anfrage blockiert: ${data.promptFeedback.blockReason}. Bitte Anfrage anpassen.`);
+
+                const part = data.candidates?.[0]?.content?.parts?.[0];
+                if (part?.functionCall) {
+                    const functionCall = part.functionCall;
+                    const functionName = functionCall.name as keyof typeof availableTools;
+                    const functionToCall = availableTools[functionName];
+
+                    if (functionToCall) {
+                        const functionArgs = functionCall.args || {};
+                        console.log(`Gemini is calling function "${functionName}" with args:`, functionArgs);
+                        const functionResponse = functionToCall(functionArgs.query);
+                        
+                        apiMessages.push(
+                            { role: 'model', parts: [part] },
+                            { role: 'function', parts: [{ functionResponse: { name: functionName, response: { content: functionResponse } } }] }
+                        );
+
+                        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: apiMessages.slice(-10),
+                                systemInstruction: { parts: [{ text: systemPrompt }] },
+                                generationConfig: { temperature: 0.7 },
+                            }),
+                        });
+                        data = await response.json();
                     }
+                }
+                
+                if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    if (data.promptFeedback?.blockReason) { throw new Error(`Anfrage blockiert: ${data.promptFeedback.blockReason}. Bitte Anfrage anpassen.`); }
                     throw new Error('Keine gültige Antwort von der API erhalten.');
                 }
                 return data.candidates[0].content.parts[0].text;
 
             } else { // Groq and OpenRouter (OpenAI-compatible)
-                const apiMessages = messages.map(msg => ({
-                    role: senderToOpenAiRole(msg.sender),
-                    content: msg.text,
-                }));
-
-                let url = '';
-                let model = '';
-
+                const openAiTools = [{
+                    type: 'function' as const,
+                    function: {
+                        name: 'search_products',
+                        description: 'Durchsuche die Produktdatenbank nach Name, Beschreibung oder Hersteller. Wenn kein Suchbegriff angegeben wird, werden alle Produkte zurückgegeben.',
+                        parameters: { type: 'object', properties: { query: { type: 'string', description: 'Der Suchbegriff, z.B. "ecoTEC" oder "Buderus".' } } },
+                    },
+                }];
+                
+                let apiMessages = messages.map(msg => ({ role: senderToOpenAiRole(msg.sender), content: msg.text }));
+                
+                let url = '', model = '';
                 if (provider === 'grok') {
-                    // Assuming user means Groq API (groq.com), which is OpenAI-compatible
                     url = 'https://api.groq.com/openai/v1/chat/completions';
                     model = 'llama3-8b-8192';
                 } else if (provider === 'openrouter') {
                     url = 'https://openrouter.ai/api/v1/chat/completions';
-                    model = 'mistralai/mistral-7b-instruct'; // A sensible default
+                    model = 'mistralai/mistral-7b-instruct';
                 }
                 
-                const body = {
+                let body = {
                     model,
-                    messages: [
-                        { role: 'system', content: systemPrompt },
-                        ...apiMessages.slice(-10)
-                    ],
+                    messages: [ { role: 'system', content: systemPrompt }, ...apiMessages.slice(-10) ],
                     temperature: 0.7,
+                    tools: openAiTools,
+                    tool_choice: "auto" as const,
                 };
                 
                 response = await fetch(url, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify(body),
                 });
                 
-                const data = await response.json();
+                let data = await response.json();
+
                 if (!response.ok) {
                     console.error(`${provider} API error:`, data);
                     const errorMessage = data.error?.message || 'Unbekannter API Fehler';
                     throw new Error(errorMessage);
                 }
+
+                const messageFromApi = data.choices?.[0]?.message;
+                if (messageFromApi?.tool_calls) {
+                    apiMessages.push(messageFromApi);
+
+                    for (const toolCall of messageFromApi.tool_calls) {
+                        const functionName = toolCall.function.name as keyof typeof availableTools;
+                        const functionToCall = availableTools[functionName];
+                        if (functionToCall) {
+                            const functionArgs = JSON.parse(toolCall.function.arguments);
+                            console.log(`OpenAI compatible API is calling function "${functionName}" with args:`, functionArgs);
+                            const functionResponse = functionToCall(functionArgs.query);
+                            apiMessages.push({
+                                tool_call_id: toolCall.id,
+                                role: 'tool',
+                                content: functionResponse,
+                            });
+                        }
+                    }
+
+                    body.messages = [ { role: 'system', content: systemPrompt }, ...apiMessages.slice(-10) ];
+                    // @ts-ignore
+                    delete body.tools;
+                    // @ts-ignore
+                    delete body.tool_choice;
+
+                    response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body),
+                    });
+                    data = await response.json();
+
+                     if (!response.ok) {
+                        console.error(`${provider} API error (after tool call):`, data);
+                        throw new Error(data.error?.message || 'Unbekannter API Fehler nach Tool-Aufruf');
+                    }
+                }
+
                 return data.choices?.[0]?.message?.content;
             }
         } catch (error) {
@@ -146,7 +250,7 @@ export const useAiChat = () => {
             });
             return null;
         }
-    }, [apiKeys, toast]);
+    }, [apiKeys, toast, searchProducts]);
 
     const hasApiKey = (provider: AiProvider) => !!apiKeys[provider];
 
