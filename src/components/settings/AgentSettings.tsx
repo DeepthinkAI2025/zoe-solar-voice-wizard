@@ -11,6 +11,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Bot } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface AgentSettingsProps {
   agents: AgentWithSettings[];
@@ -65,14 +67,22 @@ export const AgentSettings: React.FC<AgentSettingsProps> = ({
       <div className="pt-4 border-t border-border mt-4">
         <Accordion type="multiple" className="w-full space-y-4">
           {agents.map((agent) => (
-            <AccordionItem value={agent.id} key={agent.id} className="bg-muted rounded-md border-b-0">
-              <AccordionTrigger className="p-4 hover:no-underline rounded-md [&[data-state=open]]:rounded-b-none">
+            <AccordionItem value={agent.id} key={agent.id} className={cn(
+              "border-none rounded-lg transition-all duration-300",
+              agent.active && "ring-2 ring-primary/30"
+            )}>
+              <AccordionTrigger className="p-4 hover:no-underline bg-muted rounded-lg data-[state=open]:rounded-b-none">
                 <div className="flex items-center justify-between w-full">
-                  <div className="text-left">
-                    <div className="text-base font-medium">{agent.name}</div>
-                    <div className="text-sm text-muted-foreground">({agent.purpose})</div>
+                  <div className="flex items-center gap-4 text-left">
+                    <div className="bg-primary/10 p-2 rounded-lg">
+                      <Bot className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <div className="text-base font-semibold text-foreground">{agent.name}</div>
+                      <div className="text-sm text-muted-foreground">{agent.purpose}</div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-2 pl-2" onClick={(e) => e.stopPropagation()}>
                     <span className="text-xs text-muted-foreground">{agent.active ? 'Aktiv' : 'Inaktiv'}</span>
                     <Switch
                       id={`agent-toggle-${agent.id}`}
@@ -83,7 +93,7 @@ export const AgentSettings: React.FC<AgentSettingsProps> = ({
                   </div>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="p-4 pt-0">
+              <AccordionContent className="p-4 pt-0 bg-muted rounded-b-lg">
                 <div className="pt-4 border-t border-border">
                   <AgentCard 
                     agent={agent} 

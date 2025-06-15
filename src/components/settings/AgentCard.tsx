@@ -22,8 +22,8 @@ export const AgentCard: React.FC<AgentCardProps> = ({
 
   return (
     <>
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
             <div>
                 <Label htmlFor={`agent-name-${agent.id}`} className="text-xs text-muted-foreground">Name (für KI)</Label>
                 <Input
@@ -43,7 +43,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
                 />
             </div>
         </div>
-        <div>
+        <div className="opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
           <Label htmlFor={`agent-instructions-${agent.id}`} className="text-xs text-muted-foreground">Spezifische Anweisungen</Label>
           <Textarea
             id={`agent-instructions-${agent.id}`}
@@ -55,7 +55,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({
           />
         </div>
       </div>
-      <div className="mt-4 pt-4 border-t border-border">
+      <div className="mt-4 pt-4 border-t border-border opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
         <div className="flex items-center gap-4">
           <Button variant="outline" onClick={() => onStartVoiceClone(agent.id)}>
               {agent.voiceCloned ? 'Stimme erneut klonen' : 'Stimme klonen'}
