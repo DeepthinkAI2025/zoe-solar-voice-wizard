@@ -1,3 +1,4 @@
+
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -92,9 +93,9 @@ const Index = () => {
   };
 
   return (
-    <div className="h-screen w-full max-w-md mx-auto bg-black flex flex-col overflow-hidden rounded-3xl border-4 border-white/10 shadow-2xl shadow-primary/20">
+    <div className="h-screen w-full max-w-md mx-auto bg-background flex flex-col overflow-hidden rounded-3xl border-4 border-border shadow-2xl shadow-primary/20">
       <header className="flex-shrink-0 text-center py-4">
-        <h1 className="text-xl font-bold text-white tracking-wider">ZOE <span className="text-primary">Solar</span></h1>
+        <h1 className="text-xl font-bold text-foreground tracking-wider">ZOE <span className="text-primary">Solar</span></h1>
         <p className="text-xs text-muted-foreground">AI Phone</p>
       </header>
 
