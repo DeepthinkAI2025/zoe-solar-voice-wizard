@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX, Send } from 'lucide-react';
 import Icon from './Icon';
 import type { aiAgents } from '@/data/mock';
+import { Textarea } from './ui/textarea';
+import { Button } from './ui/button';
 
 type Agent = (typeof aiAgents)[0];
 
@@ -10,6 +12,7 @@ interface ActiveCallViewProps {
   number: string;
   status: 'incoming' | 'active';
   agentId?: string;
+  notes?: string;
   onEndCall: () => void;
   onAcceptCall?: () => void;
   onAcceptCallManually?: () => void;
@@ -25,10 +28,11 @@ const mockTranscript = [
   "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen.",
 ];
 
-const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, onEndCall, onAcceptCall, onAcceptCallManually, agents }) => {
+const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents }) => {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [transcript, setTranscript] = useState<string[]>([]);
+  const [newNote, setNewNote] = useState('');
   const agent = agents.find(a => a.id === agentId);
 
   useEffect(() => {
@@ -50,6 +54,14 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
     }
   }, [status]);
 
+  const handleSendNote = () => {
+    if (!newNote.trim()) return;
+    console.log("Sending new note to AI:", newNote);
+    // Add to transcript for visual feedback
+    setTranscript(prev => [...prev, `[Notiz an KI]: ${newNote}`]);
+    setNewNote('');
+  };
+
   const formatDuration = (sec: number) => {
     const minutes = Math.floor(sec / 60).toString().padStart(2, '0');
     const seconds = (sec % 60).toString().padStart(2, '0');
@@ -67,17 +79,39 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
       {/* Transcript */}
       <div className="flex-grow my-8 overflow-y-auto space-y-4 pr-2">
         {agent && (
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 text-sm">
-            <Icon name={agent.icon} className="text-primary w-5 h-5 flex-shrink-0" />
-            <span className="text-muted-foreground">{agent.name} ist aktiv.</span>
+          <div className="flex flex-col gap-3 p-3 rounded-lg bg-white/5 text-sm">
+            <div className="flex items-center gap-3">
+              <Icon name={agent.icon} className="text-primary w-5 h-5 flex-shrink-0" />
+              <span className="text-muted-foreground">{agent.name} ist aktiv.</span>
+            </div>
+            {notes && <p className="text-white/80 pl-8 border-l-2 border-primary/20 ml-2.5">Start-Notiz: "{notes}"</p>}
           </div>
         )}
         {transcript.map((line, index) => (
           <div key={index} className="text-left p-3 rounded-lg bg-white/5 animate-fade-in">
-             <p className="text-white">{line}</p>
+             <p className="text-white">{line.startsWith('[Notiz an KI]:') 
+                ? <><span className="text-primary font-semibold">Notiz an KI:</span>{line.replace('[Notiz an KI]:', '')}</>
+                : line}
+             </p>
           </div>
         ))}
       </div>
+
+      {/* In-call notes input for AI calls */}
+      {status === 'active' && agentId && (
+          <div className="flex-shrink-0 mb-6 flex gap-2">
+            <Textarea 
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                placeholder={`Live-Notiz für ${agent?.name} eingeben...`}
+                className="bg-white/5 border-white/10 min-h-0 h-12"
+                rows={1}
+            />
+            <Button onClick={handleSendNote} size="icon" className="w-12 h-12" disabled={!newNote.trim()}>
+                <Send />
+            </Button>
+          </div>
+      )}
 
       {/* Controls */}
       <div className="flex-shrink-0">

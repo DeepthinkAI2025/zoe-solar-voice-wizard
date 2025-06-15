@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -18,6 +17,7 @@ type CallState = null | {
   number: string;
   status: 'incoming' | 'active';
   agentId?: string;
+  notes?: string;
 };
 
 const Index = () => {
@@ -47,9 +47,13 @@ const Index = () => {
     setCallState({ number, status: 'active' });
   };
 
-  const handleAgentSelect = (agentId: string) => {
+  const handleAgentSelect = (agentId: string, notes: string) => {
     if(showAgentSelector) {
-        setCallState({ number: showAgentSelector, status: 'active', agentId });
+        toast({
+          title: "KI-Anruf wird gestartet...",
+          description: `Agent wird mit Ihren Notizen vorbereitet.`
+        });
+        setCallState({ number: showAgentSelector, status: 'active', agentId, notes });
         setShowAgentSelector(null);
     }
   };
