@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { contacts as initialContactsData, Contact as MockContact } from '@/data/mock';
+import { contacts as initialContactsData } from '@/data/mock';
 import { toast } from "sonner"
 
 export interface Contact {
@@ -9,8 +9,9 @@ export interface Contact {
   number: string;
 }
 
-const initialContacts: Contact[] = initialContactsData.map((c: MockContact, i: number) => ({
-  ...c,
+const initialContacts: Contact[] = initialContactsData.map((c, i) => ({
+  name: c.name,
+  number: c.number,
   id: `mock-contact-${i}`,
 }));
 
