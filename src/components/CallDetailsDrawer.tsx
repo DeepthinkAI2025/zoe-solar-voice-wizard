@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Drawer,
   DrawerContent,
@@ -10,7 +10,7 @@ import {
   DrawerClose,
 } from '@/components/ui/drawer';
 import { Button } from './ui/button';
-import { Play, FileText, Bot, Phone, X } from 'lucide-react';
+import { Play, FileText, Bot, Phone, X, Pause } from 'lucide-react';
 
 interface CallDetailsDrawerProps {
   call: {
@@ -27,6 +27,8 @@ interface CallDetailsDrawerProps {
 }
 
 const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, onStartCall, onStartCallManually }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
   if (!call) return null;
 
   const handleCallback = () => {
@@ -43,10 +45,26 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
     }
   };
 
+  const handleTogglePlay = () => {
+    setIsPlaying(prev => {
+      if (!prev) {
+        console.log("Audio playback started.");
+      } else {
+        console.log("Audio playback paused.");
+      }
+      return !prev;
+    });
+  };
+
   const shouldShowCallbackButtons = call.number && call.number !== 'Unbekannt';
 
   return (
-    <Drawer open={!!call} onClose={onClose} onOpenChange={(open) => !open && onClose()}>
+    <Drawer open={!!call} onOpenChange={(open) => {
+      if (!open) {
+        setIsPlaying(false);
+        onClose();
+      }
+    }}>
       <DrawerContent>
         <DrawerHeader className="text-left relative">
           <DrawerTitle>{call.name}</DrawerTitle>
@@ -70,12 +88,14 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
           
           <div>
             <h3 className="font-semibold text-white mb-2">Audio</h3>
-            <div className="bg-white/5 p-3 rounded-lg flex items-center justify-between">
-              <p className="text-muted-foreground text-sm">Aufnahme abhören</p>
-              <Button size="icon" variant="ghost">
-                <Play className="text-primary" />
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              className="w-full justify-between items-center bg-white/5 hover:bg-white/10 p-3 rounded-lg h-auto"
+              onClick={handleTogglePlay}
+            >
+              <span className="text-muted-foreground text-sm font-normal">Aufnahme abhören</span>
+              {isPlaying ? <Pause className="text-primary" /> : <Play className="text-primary" />}
+            </Button>
           </div>
 
           {call.transcript && (
