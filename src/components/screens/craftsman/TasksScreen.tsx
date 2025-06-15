@@ -3,12 +3,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 const initialTasks: {id: number, text: string, priority: 'high' | 'medium' | 'low', completed: boolean}[] = [
     { id: 1, text: 'Material für Baustelle "Musterfrau" bestellen', priority: 'high', completed: false },
@@ -33,6 +34,7 @@ const TasksScreen = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newTaskText, setNewTaskText] = useState('');
   const [newTaskPriority, setNewTaskPriority] = useState<'high' | 'medium' | 'low'>('medium');
+  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
 
   const handleToggle = (id: number) => {
     setTaskList(
@@ -56,6 +58,12 @@ const TasksScreen = () => {
     setNewTaskPriority('medium');
   };
   
+  const handleDeleteTask = () => {
+    if (taskToDelete === null) return;
+    setTaskList(prevTasks => prevTasks.filter(task => task.id !== taskToDelete));
+    setTaskToDelete(null);
+  };
+
   const openTasks = taskList.filter(t => !t.completed);
   const completedTasks = taskList.filter(t => t.completed);
 
@@ -90,7 +98,7 @@ const TasksScreen = () => {
                                 >
                                     <Card className="bg-secondary/50 border-none">
                                         <CardContent className="p-4 flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
+                                        <div className="flex items-center space-x-4 flex-grow">
                                             <Checkbox
                                             id={`task-${task.id}`}
                                             checked={task.completed}
@@ -104,9 +112,14 @@ const TasksScreen = () => {
                                             {task.text}
                                             </label>
                                         </div>
-                                        <Badge variant={badgeInfo.variant}>
-                                            {badgeInfo.label}
-                                        </Badge>
+                                        <div className="flex items-center gap-1">
+                                            <Badge variant={badgeInfo.variant}>
+                                                {badgeInfo.label}
+                                            </Badge>
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setTaskToDelete(task.id)}>
+                                                <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                            </Button>
+                                        </div>
                                         </CardContent>
                                     </Card>
                                 </motion.div>
@@ -131,7 +144,7 @@ const TasksScreen = () => {
                                 >
                                     <Card className="bg-background/50 border-none">
                                         <CardContent className="p-4 flex items-center justify-between">
-                                        <div className="flex items-center space-x-4">
+                                        <div className="flex items-center space-x-4 flex-grow">
                                             <Checkbox
                                             id={`task-${task.id}`}
                                             checked={task.completed}
@@ -145,6 +158,9 @@ const TasksScreen = () => {
                                             {task.text}
                                             </label>
                                         </div>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setTaskToDelete(task.id)}>
+                                            <Trash2 className="h-4 w-4 text-muted-foreground" />
+                                        </Button>
                                         </CardContent>
                                     </Card>
                                 </motion.div>
@@ -197,6 +213,20 @@ const TasksScreen = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <AlertDialog open={taskToDelete !== null} onOpenChange={(open) => !open && setTaskToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sind Sie sicher?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Diese Aktion kann nicht rückgängig gemacht werden. Dadurch wird die Aufgabe dauerhaft gelöscht.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteTask} className={buttonVariants({ variant: "destructive" })}>Löschen</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
