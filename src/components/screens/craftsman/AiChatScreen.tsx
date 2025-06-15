@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import AiChatAnimation from '@/components/craftsman/AiChatAnimation';
+import ModernAiAnimation from '@/components/craftsman/ModernAiAnimation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Mic, Send, KeyRound } from 'lucide-react';
@@ -14,11 +14,13 @@ import { Label } from "@/components/ui/label";
 import { cn } from '@/lib/utils';
 import { useRemoteStt } from '@/hooks/useRemoteStt';
 import { useRemoteTts } from '@/hooks/useRemoteTts';
+
 interface Message {
   id: number;
   text: string;
   sender: 'user' | 'ai';
 }
+
 const AiChatScreen = () => {
   const [messages, setMessages] = useState<Message[]>([{
     id: 1,
@@ -33,7 +35,6 @@ const AiChatScreen = () => {
   const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [provider, setProvider] = useState<AiProvider>('gemini');
-  // Fix: ApiKeys enthält nur noch gemini/deepseek/openrouter!
   const [tempApiKeys, setTempApiKeys] = useState<ApiKeys>({
     gemini: '',
     deepseek: '',
@@ -53,8 +54,8 @@ const AiChatScreen = () => {
     hasRecognitionSupport,
     error
   } = useSpeechRecognition();
+
   useEffect(() => {
-    // Live-Transkript im Input-Feld anzeigen
     setInput(transcript);
   }, [transcript]);
   useEffect(() => {
@@ -73,13 +74,15 @@ const AiChatScreen = () => {
   }, [messages, isTyping]);
   useEffect(() => {
     if (isApiKeyModalOpen) {
-      setTempApiKeys(apiKeys);   // Keine grok/groq mehr
+      setTempApiKeys(apiKeys);
     }
   }, [isApiKeyModalOpen, apiKeys]);
+
   const handleSaveApiKeys = () => {
     saveApiKeys(tempApiKeys);
     setIsApiKeyModalOpen(false);
   };
+
   const handleSendMessage = async () => {
     if (input.trim() === '' || isTyping) return;
     if (!hasApiKey(provider)) {
@@ -113,13 +116,12 @@ const AiChatScreen = () => {
       };
       setMessages(prev => [...prev, aiResponse]);
     } else {
-      // Handle error case, put back the original message in input and remove optimistic message
       setInput(currentInput);
       setMessages(messages);
-      // Toast is shown inside useAiChat hook
     }
     setIsTyping(false);
   };
+
   const handleMicClick = () => {
     if (isListening) {
       stopListening();
@@ -135,23 +137,15 @@ const AiChatScreen = () => {
       startListening();
     }
   };
+
   const { speak } = useRemoteTts();
-  // Send message when user stops talking
+
   useEffect(() => {
     if (!isListening && transcript.trim()) {
       handleSendMessage();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isListening]);
 
-  // Optional: So kann künftig Text nach Erhalt einer AI-Nachricht per TTS ausgegeben werden, sobald /tts aktiv ist.
-  // Beispiel-Nutzung:
-  // useEffect(() => {
-  //   const lastMsg = messages[messages.length - 1];
-  //   if (lastMsg && lastMsg.sender === 'ai') {
-  //     speak(lastMsg.text);
-  //   }
-  // }, [messages, speak]); // (auskommentiert, bis TTS bereit)
   return <div className="flex flex-col h-full">
       <ScrollArea className="flex-grow" viewportRef={scrollAreaViewportRef}>
         <div className="p-4 space-y-4 pb-4 min-h-[calc(100%-4rem)] flex flex-col">
@@ -179,7 +173,7 @@ const AiChatScreen = () => {
             </AnimatePresence>
           </div>
           <div className="flex flex-col items-center justify-center p-4">
-              <AiChatAnimation isListening={isListening} />
+              <ModernAiAnimation isListening={isListening} />
           </div>
         </div>
       </ScrollArea>
@@ -277,4 +271,5 @@ const AiChatScreen = () => {
       </AlertDialog>
     </div>;
 };
+
 export default AiChatScreen;

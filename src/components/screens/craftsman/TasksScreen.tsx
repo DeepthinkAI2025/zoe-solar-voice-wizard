@@ -1,10 +1,11 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Bot } from 'lucide-react';
 import { useTasks } from '@/hooks/useTasks';
 import TaskList from '@/components/tasks/TaskList';
 import NewTaskDialog from '@/components/tasks/NewTaskDialog';
 import DeleteTaskDialog from '@/components/tasks/DeleteTaskDialog';
+import AiTaskDialog from '@/components/tasks/AiTaskDialog';
 
 const TasksScreen = () => {
     const {
@@ -27,6 +28,8 @@ const TasksScreen = () => {
         handleDeleteSubtask,
     } = useTasks();
 
+    const [isAiDialogOpen, setIsAiDialogOpen] = React.useState(false);
+
     const handleDialogClose = (open: boolean) => {
         if (!open) {
             setIsNewTaskDialogOpen(false);
@@ -34,10 +37,20 @@ const TasksScreen = () => {
         }
     };
 
+    const handleTasksGenerated = (tasks: Array<{ text: string; priority: 'high' | 'medium' | 'low' }>) => {
+        tasks.forEach(task => {
+            handleAddTask(task.text, task.priority);
+        });
+    };
+
     return (
         <>
             <div className="p-4 flex-grow overflow-y-auto">
-                <div className="flex justify-end items-center mb-6">
+                <div className="flex justify-end items-center gap-2 mb-6">
+                    <Button onClick={() => setIsAiDialogOpen(true)} variant="outline">
+                        <Bot className="mr-2 h-4 w-4" />
+                        KI-Aufgaben
+                    </Button>
                     <Button onClick={() => setIsNewTaskDialogOpen(true)}>
                         <Plus className="mr-2 h-4 w-4" />
                         Neue Aufgabe
@@ -89,6 +102,12 @@ const TasksScreen = () => {
                 isOpen={taskToDelete !== null}
                 onCancel={cancelDeleteTask}
                 onConfirm={handleDeleteTask}
+            />
+
+            <AiTaskDialog
+                isOpen={isAiDialogOpen}
+                onOpenChange={setIsAiDialogOpen}
+                onTasksGenerated={handleTasksGenerated}
             />
         </>
     );
