@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Mic, MicOff, Phone, Volume2, Bluetooth } from 'lucide-react';
 
@@ -26,19 +25,10 @@ export const useActiveCallLogic = ({ agentId, contactName, startMuted }: UseActi
         setIsMuted(!!agentId);
     }, [agentId]);
     
-    const audioOptionsWithMute = useMemo(() => [
-        ...audioOutputs,
-        { id: 'mute-toggle', name: isMuted ? 'Ton an' : 'Stumm', icon: isMuted ? Mic : MicOff }
-    ], [isMuted]);
-    
     const selectedAudioDevice = useMemo(() => audioOutputs.find(o => o.id === audioOutput) || audioOutputs[0], [audioOutput]);
 
     const handleAudioOutputChange = (id: string) => {
-        if (id === 'mute-toggle') {
-            setIsMuted(prev => !prev);
-        } else {
-            setAudioOutput(id);
-        }
+        setAudioOutput(id);
     };
 
     return {
@@ -46,7 +36,7 @@ export const useActiveCallLogic = ({ agentId, contactName, startMuted }: UseActi
         isRingerMuted, setIsRingerMuted,
         scrollContainerRef,
         callerName,
-        audioOptionsWithMute,
+        audioOptionsWithMute: audioOutputs,
         selectedAudioDevice,
         handleAudioOutputChange,
     };
