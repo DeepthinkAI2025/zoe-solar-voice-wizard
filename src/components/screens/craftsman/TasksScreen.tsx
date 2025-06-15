@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,7 +11,7 @@ const initialTasks: {id: number, text: string, priority: 'high' | 'medium' | 'lo
     { id: 4, text: 'Werkzeug warten', priority: 'medium', completed: false },
 ];
 
-const getPriorityBadgeInfo = (priority: 'high' | 'medium' | 'low') => {
+const getPriorityBadgeInfo = (priority: 'high' | 'medium' | 'low'): { variant: 'destructive' | 'default' | 'secondary' | 'outline', label: string } => {
   switch (priority) {
     case 'high':
       return { variant: 'destructive', label: 'Hoch' };
@@ -51,37 +50,40 @@ const TasksScreen = () => {
                 <h2 className="font-semibold text-lg mb-3">Offen</h2>
                 <div className="space-y-3">
                      <AnimatePresence>
-                        {openTasks.length > 0 ? openTasks.map(task => (
-                            <motion.div
-                                key={task.id}
-                                layout
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
-                            >
-                                <Card className="bg-secondary/50 border-none">
-                                    <CardContent className="p-4 flex items-center justify-between">
-                                    <div className="flex items-center space-x-4">
-                                        <Checkbox
-                                        id={`task-${task.id}`}
-                                        checked={task.completed}
-                                        onCheckedChange={() => handleToggle(task.id)}
-                                        className="data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-                                        />
-                                        <label
-                                        htmlFor={`task-${task.id}`}
-                                        className={`text-sm font-medium leading-none`}
-                                        >
-                                        {task.text}
-                                        </label>
-                                    </div>
-                                    <Badge variant={getPriorityBadgeInfo(task.priority).variant}>
-                                        {getPriorityBadgeInfo(task.priority).label}
-                                    </Badge>
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
-                        )) : <p className="text-sm text-muted-foreground pl-2">Super! Keine offenen Aufgaben.</p>}
+                        {openTasks.length > 0 ? openTasks.map(task => {
+                            const badgeInfo = getPriorityBadgeInfo(task.priority);
+                            return (
+                                <motion.div
+                                    key={task.id}
+                                    layout
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, x: -20, transition: { duration: 0.2 } }}
+                                >
+                                    <Card className="bg-secondary/50 border-none">
+                                        <CardContent className="p-4 flex items-center justify-between">
+                                        <div className="flex items-center space-x-4">
+                                            <Checkbox
+                                            id={`task-${task.id}`}
+                                            checked={task.completed}
+                                            onCheckedChange={() => handleToggle(task.id)}
+                                            className="data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                                            />
+                                            <label
+                                            htmlFor={`task-${task.id}`}
+                                            className={`text-sm font-medium leading-none`}
+                                            >
+                                            {task.text}
+                                            </label>
+                                        </div>
+                                        <Badge variant={badgeInfo.variant}>
+                                            {badgeInfo.label}
+                                        </Badge>
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            );
+                        }) : <p className="text-sm text-muted-foreground pl-2">Super! Keine offenen Aufgaben.</p>}
                     </AnimatePresence>
                 </div>
             </div>
