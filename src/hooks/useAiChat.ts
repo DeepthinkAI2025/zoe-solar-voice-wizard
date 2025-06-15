@@ -8,9 +8,9 @@ interface Message {
   sender: 'user' | 'ai';
 }
 
-// Map local message sender to API role
-const senderToRole = (sender: 'user' | 'ai'): 'user' | 'assistant' => {
-    return sender === 'user' ? 'user' : 'assistant';
+// Map local message sender to API role for Gemini
+const senderToRole = (sender: 'user' | 'ai'): 'user' | 'model' => {
+    return sender === 'user' ? 'user' : 'model';
 };
 
 export const useAiChat = () => {
@@ -18,7 +18,7 @@ export const useAiChat = () => {
     const { toast } = useToast();
 
     useEffect(() => {
-        const storedApiKey = localStorage.getItem('perplexity_api_key');
+        const storedApiKey = localStorage.getItem('google_ai_api_key');
         if (storedApiKey) {
             setApiKey(storedApiKey);
         }
@@ -26,7 +26,7 @@ export const useAiChat = () => {
 
     const saveApiKey = (key: string) => {
         if (key.trim()) {
-            localStorage.setItem('perplexity_api_key', key);
+            localStorage.setItem('google_ai_api_key', key);
             setApiKey(key);
             toast({ title: 'API-Schlüssel gespeichert.' });
         }
@@ -36,47 +36,64 @@ export const useAiChat = () => {
         if (!apiKey) {
             toast({
                 title: 'API-Schlüssel fehlt',
-                description: 'Bitte hinterlege deinen Perplexity API-Schlüssel.',
+                description: 'Bitte hinterlege deinen Google AI API-Schlüssel.',
                 variant: 'destructive',
             });
             return null;
         }
 
-        const systemMessage = {
-            role: 'system',
-            content: "Du bist Zoe, eine freundliche und hilfsbereite KI-Assistentin für Handwerker der Firma ZOE Solar. Antworte auf Deutsch. Sei präzise und kurz."
-        };
+        // Gemini API requires alternating user/model roles. This ensures it.
+        const validMessages = messages.reduce((acc, current) => {
+            if (acc.length > 0 && acc[acc.length - 1].sender === current.sender) {
+                acc.pop(); // Remove previous message from same sender
+            }
+            acc.push(current);
+            return acc;
+        }, [] as Message[]);
         
-        const apiMessages = messages.map(msg => ({
+        const apiMessages = validMessages.map(msg => ({
             role: senderToRole(msg.sender),
-            content: msg.text,
+            parts: [{ text: msg.text }],
         }));
 
         try {
-            const response = await fetch('https://api.perplexity.ai/chat/completions', {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    model: 'llama-3.1-sonar-small-128k-online',
-                    messages: [systemMessage, ...apiMessages.slice(-10)], // Send last 10 messages for context
-                    temperature: 0.7,
+                    contents: apiMessages.slice(-10), // Send last 10 messages for context
+                    systemInstruction: {
+                        parts: [{
+                            text: "Du bist Zoe, eine freundliche und hilfsbereite KI-Assistentin für Handwerker der Firma ZOE Solar. Deine Expertise liegt im Bereich Solartechnik und Photovoltaik. Antworte auf Deutsch. Sei präzise und kurz."
+                        }]
+                    },
+                    generationConfig: {
+                        temperature: 0.7,
+                    }
                 }),
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Perplexity API error:', errorData);
-                throw new Error(errorData.error?.message || 'Unbekannter API Fehler');
+                console.error('Google Gemini API error:', data);
+                const errorMessage = data.error?.message || 'Unbekannter API Fehler';
+                throw new Error(errorMessage);
             }
 
-            const data = await response.json();
-            return data.choices[0].message.content;
+            if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                if (data.promptFeedback?.blockReason) {
+                    throw new Error(`Anfrage blockiert: ${data.promptFeedback.blockReason}. Bitte Anfrage anpassen.`);
+                }
+                throw new Error('Keine gültige Antwort von der API erhalten.');
+            }
+
+            return data.candidates[0].content.parts[0].text;
 
         } catch (error) {
-            console.error("Fehler bei der Kommunikation mit der Perplexity API:", error);
+            console.error("Fehler bei der Kommunikation mit der Google Gemini API:", error);
             const errorMessage = error instanceof Error ? error.message : "Ein unbekannter Fehler ist aufgetreten.";
             toast({
                 title: 'API Fehler',

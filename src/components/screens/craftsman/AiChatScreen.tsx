@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import AiChatAnimation from '@/components/craftsman/AiChatAnimation';
 import { Input } from '@/components/ui/input';
@@ -86,7 +85,7 @@ const AiChatScreen = () => {
     if (!isApiKeySet) {
         toast({
             title: "API-Schlüssel fehlt",
-            description: "Bitte klicke auf das Schlüssel-Symbol, um deinen API-Schlüssel einzugeben.",
+            description: "Bitte klicke auf das Schlüssel-Symbol, um deinen Google AI API-Schlüssel einzugeben.",
             variant: "destructive"
         })
         setIsApiKeyModalOpen(true);
@@ -123,7 +122,7 @@ const AiChatScreen = () => {
         setMessages(messages);
         toast({
             title: 'Senden fehlgeschlagen',
-            description: 'Die Nachricht konnte nicht verarbeitet werden. Bitte prüfe deinen API-Schlüssel.',
+            description: 'Die Nachricht konnte nicht verarbeitet werden. Bitte prüfe deinen API-Schlüssel und die Internetverbindung.',
             variant: 'destructive',
         })
     }
@@ -237,10 +236,9 @@ const AiChatScreen = () => {
       <AlertDialog open={isApiKeyModalOpen} onOpenChange={setIsApiKeyModalOpen}>
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>Perplexity API-Schlüssel</AlertDialogTitle>
+                <AlertDialogTitle>Google AI API-Schlüssel</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Um die KI-Chat-Funktion zu nutzen, gib bitte deinen Perplexity API-Schlüssel ein. Er wird sicher in deinem Browser gespeichert.
-                    Wir empfehlen, für eine sichere Verwaltung deiner Schlüssel unsere Supabase-Integration zu nutzen.
+                    Um die KI-Chat-Funktion zu nutzen, gib bitte deinen Google AI API-Schlüssel ein. Er wird sicher in deinem Browser gespeichert. Deinen Schlüssel erhältst du im Google AI Studio.
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <Input 
