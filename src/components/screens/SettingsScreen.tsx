@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 import { VoiceCloneDialog } from '@/components/VoiceCloneDialog';
@@ -90,7 +91,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
   };
 
   return (
-    <div className="p-4 space-y-6 h-full overflow-y-auto">
+    <div className="px-4 py-2 space-y-6 h-full overflow-y-auto">
       <input
         type="file"
         ref={fileInputRef}
