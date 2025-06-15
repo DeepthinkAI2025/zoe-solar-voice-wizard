@@ -14,6 +14,8 @@ export const usePhoneState = () => {
     workingHoursStart: settings.workingHoursStart,
     workingHoursEnd: settings.workingHoursEnd,
     autoAnswerEnabled: settings.autoAnswerEnabled,
+    agents: agentManagement.agents,
+    globalSystemInstructions: agentManagement.globalSystemInstructions,
   });
 
   return {
@@ -24,3 +26,4 @@ export const usePhoneState = () => {
     ...callManagement,
   };
 };
+

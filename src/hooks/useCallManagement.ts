@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import type { CallHistoryItem, CallState } from '@/types/call';
+import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 
 interface CallManagementProps {
   silentModeEnabled: boolean;
   workingHoursStart: number;
   workingHoursEnd: number;
   autoAnswerEnabled: boolean;
+  agents: AgentWithSettings[];
+  globalSystemInstructions: string;
 }
 
-export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workingHoursEnd, autoAnswerEnabled }: CallManagementProps) => {
+export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workingHoursEnd, autoAnswerEnabled, agents, globalSystemInstructions }: CallManagementProps) => {
   const [callState, setCallState] = useState<CallState>(null);
   const [showAgentSelector, setShowAgentSelector] = useState<string | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
@@ -48,6 +51,18 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
             title: "Anruf automatisch angenommen",
             description: `KI-Agent für allgemeine Anfragen übernimmt.`
           });
+
+          const agentId = 'general';
+          const agent = agents.find(a => a.id === agentId);
+          const fullInstructions = agent 
+            ? `${globalSystemInstructions}\n\n${agent.systemInstructions}`
+            : globalSystemInstructions;
+
+          console.log("--- AUTO-ANSWER ---");
+          console.log("Anruf wird automatisch mit Agent 'general' beantwortet.");
+          console.log("VOLLSTÄNDIGE ANWEISUNGEN:", fullInstructions);
+          console.log("-------------------");
+          
           return {
             ...currentCallState,
             status: 'active',
@@ -63,7 +78,7 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     return () => {
       clearTimeout(autoAnswerTimeout);
     };
-  }, [callState, toast, autoAnswerEnabled, outboundCallActive]);
+  }, [callState, toast, autoAnswerEnabled, outboundCallActive, agents, globalSystemInstructions]);
 
 
   const handleStartCall = (number: string) => {
@@ -78,11 +93,24 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
   const handleAgentSelect = (agentId: string, notes: string) => {
     if(!showAgentSelector) return;
 
+    const agent = agents.find(a => a.id === agentId);
+    if (!agent) {
+        console.error("Agent not found:", agentId);
+        toast({ title: "Fehler", description: "Ausgewählter Agent nicht gefunden.", variant: "destructive" });
+        return;
+    }
+
+    const fullInstructions = `${globalSystemInstructions}\n\n${agent.systemInstructions}`;
+    console.log(`--- STARTING CALL WITH AGENT: ${agent.name} ---`);
+    console.log("FULL INSTRUCTIONS:", fullInstructions);
+    console.log("USER NOTES:", notes || "(none)");
+    console.log("---------------------------------------");
+
     const isForward = callState?.status === 'active' && callState?.number === showAgentSelector;
 
     if (isForward) {
         // Forwarding logic
-        toast({ title: "Anruf wird weitergeleitet...", description: "Einen Moment bitte." });
+        toast({ title: "Anruf wird weitergeleitet...", description: `Zu ${agent.name} mit neuen Anweisungen.` });
         setIsUiForwarding(true);
         setShowAgentSelector(null);
 
@@ -93,13 +121,13 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
                 notes: (cs.notes ? cs.notes + "\n" : "") + "Weitergeleitet mit Notiz: " + notes 
             } : null);
             setIsUiForwarding(false);
-        }, 3000);
+        }, 2000);
     } else {
         // New call logic
         setOutboundCallActive(true);
         toast({
           title: "KI-Anruf wird gestartet...",
-          description: `Agent wird mit Ihren Notizen vorbereitet.`
+          description: `Agent ${agent.name} wird mit Ihren Anweisungen vorbereitet.`
         });
         setCallState({ number: showAgentSelector, status: 'active', agentId, notes });
         setShowAgentSelector(null);
