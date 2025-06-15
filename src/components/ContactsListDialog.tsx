@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -42,15 +41,13 @@ export const ContactsListDialog: React.FC<ContactsListDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="h-[80vh] flex flex-col bg-background border-border p-0 gap-0">
         <div className="flex items-center justify-between border-b p-4 flex-shrink-0">
-          <Button size="icon" variant="ghost" onClick={handleAdd}>
-            <Plus size={22} />
+          <Button size="icon" variant="outline" onClick={handleAdd}>
+            <Plus size={18} />
           </Button>
           <h2 className="text-lg font-semibold leading-none tracking-tight">Kontakte</h2>
-          <DialogClose asChild>
-            <Button size="icon" variant="ghost">
-              <X size={22} />
-            </Button>
-          </DialogClose>
+          {/* This is a placeholder to balance the + button, so the title remains centered.
+              The actual close button is rendered by DialogContent by default. */}
+          <div className="w-10 h-10" />
         </div>
         <div className="p-4 flex-shrink-0">
             <div className="relative">
