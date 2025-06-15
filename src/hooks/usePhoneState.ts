@@ -19,6 +19,7 @@ export const usePhoneState = () => {
     autoAnswerEnabled: settings.autoAnswerEnabled,
     agents: agentManagement.agents,
     globalSystemInstructions: agentManagement.globalSystemInstructions,
+    contacts: contactManagement.contacts,
   });
 
   const openContactEditor = (contactId: string) => {

@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import type { CallHistoryItem, CallState } from '@/types/call';
 import type { AgentWithSettings } from '@/hooks/useAgentManagement';
+import type { Contact } from '@/hooks/useContactManagement';
 
 interface CallManagementProps {
   silentModeEnabled: boolean;
@@ -10,9 +12,10 @@ interface CallManagementProps {
   autoAnswerEnabled: boolean;
   agents: AgentWithSettings[];
   globalSystemInstructions: string;
+  contacts: Contact[];
 }
 
-export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workingHoursEnd, autoAnswerEnabled, agents, globalSystemInstructions }: CallManagementProps) => {
+export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workingHoursEnd, autoAnswerEnabled, agents, globalSystemInstructions, contacts }: CallManagementProps) => {
   const [callState, setCallState] = useState<CallState>(null);
   const [showAgentSelector, setShowAgentSelector] = useState<string | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
@@ -47,9 +50,21 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
       setCallState(currentCallState => {
         // Check again in case the user answered/rejected in the meantime
         if (currentCallState?.status === 'incoming') {
+          const contact = contacts.find(c => c.number === currentCallState.number);
+          const callerName = contact?.name || 'Unbekannter Anrufer';
+          const firstAIMessage = "Hallo, ZOE Solar, mein Name ist Alex, der KI-Assistent. Wie kann ich Ihnen helfen?";
+          
           toast({
             title: "Anruf automatisch angenommen",
-            description: `KI-Agent für allgemeine Anfragen übernimmt.`
+            description: (
+              <div className="flex flex-col gap-2 mt-2">
+                <p className="text-sm font-medium">{callerName} <span className="text-muted-foreground">({currentCallState.number})</span></p>
+                <p className="text-sm text-muted-foreground">Nach 6s vom KI-Agenten übernommen.</p>
+                <p className="text-xs italic text-muted-foreground pt-2 border-t border-border mt-2">
+                  KI: "{firstAIMessage}"
+                </p>
+              </div>
+            )
           });
 
           const agentId = 'general';
@@ -78,7 +93,7 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     return () => {
       clearTimeout(autoAnswerTimeout);
     };
-  }, [callState, toast, autoAnswerEnabled, outboundCallActive, agents, globalSystemInstructions]);
+  }, [callState, toast, autoAnswerEnabled, outboundCallActive, agents, globalSystemInstructions, contacts]);
 
 
   const handleStartCall = (number: string) => {
