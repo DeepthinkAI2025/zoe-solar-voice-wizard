@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { initialTasks } from '@/data/tasks';
 import type { Task } from '@/types/task';
@@ -80,6 +79,7 @@ export const useTasks = () => {
     const completedTasks = useMemo(() => taskList.filter(t => t.completed), [taskList]);
 
     return {
+        taskList,
         openTasks,
         completedTasks,
         isNewTaskDialogOpen,
