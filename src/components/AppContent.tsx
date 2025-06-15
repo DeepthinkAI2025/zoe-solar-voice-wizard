@@ -3,12 +3,18 @@ import React from 'react';
 import Dialpad from '@/components/Dialpad';
 import ContactsScreen from '@/components/screens/ContactsScreen';
 import SettingsScreen from '@/components/screens/SettingsScreen';
+import AppointmentsScreen from '@/components/screens/craftsman/AppointmentsScreen';
+import TasksScreen from '@/components/screens/craftsman/TasksScreen';
+import ProductsScreen from '@/components/screens/craftsman/ProductsScreen';
+import AiChatScreen from '@/components/screens/craftsman/AiChatScreen';
+import type { NavItemId } from '@/hooks/usePhoneState';
 import type { CallHistoryItem } from '@/types/call';
 import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 import type { Contact } from '@/hooks/useContactManagement';
 
 interface AppContentProps {
-  activeTab: 'dialpad' | 'history' | 'settings';
+  activeApp: 'phone' | 'craftsman';
+  activeTab: NavItemId;
   // History/Contacts props
   onCallSelect: (call: CallHistoryItem) => void;
   onSelectContact: (number: string) => void;
@@ -44,10 +50,11 @@ interface AppContentProps {
   setAgentToFocusInSettings: (agentId: string | null) => void;
 
   // Dialpad props
-  onSchedule: () => void;
+  onSchedule: (number: string) => void;
 }
 
 const AppContent: React.FC<AppContentProps> = ({
+  activeApp,
   activeTab,
   // History/Contacts
   onCallSelect,
@@ -84,6 +91,22 @@ const AppContent: React.FC<AppContentProps> = ({
   // Dialpad
   onSchedule,
 }) => {
+  if (activeApp === 'craftsman') {
+    switch (activeTab) {
+      case 'termine':
+        return <AppointmentsScreen />;
+      case 'aufgaben':
+        return <TasksScreen />;
+      case 'produkte':
+        return <ProductsScreen />;
+      case 'ki-chat':
+        return <AiChatScreen />;
+      default:
+        return <AppointmentsScreen />;
+    }
+  }
+
+  // Phone App
   switch (activeTab) {
     case 'history':
       return <ContactsScreen 

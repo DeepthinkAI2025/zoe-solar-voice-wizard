@@ -33,10 +33,11 @@ const Index = () => {
 
   return (
     <div ref={containerRef} className="h-screen w-full max-w-md mx-auto bg-background flex flex-col relative rounded-3xl border-4 border-border shadow-2xl shadow-primary/20">
-      <AppHeader />
+      <AppHeader onLogoClick={phoneState.switchApp} />
 
       <main className="flex-grow flex flex-col overflow-hidden">
         <AppContent
+          activeApp={phoneState.activeApp}
           activeTab={phoneState.activeTab}
           callHistory={callHistory}
           onCallSelect={phoneState.setSelectedCall}
@@ -72,7 +73,12 @@ const Index = () => {
         />
       </main>
 
-      <BottomNav activeTab={phoneState.activeTab} setActiveTab={phoneState.setActiveTab} className="flex-shrink-0" />
+      <BottomNav 
+        activeApp={phoneState.activeApp}
+        activeTab={phoneState.activeTab} 
+        setActiveTab={phoneState.setActiveTab} 
+        className="flex-shrink-0" 
+      />
 
       {phoneState.agentSelectorState && (
         <AgentSelector 

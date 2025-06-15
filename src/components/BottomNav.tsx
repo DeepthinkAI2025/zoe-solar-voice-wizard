@@ -3,22 +3,31 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Icon from './Icon';
 import { cn } from '@/lib/utils';
-
-type NavItemId = 'dialpad' | 'history' | 'settings';
+import type { NavItemId } from '@/hooks/usePhoneState';
 
 interface BottomNavProps {
+  activeApp: 'phone' | 'craftsman';
   activeTab: NavItemId;
   setActiveTab: (tab: NavItemId) => void;
   className?: string;
 }
 
-const navItems: { id: NavItemId; label: string; icon: string }[] = [
+const phoneNavItems: { id: NavItemId; label: string; icon: string }[] = [
     { id: 'dialpad', label: 'Wähltastatur', icon: 'Phone' },
     { id: 'history', label: 'Anrufliste', icon: 'History' },
     { id: 'settings', label: 'Einstellungen', icon: 'Settings' },
 ];
 
-const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, className }) => {
+const craftsmanNavItems: { id: NavItemId; label: string; icon: string }[] = [
+    { id: 'termine', label: 'Termine', icon: 'Calendar' },
+    { id: 'aufgaben', label: 'Aufgaben', icon: 'ClipboardList' },
+    { id: 'produkte', label: 'Produkte', icon: 'Package' },
+    { id: 'ki-chat', label: 'KI-Chat', icon: 'Bot' },
+];
+
+const BottomNav: React.FC<BottomNavProps> = ({ activeApp, activeTab, setActiveTab, className }) => {
+  const navItems = activeApp === 'phone' ? phoneNavItems : craftsmanNavItems;
+
   return (
     <nav className={cn(
       "relative flex justify-around items-center p-2 mx-auto mb-4 w-11/12 max-w-sm rounded-3xl z-10",

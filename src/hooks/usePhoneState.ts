@@ -6,8 +6,11 @@ import { useCallManagement } from './useCallManagement';
 import { useContactManagement } from './useContactManagement';
 import type { CallHistoryItem } from '@/types/call';
 
+export type NavItemId = 'dialpad' | 'history' | 'settings' | 'termine' | 'aufgaben' | 'produkte' | 'ki-chat';
+
 export const usePhoneState = () => {
-  const [activeTab, setActiveTab] = useState<'dialpad' | 'history' | 'settings'>('dialpad');
+  const [activeApp, setActiveApp] = useState<'phone' | 'craftsman'>('phone');
+  const [activeTab, setActiveTab] = useState<NavItemId>('dialpad');
   const [contactToEditId, setContactToEditId] = useState<string | null>(null);
   const [agentSelectorState, setAgentSelectorState] = useState<{ number: string; context?: string } | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
@@ -25,6 +28,18 @@ export const usePhoneState = () => {
     agents: agentManagement.agents,
     contacts: contactManagement.contacts,
   });
+
+  const switchApp = useCallback(() => {
+    setActiveApp(prevApp => {
+        const newApp = prevApp === 'phone' ? 'craftsman' : 'phone';
+        if (newApp === 'craftsman') {
+            setActiveTab('termine');
+        } else {
+            setActiveTab('dialpad');
+        }
+        return newApp;
+    });
+  }, []);
 
   const openContactEditor = (contactId: string) => {
     setContactToEditId(contactId);
@@ -81,12 +96,14 @@ export const usePhoneState = () => {
     }
   }, [agentManagement.agents, callManagement]);
 
-  const handleScheduleCall = useCallback(() => {
-    // Placeholder
-    console.log("Scheduling call...");
-  }, []);
+  const handleScheduleCall = useCallback((number: string) => {
+    console.log(`Scheduling call for ${number}...`);
+    handleStartCall(number, 'schedule');
+  }, [handleStartCall]);
 
   return {
+    activeApp,
+    switchApp,
     activeTab,
     setActiveTab,
     contactToEditId,
