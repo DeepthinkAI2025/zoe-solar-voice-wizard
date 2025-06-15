@@ -1,165 +1,88 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+
+import React, { useState } from 'react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { X } from 'lucide-react';
+import type { Contact, Category } from '@/hooks/useContactManagement';
+import { categories, contactCategoryLabels } from '@/hooks/useContactManagement';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { contactCategories, type Contact } from '@/hooks/useContactManagement';
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: 'Name muss mindestens 2 Zeichen lang sein.' }),
-  number: z.string().min(5, { message: 'Nummer muss mindestens 5 Zeichen lang sein.' }),
-  category: z.enum(contactCategories).optional(),
-});
+} from "@/components/ui/select"
 
 interface ContactEditorProps {
-  contact: Contact | null;
-  isOpen: boolean;
-  onOpenChange: (isOpen: boolean) => void;
+  contact?: Contact;
   onSave: (contact: Contact | Omit<Contact, 'id'>) => void;
-  onDelete?: (contactId: string) => void;
+  onClose: () => void;
 }
 
-export const ContactEditor: React.FC<ContactEditorProps> = ({ contact, isOpen, onOpenChange, onSave, onDelete }) => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      number: '',
-      category: undefined,
-    },
+export const ContactEditor: React.FC<ContactEditorProps> = ({ contact, onSave, onClose }) => {
+  const [formData, setFormData] = useState<Omit<Contact, 'id'>>({
+    name: contact?.name || '',
+    number: contact?.number || '',
+    category: contact?.category || 'kunde',
   });
 
-  useEffect(() => {
-    if (contact) {
-      form.reset({
-        name: contact.name,
-        number: contact.number,
-        category: contact.category,
-      });
-    } else {
-      form.reset({
-        name: '',
-        number: '',
-        category: undefined,
-      });
+  const handleSave = () => {
+    if (formData.name && formData.number) {
+      if (contact) {
+        onSave({ ...contact, ...formData });
+      } else {
+        onSave(formData);
+      }
     }
-  }, [contact, form, isOpen]);
-
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if (contact) {
-      onSave({ ...contact, ...values });
-    } else {
-      onSave(values);
-    }
-    onOpenChange(false);
   };
-  
-  const handleDelete = () => {
-    if (contact && onDelete) {
-        onDelete(contact.id);
-        onOpenChange(false);
-    }
-  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setFormData(prev => ({ ...prev, category: value as Category }));
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{contact ? 'Kontakt bearbeiten' : 'Neuer Kontakt'}</DialogTitle>
-          <DialogDescription>
-            {contact ? 'Bearbeiten Sie die Kontaktdetails.' : 'Fügen Sie einen neuen Kontakt hinzu.'}
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Max Mustermann" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Telefonnummer</FormLabel>
-                  <FormControl>
-                    <Input placeholder="+49 123 456789" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Kategorie</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Kategorie auswählen" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {contactCategories.map(category => (
-                        <SelectItem key={category} value={category}>
-                          {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter className="pt-4 sm:justify-between">
-              <div>
-                {contact && onDelete && (
-                   <Button type="button" variant="destructive" onClick={handleDelete}>Löschen</Button>
-                )}
-              </div>
-              <div className="flex gap-2 justify-end">
-                <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>Abbrechen</Button>
-                <Button type="submit">Speichern</Button>
-              </div>
-            </DialogFooter>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-background border border-border rounded-2xl p-6 w-full max-w-sm animate-slide-up relative flex flex-col">
+        <button onClick={onClose} className="absolute top-4 right-4 text-muted-foreground hover:text-white">
+          <X size={24} />
+        </button>
+        <h2 className="text-xl font-bold text-white mb-6">{contact ? 'Kontakt bearbeiten' : 'Neuer Kontakt'}</h2>
+
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="name">Name</Label>
+            <Input id="name" name="name" value={formData.name} onChange={handleChange} placeholder="Max Mustermann" />
+          </div>
+          <div>
+            <Label htmlFor="number">Nummer</Label>
+            <Input id="number" name="number" type="tel" value={formData.number} onChange={handleChange} placeholder="+49 123 456789" />
+          </div>
+          <div>
+            <Label htmlFor="category">Kategorie</Label>
+            <Select name="category" value={formData.category} onValueChange={handleCategoryChange}>
+              <SelectTrigger id="category">
+                <SelectValue placeholder="Kategorie auswählen" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map(cat => (
+                  <SelectItem key={cat} value={cat}>{contactCategoryLabels[cat]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="mt-8 flex justify-end gap-3">
+          <Button variant="ghost" onClick={onClose}>Abbrechen</Button>
+          <Button onClick={handleSave} disabled={!formData.name || !formData.number}>Speichern</Button>
+        </div>
+      </div>
+    </div>
   );
 };

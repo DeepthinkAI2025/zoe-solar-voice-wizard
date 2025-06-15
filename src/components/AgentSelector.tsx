@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
@@ -92,7 +93,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
             </div>
         </div>
         
-        <div className="grid grid-cols-2 gap-3 overflow-y-auto pr-2 flex-grow">
+        <div className="grid grid-cols-2 gap-4 overflow-y-auto overflow-x-hidden pr-2 flex-grow">
           {agents.map(agent => (
             <div
               key={agent.id}

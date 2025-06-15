@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -81,14 +82,15 @@ export const AgentSettings: React.FC<AgentSettingsProps> = ({
                       <div className="text-sm text-muted-foreground">{agent.purpose}</div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center gap-1 pl-2 text-center" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex flex-col items-center gap-2 pl-2 text-center" onClick={(e) => e.stopPropagation()}>
                     <Switch
                       id={`agent-toggle-${agent.id}`}
                       checked={agent.active}
                       onCheckedChange={(checked) => onToggleAgent(agent.id, checked)}
                       disabled={!isVmActive}
+                      orientation="vertical"
                     />
-                    <span className="text-xs text-muted-foreground mt-1 w-12">{agent.active ? 'Aktiv' : 'Inaktiv'}</span>
+                    <span className="text-xs text-muted-foreground w-12">{agent.active ? 'Aktiv' : 'Inaktiv'}</span>
                   </div>
                 </div>
               </AccordionTrigger>
