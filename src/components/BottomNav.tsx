@@ -20,7 +20,7 @@ const navItems = [
 const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, className }) => {
   return (
     <nav className={cn(
-      "relative flex justify-center items-center p-2 mx-4 mb-4 rounded-3xl",
+      "relative flex justify-center items-center p-3 mx-4 mb-4 rounded-3xl z-10",
       "bg-gradient-to-r from-black/20 via-black/30 to-black/20",
       "backdrop-blur-xl border border-white/10",
       "shadow-2xl shadow-primary/5",
@@ -35,11 +35,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, classNam
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               className={cn(
-                "relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500 ease-out group",
-                "hover:scale-110 hover:-translate-y-1",
+                "relative flex flex-col items-center justify-center w-12 h-12 rounded-2xl transition-all duration-500 ease-out group",
+                "hover:scale-105 hover:-translate-y-0.5",
                 "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:ring-offset-2 focus:ring-offset-transparent",
                 isActive 
-                  ? 'text-white transform scale-110 -translate-y-1' 
+                  ? 'text-white transform scale-105 -translate-y-0.5' 
                   : 'text-muted-foreground/70 hover:text-white'
               )}
             >
@@ -55,7 +55,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, classNam
               <div className="relative z-10 mb-1">
                 <Icon 
                   name={item.icon} 
-                  size={isActive ? 22 : 20} 
+                  size={isActive ? 20 : 18} 
                   className={cn(
                     "transition-all duration-300",
                     isActive && "drop-shadow-sm filter"
@@ -65,9 +65,9 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, classNam
               
               {/* Label */}
               <span className={cn(
-                "text-xs font-medium transition-all duration-300 relative z-10 leading-none",
+                "text-[10px] font-medium transition-all duration-300 relative z-10 leading-none text-center whitespace-nowrap overflow-hidden text-ellipsis max-w-[60px]",
                 isActive 
-                  ? "text-white/90 font-semibold tracking-wide" 
+                  ? "text-white/90 font-semibold" 
                   : "text-muted-foreground/60 group-hover:text-white/80"
               )}>
                 {item.label}
@@ -75,7 +75,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, classNam
               
               {/* Magic sparkle effect for active item */}
               {isActive && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary/60 rounded-full animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse" />
               )}
             </button>
           );
