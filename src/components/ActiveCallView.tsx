@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { Phone, Volume2, Bluetooth, Eye, EyeOff } from 'lucide-react';
+import { Phone, Volume2, Bluetooth, Eye, EyeOff, Mic, MicOff } from 'lucide-react';
 import type { aiAgents } from '@/data/mock';
 import CallHeader from './active-call/CallHeader';
 import TranscriptView from './active-call/TranscriptView';
@@ -27,8 +27,13 @@ interface ActiveCallViewProps {
   onMinimize?: () => void;
 }
 
-const mockTranscript = [
+const greetings = [
   "Hallo, ZOE Solar, mein Name ist Alex, der KI-Assistent. Wie kann ich Ihnen helfen?",
+  "Guten Tag, hier ZOE Solar. Sie sprechen mit Alex, dem KI-Assistenten. Was kann ich für Sie tun?",
+  "Willkommen bei ZOE Solar. Mein Name ist Alex, Ihr persönlicher KI-Assistent. Womit kann ich Ihnen dienen?",
+];
+
+const mockConversation = [
   "Guten Tag, hier ist Müller. Ich habe eine Frage zu meiner letzten Rechnung.",
   "Selbstverständlich, Herr Müller. Um Ihnen zu helfen, benötige ich bitte Ihre Kunden- oder Rechnungsnummer.",
   "Moment, die habe ich hier... das ist die 12345.",
@@ -46,13 +51,35 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
   const agent = agents.find(a => a.id === agentId);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const fullTranscript = useMemo(() => {
+    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+    return [randomGreeting, ...mockConversation];
+  }, []);
+
+  useEffect(() => {
+    // Mute if agent is active, unmute on human intervention
+    setIsMuted(!!agentId);
+  }, [agentId]);
+
   const audioOutputs = [
     { id: 'speaker', name: 'Lautsprecher', icon: Volume2 },
     { id: 'earpiece', name: 'Telefonhörer', icon: Phone },
     { id: 'bluetooth_airpods', name: 'AirPods Pro', icon: Bluetooth },
     { id: 'bluetooth_car', name: 'Auto-HiFi', icon: Bluetooth },
   ];
+  const audioOptionsWithMute = [
+      ...audioOutputs,
+      { id: 'mute-toggle', name: isMuted ? 'Ton an' : 'Stumm', icon: isMuted ? Mic : MicOff }
+  ];
   const selectedAudioDevice = audioOutputs.find(o => o.id === audioOutput) || audioOutputs[0];
+
+  const handleAudioOutputChange = (id: string) => {
+    if (id === 'mute-toggle') {
+        setIsMuted(prev => !prev);
+    } else {
+        setAudioOutput(id);
+    }
+  };
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -62,20 +89,29 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
 
   useEffect(() => {
     if (status === 'active') {
+      let transcriptIndex = 0;
+      // Set initial greeting
+      if (fullTranscript.length > 0) {
+        setTranscript([fullTranscript[0]]);
+        transcriptIndex = 1;
+      } else {
+        setTranscript([]);
+      }
+
       const transcriptTimer = setInterval(() => {
-        setTranscript(prev => {
-          if (prev.length < mockTranscript.length) {
-            return [mockTranscript[prev.length], ...prev];
-          }
-          return prev;
-        });
+        if (transcriptIndex < fullTranscript.length) {
+          setTranscript(prev => [fullTranscript[transcriptIndex], ...prev]);
+          transcriptIndex++;
+        } else {
+          clearInterval(transcriptTimer);
+        }
       }, 3500);
 
       return () => {
         clearInterval(transcriptTimer);
       };
     }
-  }, [status]);
+  }, [status, fullTranscript]);
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const { offset } = info;
@@ -164,9 +200,9 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
             agentId={agentId}
             onForward={onForward}
             onIntervene={onIntervene}
-            audioOutputs={audioOutputs}
+            audioOutputs={audioOptionsWithMute}
             selectedAudioDevice={selectedAudioDevice}
-            onAudioOutputChange={setAudioOutput}
+            onAudioOutputChange={handleAudioOutputChange}
             onEndCall={onEndCall}
           />
         )}

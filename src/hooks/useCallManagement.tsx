@@ -1,4 +1,3 @@
-
 import { useEffect, useCallback } from 'react';
 import type { AgentWithSettings } from './useAgentManagement';
 import type { Contact } from './useContactManagement';
@@ -71,6 +70,8 @@ export const useCallManagement = ({
       const defaultAgent = agents.find(a => a.isDefault) || agents[0];
       if (!defaultAgent) return;
       
+      const randomDelay = 3000 + Math.random() * 3000; // 3 to 6 seconds
+
       setTimeout(() => {
         setActiveCall(currentCall => {
           if (currentCall && currentCall.number === number && currentCall.status === 'incoming') {
@@ -79,7 +80,7 @@ export const useCallManagement = ({
           }
           return currentCall;
         });
-      }, 2000);
+      }, randomDelay);
     }
   }, [contacts, autoAnswerEnabled, agents, setActiveCall, startTimer, silentModeEnabled, workingHoursStart, workingHoursEnd]);
 
