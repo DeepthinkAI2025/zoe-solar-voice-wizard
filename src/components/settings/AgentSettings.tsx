@@ -40,18 +40,18 @@ export const AgentSettings: React.FC<AgentSettingsProps> = ({
   onOpenAgentIdsChange,
 }) => {
   return (
-    <div className="space-y-4 p-4 bg-secondary rounded-lg">
+    <div className="space-y-4 p-4 bg-secondary rounded-lg text-left">
       <h3 className="text-lg font-semibold">KI-Agenten</h3>
 
       <div className="flex items-center justify-between pt-2">
-        <Label htmlFor="vm-global-toggle" className="pr-4 text-left">VoIP VM global aktivieren</Label>
+        <Label htmlFor="vm-global-toggle" className="pr-4">VoIP VM global aktivieren</Label>
         <Switch
           id="vm-global-toggle"
           checked={isVmActive}
           onCheckedChange={onVmToggle}
         />
       </div>
-      <p className="text-xs text-muted-foreground -mt-2 text-left">
+      <p className="text-xs text-muted-foreground -mt-2">
         {isVmActive 
           ? "Anrufe werden von KI-Agenten bearbeitet. Es muss immer ein Agent aktiv sein."
           : "Alle KI-Agenten sind deaktiviert. Anrufe werden nicht automatisch angenommen."}

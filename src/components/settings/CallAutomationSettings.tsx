@@ -36,7 +36,7 @@ export const CallAutomationSettings: React.FC<CallAutomationSettingsProps> = ({
   };
 
   return (
-    <div className="space-y-4 p-4 bg-secondary rounded-lg">
+    <div className="space-y-4 p-4 bg-secondary rounded-lg text-left">
       <h3 className="text-lg font-semibold">Anruf-Automatisierung</h3>
       <div className="flex items-center justify-between">
         <Label htmlFor="auto-answer-toggle" className="pr-4">Anrufe während der Arbeitszeit automatisch annehmen</Label>
