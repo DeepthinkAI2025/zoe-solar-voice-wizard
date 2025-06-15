@@ -14,7 +14,7 @@ export const contacts = [
 
 export const callHistory = [
     { name: 'Erika Musterfrau', number: '+49 151 87654321', type: 'Eingehend', time: '14:32', date: 'Heute', summary: 'Anfrage zu Rechnung XY. Kunde hat nach Rabatt gefragt. Weiterleitung an Buchhaltung empfohlen.', transcript: ['KI: Hallo ZOE Solar, wie kann ich helfen?', 'Erika: Ja, ich habe eine Frage zu meiner Rechnung.', 'KI: Selbstverständlich, um welche Rechnung handelt es sich?', 'Erika: Die vom letzten Monat.'] },
-    { name: 'Unbekannt', number: 'Unbekannt', type: 'Verpasst', time: '11:05', date: 'Heute', summary: null, transcript: null },
+    { name: 'H. Heinrich', number: '+49 162 9876543', type: 'Verpasst', time: '11:05', date: 'Heute', summary: null, transcript: null },
     { name: 'Max Mustermann', number: '+49 176 12345678', type: 'Ausgehend (KI)', time: '09:15', date: 'Gestern', summary: 'Termin für die Installation am 25.06.2025 wurde bestätigt. Kunde war zufrieden und hat keine weiteren Fragen.', transcript: ['KI: Hallo Herr Mustermann, hier ist ZOE Solar. Ich rufe wegen Ihres Termins an.', 'Max: Ah ja, hallo. Passt alles.', 'KI: Wunderbar, dann ist der Termin für Sie fest eingetragen.'] },
 ];
 
