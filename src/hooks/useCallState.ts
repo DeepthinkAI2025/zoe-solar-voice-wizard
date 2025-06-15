@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 
 export type TranscriptLine = { speaker: 'agent' | 'caller' | 'system'; text: string; };
@@ -33,7 +32,9 @@ const store = {
     },
     subscribe: (listener: () => void) => {
         listeners.add(listener);
-        return () => listeners.delete(listener);
+        return () => {
+          listeners.delete(listener);
+        };
     }
 }
 

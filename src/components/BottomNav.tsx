@@ -20,9 +20,9 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, classNam
   return (
     <nav className={cn(
       "relative flex justify-around items-center p-2 mx-auto mb-4 w-full max-w-sm rounded-3xl z-10",
-      "bg-black/30 backdrop-blur-xl",
-      "border border-white/10",
-      "shadow-2xl shadow-black/20",
+      "backdrop-blur-xl dark:bg-black/30 bg-secondary/80",
+      "border dark:border-white/10",
+      "shadow-lg dark:shadow-2xl dark:shadow-black/20",
       className
     )}>
       {navItems.map((item) => {
@@ -43,12 +43,12 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, classNam
                 size={22} 
                 className={cn(
                   "transition-colors",
-                  isActive ? "text-white" : "text-muted-foreground group-hover:text-foreground"
+                  isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
                 )}
               />
               <span className={cn(
                 "text-[11px] tracking-wide",
-                isActive ? "font-semibold text-white" : "text-muted-foreground group-hover:text-foreground"
+                isActive ? "font-semibold text-foreground" : "text-muted-foreground group-hover:text-foreground"
               )}>
                 {item.label}
               </span>
@@ -57,7 +57,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, classNam
             {isActive && (
               <motion.div
                 layoutId="active-pill"
-                className="absolute inset-0 rounded-2xl bg-white/10"
+                className="absolute inset-0 rounded-2xl bg-muted dark:bg-white/10"
                 transition={{ type: "spring", stiffness: 350, damping: 30 }}
               />
             )}

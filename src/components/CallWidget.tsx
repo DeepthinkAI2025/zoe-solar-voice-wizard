@@ -2,11 +2,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Phone, PhoneOff, Maximize, Mic } from 'lucide-react';
-import type { CallState } from '@/types/call';
+import type { ActiveCall } from '@/hooks/useCallState';
 import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 
 interface CallWidgetProps {
-  callState: CallState;
+  callState: ActiveCall;
   contactName?: string;
   agent?: AgentWithSettings;
   duration: number;
