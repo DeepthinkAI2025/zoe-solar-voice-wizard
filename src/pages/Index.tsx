@@ -9,6 +9,7 @@ import { usePhoneState } from '@/hooks/usePhoneState';
 import HistoryScreen from '@/components/screens/HistoryScreen';
 import ContactsScreen from '@/components/screens/ContactsScreen';
 import VoicemailScreen from '@/components/screens/VoicemailScreen';
+import SettingsScreen from '@/components/screens/SettingsScreen';
 
 const Index = () => {
   const {
@@ -30,6 +31,15 @@ const Index = () => {
     setShowAgentSelector,
     setSelectedCall,
     handleStartCallManually,
+    // Settings
+    autoAnswerEnabled,
+    workingHoursStart,
+    workingHoursEnd,
+    silentModeEnabled,
+    handleAutoAnswerToggle,
+    handleWorkingHoursStartChange,
+    handleWorkingHoursEndChange,
+    handleSilentModeToggle,
   } = usePhoneState();
 
   const renderContent = () => {
@@ -47,6 +57,17 @@ const Index = () => {
         />;
       case 'voicemail':
         return <VoicemailScreen />;
+      case 'settings':
+        return <SettingsScreen
+          autoAnswerEnabled={autoAnswerEnabled}
+          onAutoAnswerToggle={handleAutoAnswerToggle}
+          workingHoursStart={workingHoursStart}
+          onWorkingHoursStartChange={handleWorkingHoursStartChange}
+          workingHoursEnd={workingHoursEnd}
+          onWorkingHoursEndChange={handleWorkingHoursEndChange}
+          silentModeEnabled={silentModeEnabled}
+          onSilentModeToggle={handleSilentModeToggle}
+        />;
       case 'dialpad':
       default:
         return <Dialpad onCall={handleStartCall} />;

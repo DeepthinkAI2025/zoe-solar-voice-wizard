@@ -34,31 +34,38 @@ export const usePhoneState = () => {
   const [isVmActive, setIsVmActive] = useState(true);
   const { toast } = useToast();
 
+  // Settings State
+  const [autoAnswerEnabled, setAutoAnswerEnabled] = useState(true);
+  const [workingHoursStart, setWorkingHoursStart] = useState(7);
+  const [workingHoursEnd, setWorkingHoursEnd] = useState(17);
+  const [silentModeEnabled, setSilentModeEnabled] = useState(true);
+
+
   // Simulate an incoming call for demonstration & set muted state based on time
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!callState) {
         const hour = new Date().getHours();
-        const isOffHours = hour >= 17 || hour < 7;
+        const isOffHours = hour >= workingHoursEnd || hour < workingHoursStart;
         
         setCallState({ 
             number: '0176 1234 5678',
             status: 'incoming', 
-            startMuted: isOffHours 
+            startMuted: silentModeEnabled && isOffHours
         });
       }
     }, 8000); // Incoming call after 8 seconds
     return () => clearTimeout(timeout);
-  }, [callState]);
+  }, [callState, silentModeEnabled, workingHoursStart, workingHoursEnd]);
 
   // Handle auto-answer during working hours
   useEffect(() => {
-    if (callState?.status !== 'incoming') {
+    if (callState?.status !== 'incoming' || !autoAnswerEnabled) {
       return;
     }
 
     const hour = new Date().getHours();
-    const isWorkingHours = hour >= 7 && hour < 17;
+    const isWorkingHours = hour >= workingHoursStart && hour < workingHoursEnd;
 
     if (!isWorkingHours) {
       return;
@@ -87,7 +94,7 @@ export const usePhoneState = () => {
     return () => {
       clearTimeout(autoAnswerTimeout);
     };
-  }, [callState?.status, callState?.number, toast]);
+  }, [callState?.status, callState?.number, toast, autoAnswerEnabled, workingHoursStart, workingHoursEnd]);
 
 
   const handleStartCall = (number: string) => {
@@ -223,6 +230,12 @@ export const usePhoneState = () => {
     setSelectedCall(null);
   };
 
+  // Handlers for settings
+  const handleAutoAnswerToggle = (enabled: boolean) => setAutoAnswerEnabled(enabled);
+  const handleWorkingHoursStartChange = (hour: number) => setWorkingHoursStart(hour);
+  const handleWorkingHoursEndChange = (hour: number) => setWorkingHoursEnd(hour);
+  const handleSilentModeToggle = (enabled: boolean) => setSilentModeEnabled(enabled);
+
   return {
     activeTab, setActiveTab,
     callState,
@@ -239,5 +252,14 @@ export const usePhoneState = () => {
     handleAcceptCallWithAI,
     handleAcceptCallManually,
     handleEndCall,
+    // Settings state and handlers
+    autoAnswerEnabled,
+    workingHoursStart,
+    workingHoursEnd,
+    silentModeEnabled,
+    handleAutoAnswerToggle,
+    handleWorkingHoursStartChange,
+    handleWorkingHoursEndChange,
+    handleSilentModeToggle,
   };
 }
