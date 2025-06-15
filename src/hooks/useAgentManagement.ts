@@ -1,23 +1,36 @@
-
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { aiAgents as initialAgents } from '@/data/mock';
 
+type AgentWithSettings = (typeof initialAgents)[0] & {
+  purpose: string;
+  systemInstructions: string;
+};
+
 export const useAgentManagement = () => {
-  const [agents, setAgents] = useState(() => {
-    // Ensure only one agent is active initially from the mock data, if multiple are marked active.
-    const firstActiveAgent = initialAgents.find(a => a.active);
+  const [agents, setAgents] = useState<AgentWithSettings[]>(() => {
+    const agentsWithSettings = initialAgents.map(a => ({
+      ...a,
+      purpose: a.id === 'general' ? 'Zentrale' : a.id === 'tech' ? 'Techniker' : '',
+      systemInstructions: a.id === 'general' ? 'Du bist der primäre Ansprechpartner für allgemeine Anfragen. Leite technische Fragen an Thomas weiter.' : '',
+      active: a.active || false
+    }));
+
+    const firstActiveAgent = agentsWithSettings.find(a => a.active);
     if (firstActiveAgent) {
-      return initialAgents.map(a => 
+      return agentsWithSettings.map(a => 
         a.id === firstActiveAgent.id ? { ...a, active: true } : { ...a, active: false }
       );
     }
-    // If no agent is marked active in mock data, activate the 'general' one as a fallback.
-    return initialAgents.map(a => 
+    
+    return agentsWithSettings.map(a => 
         a.id === 'general' ? { ...a, active: true } : { ...a, active: false }
     );
   });
   const [isVmActive, setIsVmActive] = useState(true);
+  const [globalSystemInstructions, setGlobalSystemInstructions] = useState(
+    'Sei immer freundlich und professionell. Sprich Deutsch. Du bist ein KI-Assistent für die Firma ZOE Solar.'
+  );
   const { toast } = useToast();
 
   const handleVmToggle = async (active: boolean) => {
@@ -105,6 +118,17 @@ export const useAgentManagement = () => {
     });
   };
   
+  const handleUpdateAgentDetails = (
+    agentId: string, 
+    details: Partial<Pick<AgentWithSettings, 'name' | 'purpose' | 'systemInstructions'>>
+  ) => {
+    setAgents(prevAgents =>
+      prevAgents.map(a =>
+        a.id === agentId ? { ...a, ...details } : a
+      )
+    );
+  };
+  
   const handleUpdateAgentName = (agentId: string, newName: string) => {
     setAgents(prevAgents =>
       prevAgents.map(a =>
@@ -120,8 +144,11 @@ export const useAgentManagement = () => {
   return {
     agents,
     isVmActive,
+    globalSystemInstructions,
+    setGlobalSystemInstructions,
     handleVmToggle,
     handleAgentToggle,
     handleUpdateAgentName,
+    handleUpdateAgentDetails,
   };
 };

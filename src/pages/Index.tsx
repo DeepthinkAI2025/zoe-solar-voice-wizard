@@ -1,4 +1,3 @@
-
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -43,6 +42,10 @@ const Index = () => {
     handleWorkingHoursStartChange,
     handleWorkingHoursEndChange,
     handleSilentModeToggle,
+    // Agent Settings
+    globalSystemInstructions,
+    setGlobalSystemInstructions,
+    handleUpdateAgentDetails,
   } = usePhoneState();
 
   const renderContent = () => {
@@ -70,6 +73,13 @@ const Index = () => {
           onWorkingHoursEndChange={handleWorkingHoursEndChange}
           silentModeEnabled={silentModeEnabled}
           onSilentModeToggle={handleSilentModeToggle}
+          // Agent Settings
+          agents={agents}
+          isVmActive={isVmActive}
+          onToggleAgent={handleAgentToggle}
+          globalSystemInstructions={globalSystemInstructions}
+          onGlobalSystemInstructionsChange={setGlobalSystemInstructions}
+          onUpdateAgentDetails={handleUpdateAgentDetails}
         />;
       case 'dialpad':
       default:
