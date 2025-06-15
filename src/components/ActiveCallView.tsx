@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { Eye, EyeOff } from 'lucide-react';
+import { EyeOff } from 'lucide-react';
 import type { aiAgents } from '@/data/mock';
 import CallHeader from './active-call/CallHeader';
 import TranscriptView from './active-call/TranscriptView';
@@ -31,7 +30,6 @@ interface ActiveCallViewProps {
 }
 
 const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, onIntervene, isForwarding, duration, onMinimize }) => {
-  const [isTranscriptVisible, setIsTranscriptVisible] = useState(true);
   const agent = agents.find(a => a.id === agentId);
 
   const {
@@ -94,14 +92,14 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
       <CallHeader number={number} contactName={contactName} status={status} duration={duration} />
 
       <button 
-            onClick={() => setIsTranscriptVisible(!isTranscriptVisible)} 
+            onClick={onMinimize} 
             className="absolute top-7 right-7 text-muted-foreground hover:text-foreground z-50 p-2 rounded-full hover:bg-white/10 transition-colors"
-            aria-label={isTranscriptVisible ? "Transkript ausblenden" : "Transkript einblenden"}
+            aria-label="Anruf minimieren"
         >
-            {isTranscriptVisible ? <EyeOff size={22} /> : <Eye size={22} />}
+            <EyeOff size={22} />
         </button>
 
-      {status === 'active' && isTranscriptVisible && (
+      {status === 'active' && (
         <TranscriptView
           scrollContainerRef={scrollContainerRef}
           agent={agent}

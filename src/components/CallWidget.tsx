@@ -47,7 +47,13 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
         )}
         <div className="flex flex-col min-w-0">
           <span className="font-bold text-sm truncate">{displayName}</span>
-          <span className="text-xs text-muted-foreground">{agent ? `KI: ${agent.name}` : `Anruf ${formatDuration(duration)}`}</span>
+          <span className="text-xs text-muted-foreground">
+            {callState.status === 'incoming' 
+              ? 'Eingehender Anruf' 
+              : agent 
+                ? `KI: ${agent.name}` 
+                : `Anruf ${formatDuration(duration)}`}
+          </span>
         </div>
       </div>
       
