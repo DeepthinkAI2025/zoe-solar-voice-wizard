@@ -107,7 +107,7 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
               placeholder="Suchen..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-black/20 border-white/20 placeholder:text-muted-foreground pl-10"
+              className="bg-muted placeholder:text-muted-foreground pl-10"
               inputMode="search"
             />
           </div>
@@ -121,7 +121,7 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
            const isKnownContact = !!contact;
 
            return (
-             <div key={i} className="text-left p-3 rounded-lg bg-white/5 transition-colors hover:bg-white/10 cursor-pointer" onClick={() => onCallSelect(call)}>
+             <div key={i} className="text-left p-3 rounded-lg bg-transparent transition-colors hover:bg-muted cursor-pointer" onClick={() => onCallSelect(call)}>
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
                     {call.type === 'Eingehend' && <Phone size={20} className="text-green-400"/>}
@@ -132,7 +132,7 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
                 <div className="flex-grow">
                     <div className="flex items-center gap-2">
                         <p 
-                          className={`text-white font-semibold ${isKnownContact ? 'cursor-pointer hover:underline' : ''}`}
+                          className={`font-semibold ${isKnownContact ? 'cursor-pointer hover:underline' : ''} text-foreground`}
                           onClick={(e) => {
                             if (isKnownContact) {
                               e.stopPropagation();

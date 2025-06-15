@@ -63,17 +63,17 @@ export const ContactsListDialog: React.FC<ContactsListDialogProps> = ({
                 placeholder="Kontakte durchsuchen..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-black/20 border-white/20 placeholder:text-muted-foreground pl-10"
+                className="bg-muted placeholder:text-muted-foreground pl-10"
                 inputMode="search"
                 />
             </div>
         </div>
         <div className="flex-grow overflow-y-auto px-4 pb-4 space-y-1">
             {filteredContacts.map(contact => (
-                <div key={contact.id} className="text-left p-3 rounded-lg bg-white/5 transition-colors hover:bg-white/10 cursor-pointer flex items-center gap-3" onClick={() => handleEdit(contact)}>
+                <div key={contact.id} className="text-left p-3 rounded-lg bg-transparent transition-colors hover:bg-muted cursor-pointer flex items-center gap-3" onClick={() => handleEdit(contact)}>
                     <User size={20} className="text-muted-foreground flex-shrink-0" />
                     <div className="flex-grow">
-                        <p className="text-white font-semibold">{contact.name}</p>
+                        <p className="text-foreground font-semibold">{contact.name}</p>
                         <p className="text-sm text-muted-foreground">{contact.number}</p>
                     </div>
                 </div>
