@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
@@ -113,13 +114,18 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
                 agent.active && "cursor-pointer"
               )}
             >
-              <Switch
-                  checked={agent.active}
-                  onCheckedChange={(checked) => onToggleAgent(agent.id, checked)}
-                  onClick={(e) => e.stopPropagation()}
+              <button
+                  onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleAgent(agent.id, !agent.active);
+                  }}
                   disabled={!isVmActive}
                   aria-label={`Agent ${agent.name} ${agent.active ? 'deaktivieren' : 'aktivieren'}`}
-                  className="absolute top-4 right-4"
+                  className={cn(
+                      "absolute top-4 right-4 w-4 h-4 rounded-full transition-all",
+                      agent.active ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-muted-foreground/50",
+                      !isVmActive && "cursor-not-allowed opacity-50"
+                  )}
               />
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mb-3 flex-shrink-0">
                   <Icon name={agent.icon} size={20} className="text-primary" />
