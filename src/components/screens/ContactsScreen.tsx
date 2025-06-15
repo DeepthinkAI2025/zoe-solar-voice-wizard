@@ -134,21 +134,23 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
                     )}
                 </div>
 
-                <div className="flex flex-col gap-0 flex-shrink-0 -my-1">
-                  <Button variant="ghost" size="icon" className="w-9 h-9" onClick={(e) => { e.stopPropagation(); onStartCallManually(call.number); }} disabled={call.number === 'Unbekannt'}>
-                    <Phone size={16} />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="w-9 h-9" onClick={(e) => { 
-                      e.stopPropagation();
-                      if (call.type === 'Verpasst') {
-                        onStartCall(call.number, 'missed-call-callback');
-                      } else {
-                        onStartCall(call.number);
-                      }
-                  }} disabled={call.number === 'Unbekannt'}>
-                    <Bot size={16} />
-                  </Button>
-                </div>
+                {call.number !== 'Unbekannt' && (
+                  <div className="flex flex-col gap-0 flex-shrink-0 -my-1">
+                    <Button variant="ghost" size="icon" className="w-9 h-9" onClick={(e) => { e.stopPropagation(); onStartCallManually(call.number); }}>
+                      <Phone size={16} />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="w-9 h-9" onClick={(e) => { 
+                        e.stopPropagation();
+                        if (call.type === 'Verpasst') {
+                          onStartCall(call.number, 'missed-call-callback');
+                        } else {
+                          onStartCall(call.number);
+                        }
+                    }}>
+                      <Bot size={16} />
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
            );
