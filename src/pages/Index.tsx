@@ -1,4 +1,3 @@
-
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -110,7 +109,12 @@ const Index = () => {
         />
       )}
 
-      <CallDetailsDrawer call={selectedCall} onClose={() => setSelectedCall(null)} />
+      <CallDetailsDrawer 
+        call={selectedCall} 
+        onClose={() => setSelectedCall(null)}
+        onStartCall={handleStartCall}
+        onStartCallManually={handleStartCallManually}
+      />
     </div>
   );
 };

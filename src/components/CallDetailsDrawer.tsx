@@ -10,21 +10,38 @@ import {
   DrawerClose,
 } from '@/components/ui/drawer';
 import { Button } from './ui/button';
-import { Play, FileText, Bot } from 'lucide-react';
+import { Play, FileText, Bot, Phone } from 'lucide-react';
 
 interface CallDetailsDrawerProps {
   call: {
     name: string;
+    number?: string;
     type: string;
     time: string;
     summary: string | null;
     transcript: string[] | null;
   } | null;
   onClose: () => void;
+  onStartCall: (number: string) => void;
+  onStartCallManually: (number: string) => void;
 }
 
-const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose }) => {
+const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, onStartCall, onStartCallManually }) => {
   if (!call) return null;
+
+  const handleCallback = () => {
+    if (call?.number) {
+      onClose();
+      onStartCallManually(call.number);
+    }
+  };
+
+  const handleAiCallback = () => {
+    if (call?.number) {
+      onClose();
+      onStartCall(call.number);
+    }
+  };
 
   return (
     <Drawer open={!!call} onClose={onClose} onOpenChange={(open) => !open && onClose()}>
@@ -65,8 +82,20 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose }) 
           )}
         </div>
         <DrawerFooter>
+          {call.type === 'Voicemail' && call.number && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+              <Button variant="outline" className="w-full" onClick={handleCallback}>
+                <Phone size={16} className="mr-2" />
+                Zurückrufen
+              </Button>
+              <Button variant="outline" className="w-full" onClick={handleAiCallback}>
+                <Bot size={16} className="mr-2" />
+                KI ruft zurück
+              </Button>
+            </div>
+          )}
           <DrawerClose asChild>
-            <Button variant="outline">Schließen</Button>
+            <Button variant="outline" className="w-full">Schließen</Button>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
