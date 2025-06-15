@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -41,7 +42,12 @@ export const ContactsListDialog: React.FC<ContactsListDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="h-[80vh] flex flex-col bg-background border-border p-0 gap-0">
         <div className="flex items-center justify-between border-b p-4 flex-shrink-0">
-          <Button size="icon" variant="outline" onClick={handleAdd}>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={handleAdd}
+            className="bg-accent text-accent-foreground hover:brightness-90"
+          >
             <Plus size={18} />
           </Button>
           <h2 className="text-lg font-semibold leading-none tracking-tight">Kontakte</h2>
