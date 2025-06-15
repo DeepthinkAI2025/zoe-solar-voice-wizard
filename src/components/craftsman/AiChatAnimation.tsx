@@ -19,7 +19,7 @@ const AiChatAnimation: React.FC<AiChatAnimationProps> = ({ isListening = false }
       y: [0, -10, 0, 10, 0, -5, 0],
       scaleY: [1, 1.5, 1, 0.8, 1, 1.2, 1],
       transition: {
-        duration: 1.5 + Math.random() * 0.5,
+        duration: 1.5,
         repeat: Infinity,
         ease: 'easeInOut',
         delay: i * 0.1,
