@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Icon from '@/components/Icon';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,6 +32,12 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
   callerName,
 }) => {
   const [showStartNotice, setShowStartNotice] = useState(true);
+  const endOfMessagesRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Smoothly scroll to the latest message
+    endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [transcript]);
 
   useEffect(() => {
     if (agent) {
@@ -49,14 +55,15 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
         return agent?.name || 'KI-Assistent';
     }
     if (speaker === 'caller') {
-        return callerName;
+        // Display "Anrufer" as shown in the screenshot
+        return 'Anrufer';
     }
     return null;
   }
 
   return (
     <>
-      <div ref={scrollContainerRef} className="flex-grow my-8 overflow-y-auto space-y-4 pr-2">
+      <div ref={scrollContainerRef} className="flex-grow my-4 overflow-y-auto space-y-4 pr-2 pb-4">
         <AnimatePresence>
           {showStartNotice && agent && (
             <motion.div
@@ -73,37 +80,58 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
             </motion.div>
           )}
         </AnimatePresence>
-        {transcript.map((line, index) => {
-            const speakerName = getSpeakerName(line.speaker);
-            return (
-              <div key={index} className="text-left p-3 rounded-lg bg-secondary animate-fade-in">
-                 {line.speaker === 'system' ? (
-                    <p className="text-foreground">
-                        <span className="text-primary font-semibold">Notiz an KI:</span>{line.text.replace('[Notiz an KI]:', '')}
-                    </p>
-                 ) : (
-                    <>
-                        {speakerName && <p className="text-sm font-semibold text-primary mb-1">{speakerName}</p>}
-                        <p className="text-foreground">{line.text}</p>
-                    </>
-                 )}
-              </div>
-            );
-        })}
+        <AnimatePresence initial={false}>
+          {transcript.map((line, index) => {
+              const speakerName = getSpeakerName(line.speaker);
+              
+              if (line.speaker === 'system') {
+                return (
+                  <motion.div
+                    key={index}
+                    layout
+                    initial={{ opacity: 0, y: 10, scale: 0.5 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    className="flex justify-center"
+                  >
+                    <div className="text-xs italic text-muted-foreground bg-secondary/50 rounded-full px-3 py-1">
+                      {line.text.replace('[Notiz an KI]:', 'Notiz an KI gesendet')}
+                    </div>
+                  </motion.div>
+                )
+              }
+
+              return (
+                <motion.div 
+                  key={index} 
+                  layout
+                  initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
+                  className="text-left p-4 rounded-xl bg-secondary dark:bg-secondary/80 border border-black/5 dark:border-white/10 shadow-sm"
+                >
+                   <p className="text-sm font-semibold text-primary mb-1.5">{speakerName}</p>
+                   <p className="text-foreground/90 whitespace-pre-wrap">{line.text}</p>
+                </motion.div>
+              );
+          })}
+        </AnimatePresence>
+        <div ref={endOfMessagesRef} />
       </div>
 
       {agent && (
-        <div className="flex-shrink-0 mb-6 flex gap-2">
+        <div className="flex-shrink-0 mb-4 flex gap-2 items-start">
           <Textarea 
               value={newNote}
               onChange={(e) => onNewNoteChange(e.target.value)}
-              placeholder={`Live-Notiz für ${agent.name} eingeben...`}
-              className="bg-secondary border-border min-h-0 h-12"
+              placeholder={`Live-Notiz für ${agent.name}...`}
+              className="bg-secondary border-border min-h-[48px] text-base resize-none"
               rows={1}
               inputMode="text"
           />
-          <Button onClick={onSendNote} size="icon" className="w-12 h-12" disabled={!newNote.trim()}>
-              <Send />
+          <Button onClick={onSendNote} size="icon" className="w-12 h-12 flex-shrink-0" disabled={!newNote.trim()}>
+              <Send size={20} />
           </Button>
         </div>
       )}
