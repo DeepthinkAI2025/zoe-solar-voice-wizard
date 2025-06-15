@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import CallScreen from '@/components/CallScreen';
 import { contacts } from '@/data/mock';
-import { User, Phone, Bot } from 'lucide-react';
+import { User, Phone, Bot, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface ContactsScreenProps {
   onStartCall: (number: string) => void;
@@ -11,9 +12,28 @@ interface ContactsScreenProps {
 }
 
 const ContactsScreen: React.FC<ContactsScreenProps> = ({ onStartCall, onStartCallManually }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredContacts = contacts.filter(contact =>
+    contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    contact.number.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <CallScreen title="Kontakte">
-       {contacts.map((contact, i) => (
+      <div className="px-4 pb-2">
+        <div className="relative">
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Suchen..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="bg-black/20 border-white/20 placeholder:text-muted-foreground pl-10"
+          />
+        </div>
+      </div>
+       {filteredContacts.map((contact, i) => (
          <div key={i} className="flex items-center text-left p-3 rounded-lg bg-white/5">
             <div className="flex-grow flex items-center">
                 <User size={20} className="mr-4 text-muted-foreground flex-shrink-0"/>

@@ -19,7 +19,7 @@ export const callHistory = [
 ];
 
 export const voicemails = [
-    { name: 'Max Mustermann', duration: '0:45', time: '18:10', date: 'Vorgestern' },
+    { name: 'Max Mustermann', number: '+49 176 12345678', duration: '0:45', time: '18:10', date: 'Vorgestern' },
 ];
 
 export const navItems = [

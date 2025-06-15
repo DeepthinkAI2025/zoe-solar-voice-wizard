@@ -56,7 +56,7 @@ const Index = () => {
           onStartCallManually={handleStartCallManually} 
         />;
       case 'voicemail':
-        return <VoicemailScreen />;
+        return <VoicemailScreen onVoicemailSelect={setSelectedCall} />;
       case 'settings':
         return <SettingsScreen
           autoAnswerEnabled={autoAnswerEnabled}
