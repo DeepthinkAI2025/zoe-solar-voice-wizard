@@ -8,6 +8,7 @@ export type AgentWithSettings = (typeof initialAgents)[0] & {
   systemInstructions: string;
   voiceCloned?: boolean;
   voiceLabel?: string;
+  isDefault?: boolean;
 };
 
 export const useAgentManagement = () => {
@@ -42,6 +43,7 @@ export const useAgentManagement = () => {
         active: a.active || false,
         voiceCloned: false,
         voiceLabel: '',
+        isDefault: a.id === 'general',
       };
     });
 
