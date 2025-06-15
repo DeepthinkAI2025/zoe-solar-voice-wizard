@@ -8,11 +8,19 @@ interface DialpadProps {
   onSchedule: (number: string) => void;
 }
 
-const buttons = [
-  '1', '2', '3',
-  '4', '5', '6',
-  '7', '8', '9',
-  '*', '0', '#'
+const buttonDetails = [
+  { digit: '1', letters: ' ' },
+  { digit: '2', letters: 'ABC' },
+  { digit: '3', letters: 'DEF' },
+  { digit: '4', letters: 'GHI' },
+  { digit: '5', letters: 'JKL' },
+  { digit: '6', letters: 'MNO' },
+  { digit: '7', letters: 'PQRS' },
+  { digit: '8', letters: 'TUV' },
+  { digit: '9', letters: 'WXYZ' },
+  { digit: '*', letters: '' },
+  { digit: '0', letters: '+' },
+  { digit: '#', letters: '' },
 ];
 
 const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule }) => {
@@ -39,14 +47,14 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
   };
 
   return (
-    <div className="flex flex-col h-full justify-between p-4">
-      <div className="h-24 flex items-center justify-center relative">
+    <div className="flex flex-col h-full justify-between p-6">
+      <div className="h-28 flex items-center justify-center relative">
         <input
           type="tel"
           value={number}
           onChange={handleInputChange}
           placeholder="Nummer eingeben"
-          className="w-full bg-transparent text-center text-4xl tracking-widest text-white/90 focus:outline-none placeholder:text-muted-foreground pr-12"
+          className="w-full bg-transparent text-center text-3xl tracking-wider text-white focus:outline-none placeholder:text-muted-foreground pr-12"
         />
         {number && (
           <button onClick={handleDelete} className="absolute right-0 p-4 text-muted-foreground hover:text-white transition-colors">
@@ -55,26 +63,40 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
         )}
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {buttons.map(btn => (
-          <button key={btn} onClick={() => handlePress(btn)} className="h-20 rounded-full bg-white/5 hover:bg-white/10 text-3xl text-white transition-colors duration-200">
-            {btn}
+        {buttonDetails.map(btn => (
+          <button 
+            key={btn.digit} 
+            onClick={() => handlePress(btn.digit)} 
+            className="h-20 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 transform active:scale-95 active:bg-white/20"
+          >
+            <span className="block text-3xl font-light">{btn.digit}</span>
+            <span className="block text-xs tracking-widest text-white/50 font-mono h-4">{btn.letters}</span>
           </button>
         ))}
       </div>
       <div className="flex justify-around items-center h-24">
-        <div className="flex flex-col items-center gap-1 w-24 text-center">
-          <button onClick={handleAICall} className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors disabled:opacity-50" disabled={!number}>
+        <div className="flex flex-col items-center gap-2 w-24 text-center">
+          <button 
+            onClick={handleAICall} 
+            className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95" 
+            disabled={!number}>
             <Bot size={24} className="text-white" />
           </button>
           <span className="text-xs text-muted-foreground">KI-Anruf</span>
         </div>
         
-        <button onClick={handleManualCall} className="w-20 h-20 rounded-full bg-primary/80 hover:bg-primary shadow-lg shadow-primary/30 flex items-center justify-center transition-transform hover:scale-105 disabled:bg-gray-600 disabled:shadow-none" disabled={!number}>
+        <button 
+          onClick={handleManualCall} 
+          className="w-20 h-20 rounded-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30 flex items-center justify-center transition-all hover:scale-105 disabled:bg-muted disabled:shadow-none disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95" 
+          disabled={!number}>
           <Phone size={32} className="text-primary-foreground" />
         </button>
         
-        <div className="flex flex-col items-center gap-1 w-24 text-center">
-          <button onClick={handleScheduleCall} className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors disabled:opacity-50" disabled={!number}>
+        <div className="flex flex-col items-center gap-2 w-24 text-center">
+          <button 
+            onClick={handleScheduleCall} 
+            className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95" 
+            disabled={!number}>
             <Calendar size={24} className="text-white" />
           </button>
           <span className="text-xs text-muted-foreground">Planen</span>
