@@ -1,4 +1,3 @@
-
 import { Phone, Delete, Bot, Calendar } from 'lucide-react';
 import React, { useState, useRef } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -112,7 +111,7 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
           <motion.button 
             key={btn.digit} 
             onClick={() => handlePress(btn.digit)} 
-            className="h-20 rounded-full bg-muted/50 hover:bg-muted/70 text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 flex flex-col items-center justify-center"
+            className="w-16 h-16 rounded-full bg-muted/50 hover:bg-muted/70 text-foreground transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50 flex flex-col items-center justify-center justify-self-center"
             variants={keyVariants}
             whileTap={{ scale: 0.95, backgroundColor: 'hsl(var(--muted))' }}
           >
