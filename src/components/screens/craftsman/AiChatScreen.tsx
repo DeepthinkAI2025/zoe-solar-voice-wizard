@@ -32,9 +32,10 @@ const AiChatScreen = () => {
   const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
   const [provider, setProvider] = useState<AiProvider>('gemini');
+  // Fix: ApiKeys enthält nur noch gemini/deepseek/openrouter!
   const [tempApiKeys, setTempApiKeys] = useState<ApiKeys>({
     gemini: '',
-    grok: '',
+    deepseek: '',
     openrouter: ''
   });
   const {
@@ -71,7 +72,7 @@ const AiChatScreen = () => {
   }, [messages, isTyping]);
   useEffect(() => {
     if (isApiKeyModalOpen) {
-      setTempApiKeys(apiKeys);
+      setTempApiKeys(apiKeys);   // Keine grok/groq mehr
     }
   }, [isApiKeyModalOpen, apiKeys]);
   const handleSaveApiKeys = () => {
