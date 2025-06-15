@@ -1,3 +1,4 @@
+
 import { useEffect, useCallback, useMemo } from 'react';
 import type { AgentWithSettings } from './useAgentManagement';
 import type { Contact } from './useContactManagement';
@@ -49,33 +50,40 @@ export const useCallManagement = ({
   }, [activeCall?.agentId]);
 
   useEffect(() => {
-      if (activeCall?.status === 'active' && activeCall.agentId && fullTranscript.length > 0) {
-          let transcriptIndex = 0;
-          
-          const initialTranscript = [fullTranscript[0]];
-          setActiveCall(prev => prev ? { ...prev, transcript: initialTranscript } : null);
-          transcriptIndex = 1;
+    if (activeCall?.status === 'active' && activeCall.agentId && fullTranscript.length > 0) {
+        let transcriptIndex = 0;
+        let timerId: NodeJS.Timeout;
 
-          const transcriptTimer = setInterval(() => {
-              if (transcriptIndex < fullTranscript.length) {
-                  setActiveCall(prev => {
-                      if (!prev || !prev.transcript) return prev;
-                      const newTranscriptLine = fullTranscript[transcriptIndex];
-                      return { ...prev, transcript: [newTranscriptLine, ...prev.transcript] };
-                  });
-                  transcriptIndex++;
-              } else {
-                  clearInterval(transcriptTimer);
-              }
-          }, 3500);
+        const addNextLine = () => {
+            if (transcriptIndex >= fullTranscript.length) return;
 
-          return () => {
-              clearInterval(transcriptTimer);
-          };
-      } else if (activeCall?.status === 'active' && !activeCall.agentId) {
-           setActiveCall(prev => prev ? { ...prev, transcript: [] } : null);
-      }
-  }, [activeCall?.status, activeCall?.agentId, fullTranscript, setActiveCall]);
+            const line = fullTranscript[transcriptIndex];
+            setActiveCall(prev => {
+                if (!prev || prev.status !== 'active') return prev;
+                const currentTranscript = prev.transcript || [];
+                return { ...prev, transcript: [...currentTranscript, line] };
+            });
+            transcriptIndex++;
+
+            if (transcriptIndex < fullTranscript.length) {
+                const nextLine = fullTranscript[transcriptIndex];
+                // More natural delay based on text length
+                const delay = Math.max(1500, nextLine.text.length * 70); 
+                timerId = setTimeout(addNextLine, delay);
+            }
+        };
+
+        // Start with an empty transcript and begin the conversation flow
+        setActiveCall(prev => prev ? { ...prev, transcript: [] } : null);
+        timerId = setTimeout(addNextLine, 1000); // Initial delay before first message
+
+        return () => {
+            clearTimeout(timerId);
+        };
+    } else if (activeCall?.status === 'active' && !activeCall.agentId) {
+         setActiveCall(prev => prev ? { ...prev, transcript: [] } : null);
+    }
+}, [activeCall?.status, activeCall?.agentId, fullTranscript, setActiveCall]);
 
 
   const endCall = useCallback(() => {
@@ -216,7 +224,7 @@ export const useCallManagement = ({
       const noteLine: TranscriptLine = { speaker: 'system', text: `[Notiz an KI]: ${newNote}` };
       setActiveCall(prev => {
           if (!prev) return null;
-          const updatedTranscript = prev.transcript ? [noteLine, ...prev.transcript] : [noteLine];
+          const updatedTranscript = prev.transcript ? [...prev.transcript, noteLine] : [noteLine];
           return { ...prev, transcript: updatedTranscript };
       });
   }, [activeCall, setActiveCall]);
@@ -248,3 +256,4 @@ export const useCallManagement = ({
     handleSendNote,
   };
 };
+

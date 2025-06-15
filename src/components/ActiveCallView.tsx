@@ -58,7 +58,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
 
   useEffect(() => {
     if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 0;
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
   }, [transcript, scrollContainerRef]);
 
@@ -155,3 +155,4 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
 };
 
 export default ActiveCallView;
+
