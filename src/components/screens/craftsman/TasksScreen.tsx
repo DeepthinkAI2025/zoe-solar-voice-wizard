@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Bot } from 'lucide-react';
@@ -6,6 +7,7 @@ import TaskList from '@/components/tasks/TaskList';
 import NewTaskDialog from '@/components/tasks/NewTaskDialog';
 import DeleteTaskDialog from '@/components/tasks/DeleteTaskDialog';
 import AiTaskDialog from '@/components/tasks/AiTaskDialog';
+import { useAppointments } from '@/hooks/useAppointments';
 
 const TasksScreen = () => {
     const {
@@ -27,6 +29,7 @@ const TasksScreen = () => {
         handleToggleSubtask,
         handleDeleteSubtask,
     } = useTasks();
+    const { appointments } = useAppointments();
 
     const [isAiDialogOpen, setIsAiDialogOpen] = React.useState(false);
 
@@ -69,6 +72,7 @@ const TasksScreen = () => {
                             onAddSubtask={handleAddSubtask}
                             onToggleSubtask={handleToggleSubtask}
                             onDeleteSubtask={handleDeleteSubtask}
+                            appointments={appointments}
                         />
                     </div>
                     
@@ -84,6 +88,7 @@ const TasksScreen = () => {
                                 onAddSubtask={handleAddSubtask}
                                 onToggleSubtask={handleToggleSubtask}
                                 onDeleteSubtask={handleDeleteSubtask}
+                                appointments={appointments}
                             />
                         </div>
                     )}

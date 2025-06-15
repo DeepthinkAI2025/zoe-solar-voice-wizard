@@ -5,11 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
-import { ChevronRight, PlusCircle, Trash2, Pencil } from 'lucide-react';
+import { ChevronRight, PlusCircle, Trash2, Pencil, Tag } from 'lucide-react';
 import type { Task } from '@/types/task';
 import { getPriorityBadgeInfo } from './utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { Input } from '../ui/input';
+import type { Appointment } from '@/hooks/useAppointments';
 
 interface TaskItemProps {
     task: Task;
@@ -19,11 +20,13 @@ interface TaskItemProps {
     onAddSubtask: (taskId: number, text: string) => void;
     onToggleSubtask: (taskId: number, subtaskId: number) => void;
     onDeleteSubtask: (taskId: number, subtaskId: number) => void;
+    appointments: Appointment[];
 }
 
-const TaskItem = ({ task, onToggle, onDelete, onEdit, onAddSubtask, onToggleSubtask, onDeleteSubtask }: TaskItemProps) => {
+const TaskItem = ({ task, onToggle, onDelete, onEdit, onAddSubtask, onToggleSubtask, onDeleteSubtask, appointments }: TaskItemProps) => {
     const badgeInfo = getPriorityBadgeInfo(task.priority);
     const [newSubtaskText, setNewSubtaskText] = useState('');
+    const appointment = appointments.find(a => a.id === task.appointmentId);
 
     const handleAddSubtask = (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,6 +64,12 @@ const TaskItem = ({ task, onToggle, onDelete, onEdit, onAddSubtask, onToggleSubt
                         </label>
                     </div>
                     <div className="flex items-center gap-1">
+                        {appointment && !task.completed && (
+                            <Badge variant="outline" className="flex items-center font-normal">
+                                <Tag className="h-3 w-3 mr-1" />
+                                {appointment.customer}
+                            </Badge>
+                        )}
                         {!task.completed && (
                             <Badge variant={badgeInfo.variant}>
                                 {badgeInfo.label}
