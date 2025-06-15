@@ -13,16 +13,17 @@ export type Task = {
     priority: 'high' | 'medium' | 'low';
     completed: boolean;
     subtasks?: Subtask[];
+    appointmentId?: string;
 };
 
 const initialTasks: Task[] = [
     { id: 1, text: 'Material für Baustelle "Musterfrau" bestellen', priority: 'high', completed: false, subtasks: [
         { id: 101, text: 'Holzbalken 10x10cm', completed: false },
         { id: 102, text: 'Schrauben 5x50mm', completed: true },
-    ] },
-    { id: 2, text: 'Angebot für "John Doe" erstellen', priority: 'medium', completed: false, subtasks: [] },
+    ], appointmentId: '2' },
+    { id: 2, text: 'Angebot für "John Doe" erstellen', priority: 'medium', completed: false, subtasks: [], appointmentId: '3' },
     { id: 3, text: 'Rechnung für "Peter Pan" schreiben', priority: 'low', completed: true, subtasks: [] },
-    { id: 4, text: 'Werkzeug warten', priority: 'medium', completed: false, subtasks: [] },
+    { id: 4, text: 'Werkzeug warten', priority: 'medium', completed: false, subtasks: [], appointmentId: '1' },
 ];
 
 export const useTasks = () => {
@@ -71,7 +72,7 @@ export const useTasks = () => {
         }
     };
 
-    const handleAddTask = (text: string, priority: Task['priority']) => {
+    const handleAddTask = (text: string, priority: Task['priority'], appointmentId?: string) => {
         if (!text.trim()) return;
         const newTask: Task = {
             id: Date.now(),
@@ -79,6 +80,7 @@ export const useTasks = () => {
             priority: priority,
             completed: false,
             subtasks: [],
+            appointmentId,
         };
         setTaskList(prevTasks => [newTask, ...prevTasks]);
         setIsNewTaskDialogOpen(false);
