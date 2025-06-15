@@ -136,7 +136,7 @@ const Index = () => {
   return (
     <div ref={containerRef} className="h-screen w-full max-w-md mx-auto bg-background flex flex-col relative rounded-3xl border-4 border-border shadow-2xl shadow-primary/20">
       <header className="flex-shrink-0 py-4 px-6">
-        <img src="/lovable-uploads/dcf681e6-d2fe-4ca7-a24d-7137ef67a9f0.png" alt="Fapro Logo" className="h-10" />
+        <img src="/lovable-uploads/dcf681e6-d2fe-4ca7-a24d-7137ef67a9f0.png" alt="Fapro Logo" className="h-12" />
       </header>
 
       <main className="flex-grow flex flex-col overflow-hidden">
