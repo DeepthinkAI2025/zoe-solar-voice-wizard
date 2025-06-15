@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { aiAgents as initialAgents } from '@/data/mock';
@@ -12,7 +13,11 @@ export const useAgentManagement = () => {
     const agentsWithSettings = initialAgents.map(a => ({
       ...a,
       purpose: a.id === 'general' ? 'Zentrale' : a.id === 'tech' ? 'Techniker' : '',
-      systemInstructions: a.id === 'general' ? 'Du bist der primäre Ansprechpartner für allgemeine Anfragen. Leite technische Fragen an Thomas weiter.' : '',
+      systemInstructions: a.id === 'general'
+        ? 'Du bist der primäre Ansprechpartner für allgemeine Anfragen. Leite technische Fragen an Thomas weiter.'
+        : a.id === 'tech'
+        ? 'Du bist der technische Support für Solaranlagen. Beantworte technische Fragen detailliert und präzise. Sei kurz und informativ.'
+        : '',
       active: a.active || false
     }));
 
