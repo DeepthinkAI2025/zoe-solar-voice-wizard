@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import CallScreen from '@/components/CallScreen';
 import { User, Phone, Bot, Search, PhoneMissed, PhoneOutgoing } from 'lucide-react';
@@ -115,10 +116,15 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
           </Button>
         </div>
          {filteredCallHistory.map((call, i) => {
-           const contact = contacts.find(c => c.number === call.number);
-           const displayName = (call.name === 'Unbekannter Anrufer' || call.name === 'Unbekannt') && call.number !== 'Unbekannt' ? call.number : call.name;
+           // If call.number is 'Unbekannt', check if call.name can be used as a number.
+           const numberToUse = call.number === 'Unbekannt' && call.name !== 'Unbekannt' && call.name !== 'Unbekannter Anrufer' 
+             ? call.name 
+             : call.number;
+           
+           const contact = contacts.find(c => c.number === numberToUse);
+           const displayName = contact ? contact.name : numberToUse;
            const isKnownContact = !!contact;
-           const canCallback = call.number !== 'Unbekannt';
+           const canCallback = numberToUse !== 'Unbekannt' && numberToUse !== 'Unbekannter Anrufer';
 
            return (
              <div key={i} className="text-left p-3 rounded-lg bg-transparent transition-colors hover:bg-muted cursor-pointer" onClick={() => onCallSelect(call)}>
@@ -134,9 +140,9 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
                         <p 
                           className={`font-semibold ${isKnownContact ? 'cursor-pointer hover:underline' : ''} text-foreground`}
                           onClick={(e) => {
-                            if (isKnownContact) {
+                            if (isKnownContact && contact) {
                               e.stopPropagation();
-                              onSelectContact(call.number);
+                              onSelectContact(contact.number);
                             }
                           }}
                         >
@@ -151,15 +157,15 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
                 </div>
 
                   <div className="flex flex-col gap-0 flex-shrink-0 -my-1">
-                    <Button variant="ghost" size="icon" className="w-9 h-9" disabled={!canCallback} onClick={(e) => { e.stopPropagation(); onStartCallManually(call.number); }}>
+                    <Button variant="ghost" size="icon" className="w-9 h-9" disabled={!canCallback} onClick={(e) => { e.stopPropagation(); onStartCallManually(numberToUse); }}>
                       <Phone size={16} />
                     </Button>
                     <Button variant="ghost" size="icon" className="w-9 h-9" disabled={!canCallback} onClick={(e) => { 
                         e.stopPropagation();
                         if (call.type === 'Verpasst') {
-                          onStartCall(call.number, 'missed-call-callback');
+                          onStartCall(numberToUse, 'missed-call-callback');
                         } else {
-                          onStartCall(call.number);
+                          onStartCall(numberToUse);
                         }
                     }}>
                       <Bot size={16} />
