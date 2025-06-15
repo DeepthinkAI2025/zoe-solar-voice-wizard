@@ -27,7 +27,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
               className="w-full flex items-center p-4 rounded-lg bg-white/5 hover:bg-white/10 border border-transparent hover:border-primary/50 transition-all text-left"
             >
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-4">
-                  <Icon name={agent.icon.displayName as keyof typeof icons} size={20} className="text-primary" />
+                  <Icon name={agent.icon} size={20} className="text-primary" />
               </div>
               <div>
                 <p className="font-semibold text-white">{agent.name}</p>

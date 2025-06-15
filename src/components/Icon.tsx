@@ -3,11 +3,11 @@ import React from 'react';
 import { icons, LucideProps } from 'lucide-react';
 
 interface IconProps extends LucideProps {
-  name: keyof typeof icons;
+  name: string;
 }
 
 const Icon = ({ name, ...props }: IconProps) => {
-  const LucideIcon = icons[name];
+  const LucideIcon = icons[name as keyof typeof icons];
 
   if (!LucideIcon) {
     return null; // Or a fallback icon

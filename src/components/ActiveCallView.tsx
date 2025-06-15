@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { PhoneOff, Mic, MicOff, Volume2, Bot } from 'lucide-react';
 import { aiAgents } from '@/data/mock';
@@ -64,7 +63,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
       <div className="flex-grow my-8 overflow-y-auto space-y-4 pr-2">
         {agent && (
           <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 text-sm">
-            <Icon name={agent.icon.displayName as keyof typeof icons} className="text-primary w-5 h-5 flex-shrink-0" />
+            <Icon name={agent.icon} className="text-primary w-5 h-5 flex-shrink-0" />
             <span className="text-muted-foreground">{agent.name} ist aktiv.</span>
           </div>
         )}

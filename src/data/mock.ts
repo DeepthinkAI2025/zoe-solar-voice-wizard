@@ -1,11 +1,9 @@
 
-import { Phone, Voicemail, List, Contact, Bot, Building, Gavel, Handshake } from 'lucide-react';
-
 export const aiAgents = [
-  { id: 'tech', name: 'KI Techniker', icon: Building, description: 'Für technische Anfragen zu Solaranlagen.' },
-  { id: 'lead', name: 'KI Lead-Agent', icon: Handshake, description: 'Qualifiziert neue Kundenanfragen.' },
-  { id: 'legal', name: 'KI Anwalt', icon: Gavel, description: 'Beantwortet rechtliche Standardfragen.' },
-  { id: 'general', name: 'KI Zentrale', icon: Bot, description: 'Allgemeine Anfragen und Weiterleitung.' },
+  { id: 'tech', name: 'KI Techniker', icon: 'Building', description: 'Für technische Anfragen zu Solaranlagen.' },
+  { id: 'lead', name: 'KI Lead-Agent', icon: 'Handshake', description: 'Qualifiziert neue Kundenanfragen.' },
+  { id: 'legal', name: 'KI Anwalt', icon: 'Gavel', description: 'Beantwortet rechtliche Standardfragen.' },
+  { id: 'general', name: 'KI Zentrale', icon: 'Bot', description: 'Allgemeine Anfragen und Weiterleitung.' },
 ];
 
 export const contacts = [
@@ -26,8 +24,8 @@ export const voicemails = [
 ];
 
 export const navItems = [
-    { id: 'history', label: 'Anrufe', icon: List },
-    { id: 'contacts', label: 'Kontakte', icon: Contact },
-    { id: 'dialpad', label: 'Tastenfeld', icon: Dialpad },
-    { id: 'voicemail', label: 'Voicemail', icon: Voicemail },
+    { id: 'history', label: 'Anrufe', icon: 'List' },
+    { id: 'contacts', label: 'Kontakte', icon: 'Contact' },
+    { id: 'dialpad', label: 'Tastenfeld', icon: 'Dialpad' },
+    { id: 'voicemail', label: 'Voicemail', icon: 'Voicemail' },
 ];

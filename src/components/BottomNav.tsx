@@ -22,7 +22,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activeTab, setActiveTab, classNam
             activeTab === item.id ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
           )}
         >
-          <Icon name={item.icon.displayName as keyof typeof icons} size={24} />
+          <Icon name={item.icon} size={24} />
           <span className="text-xs mt-1">{item.label}</span>
         </button>
       ))}
