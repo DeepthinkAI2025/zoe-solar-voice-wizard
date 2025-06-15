@@ -53,7 +53,18 @@ const Index = () => {
     addContact,
     updateContact,
     deleteContact,
+    // Contact Editor State
+    contactToEditId,
+    openContactEditor,
+    clearContactToEdit,
   } = usePhoneState();
+
+  const handleSelectContactFromHistory = (number: string) => {
+    const contact = contacts.find(c => c.number === number);
+    if (contact) {
+      openContactEditor(contact.id);
+    }
+  };
 
   const contactName = showAgentSelector
     ? contacts.find(c => c.number === showAgentSelector)?.name
@@ -69,7 +80,8 @@ const Index = () => {
         return <HistoryScreen 
           onCallSelect={setSelectedCall} 
           onStartCall={handleStartCall} 
-          onStartCallManually={handleStartCallManually} 
+          onStartCallManually={handleStartCallManually}
+          onSelectContact={handleSelectContactFromHistory} 
         />;
       case 'contacts':
         return <ContactsScreen 
@@ -79,6 +91,8 @@ const Index = () => {
           addContact={addContact}
           updateContact={updateContact}
           deleteContact={deleteContact}
+          contactToEditId={contactToEditId}
+          onEditorClose={clearContactToEdit}
         />;
       case 'voicemail':
         return <VoicemailScreen onVoicemailSelect={setSelectedCall} />;

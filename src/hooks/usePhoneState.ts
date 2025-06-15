@@ -7,6 +7,7 @@ import { useContactManagement } from './useContactManagement';
 
 export const usePhoneState = () => {
   const [activeTab, setActiveTab] = useState('dialpad');
+  const [contactToEditId, setContactToEditId] = useState<string | null>(null);
   
   const settings = useSettings();
   const agentManagement = useAgentManagement();
@@ -20,9 +21,21 @@ export const usePhoneState = () => {
     globalSystemInstructions: agentManagement.globalSystemInstructions,
   });
 
+  const openContactEditor = (contactId: string) => {
+    setContactToEditId(contactId);
+    setActiveTab('contacts');
+  };
+
+  const clearContactToEdit = () => {
+    setContactToEditId(null);
+  };
+
   return {
     activeTab,
     setActiveTab,
+    contactToEditId,
+    openContactEditor,
+    clearContactToEdit,
     ...settings,
     ...agentManagement,
     ...contactManagement,

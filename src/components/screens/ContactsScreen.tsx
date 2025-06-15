@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CallScreen from '@/components/CallScreen';
 import { User, Phone, Bot, Search, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ interface ContactsScreenProps {
   addContact: (contact: Omit<Contact, 'id'>) => void;
   updateContact: (contact: Contact) => void;
   deleteContact: (contactId: string) => void;
+  contactToEditId?: string | null;
+  onEditorClose: () => void;
 }
 
 const ContactsScreen: React.FC<ContactsScreenProps> = ({ 
@@ -23,11 +25,23 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
   contacts,
   addContact,
   updateContact,
-  deleteContact
+  deleteContact,
+  contactToEditId,
+  onEditorClose
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+
+  useEffect(() => {
+    if (contactToEditId) {
+      const contact = contacts.find(c => c.id === contactToEditId);
+      if (contact) {
+        setEditingContact(contact);
+        setIsCreating(false);
+      }
+    }
+  }, [contactToEditId, contacts]);
 
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -51,6 +65,7 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
   const handleCloseEditor = () => {
     setEditingContact(null);
     setIsCreating(false);
+    onEditorClose();
   }
 
   const handleOpenCreator = () => {
