@@ -90,55 +90,6 @@ export const useCallManagement = ({
     setActiveCall(prev => prev ? { ...prev, isMinimized: false } : null);
   }, [setActiveCall]);
 
-  useEffect(() => {
-    if (activeCall?.isMinimized) {
-        const lastMessage = activeCall.transcript?.[activeCall.transcript.length - 1];
-        const contact = contacts.find(c => c.number === activeCall.number);
-        const displayName = contact?.name || activeCall.number;
-
-        let title: string;
-        let description: string;
-
-        if (lastMessage) {
-            title = `KI-Agent im Gespräch mit ${displayName}`;
-            const speakerName = lastMessage.speaker === 'agent' ? 'KI' : (contact?.name || 'Anrufer');
-            description = `${speakerName}: ${lastMessage.text}`;
-        } else {
-            title = "KI-Agent ist am Telefon";
-            description = `Anruf von ${displayName} wird im Hintergrund bearbeitet.`;
-        }
-
-        const toastOptions = {
-            description: description,
-            duration: Infinity,
-            onClick: () => {
-                if (activeCall?.isMinimized) {
-                    maximizeCall();
-                }
-            },
-        };
-
-        if (minimizedCallToastId) {
-            sonnerToast.message(title, { id: minimizedCallToastId, ...toastOptions });
-        } else {
-            const newToastId = sonnerToast.message(title, toastOptions);
-            setMinimizedCallToastId(newToastId);
-        }
-    } else {
-        if (minimizedCallToastId) {
-            sonnerToast.dismiss(minimizedCallToastId);
-            setMinimizedCallToastId(undefined);
-        }
-    }
-
-    return () => {
-        if (minimizedCallToastId && !activeCall) {
-            sonnerToast.dismiss(minimizedCallToastId);
-            setMinimizedCallToastId(undefined);
-        }
-    };
-  }, [activeCall, contacts, minimizedCallToastId, maximizeCall]);
-
   const endCall = useCallback(() => {
     if (minimizedCallToastId) {
         sonnerToast.dismiss(minimizedCallToastId);
