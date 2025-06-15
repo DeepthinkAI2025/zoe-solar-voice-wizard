@@ -26,6 +26,7 @@ const Index = () => {
   const [showAgentSelector, setShowAgentSelector] = useState<string | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
   const [agents, setAgents] = useState(initialAgents);
+  const [isVmActive, setIsVmActive] = useState(true); // New state for VM
   const { toast } = useToast();
 
   // Simulate an incoming call for demonstration
@@ -58,7 +59,52 @@ const Index = () => {
     }
   };
 
+  const handleVmToggle = async (active: boolean) => {
+    toast({
+      title: `VoIP VM wird ${active ? 'aktiviert' : 'deaktiviert'}...`,
+      description: 'Simuliere globalen Status-Wechsel.',
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsVmActive(active);
+
+    if (active) {
+      // When activating VM, ensure at least one agent is active.
+      // Let's activate the 'general' one as a default.
+      setAgents(prev => 
+        prev.map(a => 
+          a.id === 'general' ? { ...a, active: true } : a
+        )
+      );
+      toast({
+        title: 'Erfolgreich!',
+        description: 'VoIP VM wurde aktiviert. KI-Agenten sind jetzt verfügbar.',
+      });
+    } else {
+      // When deactivating VM, deactivate all agents.
+      setAgents(prev => 
+        prev.map(a => ({ ...a, active: false }))
+      );
+      toast({
+        title: 'Erfolgreich!',
+        description: 'VoIP VM wurde deaktiviert. Alle KI-Agenten sind offline.',
+      });
+    }
+  };
+
   const handleAgentToggle = async (agentId: string, active: boolean) => {
+    const activeAgentsCount = agents.filter(a => a.active).length;
+
+    if (!active && isVmActive && activeAgentsCount <= 1) {
+      toast({
+        title: 'Aktion nicht möglich',
+        description: 'Es muss mindestens ein KI-Agent aktiv sein, solange die VM aktiviert ist.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const agent = agents.find((a) => a.id === agentId);
     if (!agent) return;
 
@@ -190,6 +236,8 @@ const Index = () => {
       {showAgentSelector && (
         <AgentSelector 
             agents={agents}
+            isVmActive={isVmActive}
+            onToggleVm={handleVmToggle}
             onToggleAgent={handleAgentToggle}
             onSelect={handleAgentSelect} 
             onClose={() => setShowAgentSelector(null)} 

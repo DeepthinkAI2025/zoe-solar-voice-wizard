@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock } from 'lucide-react';
 import { Switch } from './ui/switch';
@@ -16,11 +16,22 @@ interface AgentSelectorProps {
   numberToCall: string;
   agents: Agent[];
   onToggleAgent: (agentId: string, active: boolean) => void;
+  isVmActive: boolean;
+  onToggleVm: (active: boolean) => void;
 }
 
-const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, agents, onToggleAgent }) => {
+const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, agents, onToggleAgent, isVmActive, onToggleVm }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
+
+  useEffect(() => {
+    if (selectedAgentId) {
+      const selectedAgent = agents.find(a => a.id === selectedAgentId);
+      if (!selectedAgent?.active) {
+        setSelectedAgentId(null);
+      }
+    }
+  }, [agents, selectedAgentId]);
 
   const handleSelectAndCall = () => {
     if (selectedAgentId) {
@@ -36,6 +47,20 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
         </button>
         <h2 className="text-xl font-bold text-white mb-2">KI-Agent auswählen</h2>
         <p className="text-muted-foreground mb-6">für Anruf an <span className="text-primary">{numberToCall}</span></p>
+        
+        <div className="border border-border p-4 rounded-lg mb-6 bg-white/5">
+            <div className="flex items-center justify-between">
+                <div>
+                    <p className="font-semibold text-white">VoIP VM</p>
+                    <p className="text-sm text-muted-foreground mt-1">Globale KI-Verfügbarkeit</p>
+                </div>
+                <Switch
+                    checked={isVmActive}
+                    onCheckedChange={onToggleVm}
+                    aria-label="VoIP VM global an-/ausschalten"
+                />
+            </div>
+        </div>
         
         <div className="space-y-3 overflow-y-auto pr-2 flex-grow">
           {agents.map(agent => (
@@ -58,13 +83,9 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
                     <p className="font-semibold text-white">{agent.name}</p>
                     <Switch
                         checked={agent.active}
-                        onCheckedChange={(checked) => {
-                            onToggleAgent(agent.id, checked)
-                            if (selectedAgentId === agent.id && !checked) {
-                                setSelectedAgentId(null);
-                            }
-                        }}
+                        onCheckedChange={(checked) => onToggleAgent(agent.id, checked)}
                         onClick={(e) => e.stopPropagation()}
+                        disabled={!isVmActive}
                         aria-label={`Agent ${agent.name} ${agent.active ? 'deaktivieren' : 'aktivieren'}`}
                     />
                 </div>
@@ -82,6 +103,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Was soll der KI-Agent wissen? z.B. Kontext zum Anruf, Kundennummer, etc."
                 className="bg-white/5 border-white/10"
+                disabled={!isVmActive}
             />
         </div>
 
