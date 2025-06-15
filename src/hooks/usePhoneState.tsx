@@ -10,6 +10,7 @@ export type CallState = null | {
   status: 'incoming' | 'active';
   agentId?: string;
   notes?: string;
+  startMuted?: boolean;
 };
 
 export const usePhoneState = () => {
@@ -33,15 +34,60 @@ export const usePhoneState = () => {
   const [isVmActive, setIsVmActive] = useState(true);
   const { toast } = useToast();
 
-  // Simulate an incoming call for demonstration
+  // Simulate an incoming call for demonstration & set muted state based on time
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!callState) {
-        setCallState({ number: 'Unbekannt', status: 'incoming' });
+        const hour = new Date().getHours();
+        const isOffHours = hour >= 17 || hour < 7;
+        
+        setCallState({ 
+            number: '0176 1234 5678',
+            status: 'incoming', 
+            startMuted: isOffHours 
+        });
       }
     }, 8000); // Incoming call after 8 seconds
     return () => clearTimeout(timeout);
   }, [callState]);
+
+  // Handle auto-answer during working hours
+  useEffect(() => {
+    if (callState?.status !== 'incoming') {
+      return;
+    }
+
+    const hour = new Date().getHours();
+    const isWorkingHours = hour >= 7 && hour < 17;
+
+    if (!isWorkingHours) {
+      return;
+    }
+
+    const autoAnswerTimeout = setTimeout(() => {
+      setCallState(currentCallState => {
+        // Check again in case the user answered/rejected in the meantime
+        if (currentCallState?.status === 'incoming') {
+          toast({
+            title: "Anruf automatisch angenommen",
+            description: `KI-Agent für allgemeine Anfragen übernimmt.`
+          });
+          return {
+            ...currentCallState,
+            status: 'active',
+            agentId: 'general',
+            notes: 'Anruf automatisch nach 6 Sekunden angenommen.'
+          };
+        }
+        // If call was already handled, do not change state
+        return currentCallState;
+      });
+    }, 6000); // 6 seconds
+
+    return () => {
+      clearTimeout(autoAnswerTimeout);
+    };
+  }, [callState?.status, callState?.number, toast]);
 
 
   const handleStartCall = (number: string) => {

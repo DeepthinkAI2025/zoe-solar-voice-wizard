@@ -18,6 +18,7 @@ interface ActiveCallViewProps {
   onAcceptCall?: () => void;
   onAcceptCallManually?: () => void;
   agents: Agent[];
+  startMuted?: boolean;
 }
 
 const mockTranscript = [
@@ -29,10 +30,10 @@ const mockTranscript = [
   "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen.",
 ];
 
-const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents }) => {
+const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted }) => {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
-  const [isRingerMuted, setIsRingerMuted] = useState(false);
+  const [isRingerMuted, setIsRingerMuted] = useState(startMuted ?? false);
   const [transcript, setTranscript] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
   const agent = agents.find(a => a.id === agentId);
