@@ -1,11 +1,11 @@
-
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { aiAgents as initialAgents } from '@/data/mock';
 
-type AgentWithSettings = (typeof initialAgents)[0] & {
+export type AgentWithSettings = (typeof initialAgents)[0] & {
   purpose: string;
   systemInstructions: string;
+  voiceCloned?: boolean;
 };
 
 export const useAgentManagement = () => {
@@ -38,6 +38,7 @@ export const useAgentManagement = () => {
         purpose,
         systemInstructions,
         active: a.active || false,
+        voiceCloned: false,
       };
     });
 

@@ -1,6 +1,5 @@
-
 import React, { useState, useRef } from 'react';
-import type { aiAgents } from '@/data/mock';
+import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 import { VoiceCloneDialog } from '@/components/VoiceCloneDialog';
 import { AppearanceSettings } from '../settings/AppearanceSettings';
 import { CallAutomationSettings } from '../settings/CallAutomationSettings';
@@ -8,10 +7,7 @@ import { SilentModeSettings } from '../settings/SilentModeSettings';
 import { AgentSettings } from '../settings/AgentSettings';
 import { useToast } from "@/components/ui/use-toast";
 
-type AgentWithSettings = (typeof aiAgents)[0] & {
-  purpose: string;
-  systemInstructions: string;
-};
+// Removed local AgentWithSettings type
 
 interface SettingsScreenProps {
   autoAnswerEnabled: boolean;
@@ -45,9 +41,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
     const file = event.target.files?.[0];
     if (file && cloningAgentId) {
       const agent = props.agents.find(a => a.id === cloningAgentId);
+      props.onUpdateAgentDetails(cloningAgentId, { voiceCloned: true });
       toast({
-          title: "Upload erfolgreich",
-          description: `Die Stimmdatei "${file.name}" für ${agent?.name || 'unbekannt'} wird verarbeitet.`
+          title: "Stimme geklont!",
+          description: `Für ${agent?.name || 'Agent'} wurde die Stimme via "${file.name}" erfolgreich hinterlegt.`
       });
       console.log('Uploading file:', file.name, 'for agent:', cloningAgentId);
       // In a real app, you'd upload the file here.
@@ -58,9 +55,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
   const handleRecordComplete = (blob: Blob) => {
     if (cloningAgentId) {
       const agent = props.agents.find(a => a.id === cloningAgentId);
+      props.onUpdateAgentDetails(cloningAgentId, { voiceCloned: true });
        toast({
-          title: "Aufnahme erfolgreich",
-          description: `Die Aufnahme für ${agent?.name || 'unbekannt'} wird verarbeitet.`
+          title: "Stimme geklont!",
+          description: `Für ${agent?.name || 'Agent'} wurde die aufgenommene Stimme erfolgreich hinterlegt.`
       });
       console.log('Recording complete for agent:', cloningAgentId, blob);
       // In a real app, you'd upload the blob here.

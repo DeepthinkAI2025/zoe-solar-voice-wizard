@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useCallback } from 'react';
 import {
   Dialog,
@@ -11,12 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Upload, Mic } from 'lucide-react';
-import type { aiAgents } from '@/data/mock';
-
-type AgentWithSettings = (typeof aiAgents)[0] & {
-  purpose: string;
-  systemInstructions: string;
-};
+import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 
 interface VoiceCloneDialogProps {
   agent: AgentWithSettings | undefined;

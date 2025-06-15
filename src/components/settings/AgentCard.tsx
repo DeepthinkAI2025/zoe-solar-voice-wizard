@@ -1,16 +1,11 @@
-
 import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import type { aiAgents } from '@/data/mock';
-
-type AgentWithSettings = (typeof aiAgents)[0] & {
-  purpose: string;
-  systemInstructions: string;
-};
+import type { AgentWithSettings } from '@/hooks/useAgentManagement';
+import { CheckCircle } from 'lucide-react';
 
 interface AgentCardProps {
   agent: AgentWithSettings;
@@ -73,10 +68,16 @@ export const AgentCard: React.FC<AgentCardProps> = ({
           />
         </div>
       </div>
-      <div className="mt-4 pt-4 border-t border-border">
+      <div className="mt-4 pt-4 border-t border-border flex items-center gap-4">
         <Button variant="outline" onClick={() => onStartVoiceClone(agent.id)}>
-            Stimme klonen
+            {agent.voiceCloned ? 'Stimme erneut klonen' : 'Stimme klonen'}
         </Button>
+        {agent.voiceCloned && (
+            <div className="flex items-center gap-1 text-sm text-green-600 font-medium">
+                <CheckCircle className="h-4 w-4" />
+                <span>Stimme aktiv</span>
+            </div>
+        )}
       </div>
     </div>
   );

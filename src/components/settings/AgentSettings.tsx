@@ -1,15 +1,9 @@
-
 import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import type { aiAgents } from '@/data/mock';
+import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 import { AgentCard } from './AgentCard';
-
-type AgentWithSettings = (typeof aiAgents)[0] & {
-  purpose: string;
-  systemInstructions: string;
-};
 
 interface AgentSettingsProps {
   agents: AgentWithSettings[];
