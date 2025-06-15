@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
@@ -124,8 +125,8 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
                       !isVmActive && "cursor-not-allowed opacity-50"
                   )}
               />
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mb-3 flex-shrink-0">
-                  <Icon name={agent.icon} size={20} className="text-primary" />
+              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mb-3 flex-shrink-0">
+                  <Icon name={agent.icon} size={16} className="text-primary" />
               </div>
               <div className="flex-grow">
                 <div className="flex items-center gap-2">
