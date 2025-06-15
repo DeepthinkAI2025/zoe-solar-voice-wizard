@@ -82,13 +82,16 @@ export const AgentSettings: React.FC<AgentSettingsProps> = ({
                       <div className="text-sm text-muted-foreground">{agent.purpose}</div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-center gap-2 pl-2 text-center" onClick={(e) => e.stopPropagation()}>
-                    <Switch
-                      id={`agent-toggle-${agent.id}`}
-                      checked={agent.active}
-                      onCheckedChange={(checked) => onToggleAgent(agent.id, checked)}
+                  <div className="flex flex-col items-center justify-center gap-2 pl-2 text-center h-11" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => onToggleAgent(agent.id, !agent.active)}
                       disabled={!isVmActive}
-                      orientation="vertical"
+                      className={cn(
+                        "w-4 h-4 rounded-full transition-all",
+                        agent.active ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" : "bg-muted-foreground/50",
+                        !isVmActive && "cursor-not-allowed opacity-50"
+                      )}
+                      aria-label={agent.active ? 'Agent deaktivieren' : 'Agent aktivieren'}
                     />
                     <span className="text-xs text-muted-foreground w-12">{agent.active ? 'Aktiv' : 'Inaktiv'}</span>
                   </div>
