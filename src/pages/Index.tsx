@@ -58,6 +58,10 @@ const Index = () => {
   const contactName = showAgentSelector
     ? contacts.find(c => c.number === showAgentSelector)?.name
     : undefined;
+  
+  const activeCallContactName = callState?.number
+    ? contacts.find(c => c.number === callState.number)?.name
+    : undefined;
 
   const renderContent = () => {
     switch (activeTab) {
@@ -139,6 +143,7 @@ const Index = () => {
         <ActiveCallView 
             {...callState} 
             agents={agents}
+            contactName={activeCallContactName}
             onEndCall={handleEndCall}
             onAcceptCall={handleAcceptCallWithAI}
             onAcceptCallManually={handleAcceptCallManually}

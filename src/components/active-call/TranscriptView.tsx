@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Icon from '@/components/Icon';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -27,18 +28,38 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
   onNewNoteChange,
   onSendNote,
 }) => {
+  const [showStartNotice, setShowStartNotice] = useState(true);
+
+  useEffect(() => {
+    if (agent) {
+      setShowStartNotice(true);
+      const timer = setTimeout(() => {
+        setShowStartNotice(false);
+      }, 5000); // Hide after 5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [agent]);
+
   return (
     <>
       <div ref={scrollContainerRef} className="flex-grow my-8 overflow-y-auto space-y-4 pr-2">
-        {agent && (
-          <div className="flex flex-col gap-3 p-3 rounded-lg bg-secondary text-sm">
-            <div className="flex items-center gap-3">
-              <Icon name={agent.icon} className="text-primary w-5 h-5 flex-shrink-0" />
-              <span className="text-secondary-foreground">{agent.name} ist aktiv.</span>
-            </div>
-            {notes && <p className="text-secondary-foreground/80 pl-8 border-l-2 border-primary/20 ml-2.5">Start-Notiz: "{notes}"</p>}
-          </div>
-        )}
+        <AnimatePresence>
+          {showStartNotice && agent && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, transition: { duration: 0.3 } }}
+              className="flex flex-col gap-3 p-3 rounded-lg bg-secondary text-sm"
+            >
+              <div className="flex items-center gap-3">
+                <Icon name={agent.icon} className="text-primary w-5 h-5 flex-shrink-0" />
+                <span className="text-secondary-foreground">{agent.name} ist aktiv.</span>
+              </div>
+              {notes && <p className="text-secondary-foreground/80 pl-8 border-l-2 border-primary/20 ml-2.5">Start-Notiz: "{notes}"</p>}
+            </motion.div>
+          )}
+        </AnimatePresence>
         {transcript.map((line, index) => (
           <div key={index} className="text-left p-3 rounded-lg bg-secondary animate-fade-in">
              <p className="text-foreground">{line.startsWith('[Notiz an KI]:') 

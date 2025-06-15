@@ -11,6 +11,7 @@ type Agent = (typeof aiAgents)[0];
 
 interface ActiveCallViewProps {
   number: string;
+  contactName?: string;
   status: 'incoming' | 'active';
   agentId?: string;
   notes?: string;
@@ -32,7 +33,7 @@ const mockTranscript = [
   "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen.",
 ];
 
-const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, isForwarding }) => {
+const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, isForwarding }) => {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isRingerMuted, setIsRingerMuted] = useState(startMuted ?? false);
@@ -108,7 +109,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
           </div>
       )}
       
-      <CallHeader number={number} status={status} duration={duration} />
+      <CallHeader number={number} contactName={contactName} status={status} duration={duration} />
 
       {status === 'active' && (
         <TranscriptView
