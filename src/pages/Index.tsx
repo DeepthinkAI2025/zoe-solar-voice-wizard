@@ -10,7 +10,7 @@ import HistoryScreen from '@/components/screens/HistoryScreen';
 import ContactsScreen from '@/components/screens/ContactsScreen';
 import VoicemailScreen from '@/components/screens/VoicemailScreen';
 import SettingsScreen from '@/components/screens/SettingsScreen';
-import { contacts } from '@/data/mock';
+// import { contacts } from '@/data/mock';
 
 const Index = () => {
   const {
@@ -48,6 +48,11 @@ const Index = () => {
     globalSystemInstructions,
     setGlobalSystemInstructions,
     handleUpdateAgentDetails,
+    // Contact Management
+    contacts,
+    addContact,
+    updateContact,
+    deleteContact,
   } = usePhoneState();
 
   const contactName = showAgentSelector
@@ -65,7 +70,11 @@ const Index = () => {
       case 'contacts':
         return <ContactsScreen 
           onStartCall={handleStartCall} 
-          onStartCallManually={handleStartCallManually} 
+          onStartCallManually={handleStartCallManually}
+          contacts={contacts}
+          addContact={addContact}
+          updateContact={updateContact}
+          deleteContact={deleteContact}
         />;
       case 'voicemail':
         return <VoicemailScreen onVoicemailSelect={setSelectedCall} />;

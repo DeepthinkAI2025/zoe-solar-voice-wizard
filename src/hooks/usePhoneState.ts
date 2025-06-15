@@ -3,12 +3,14 @@ import { useState } from 'react';
 import { useSettings } from './useSettings';
 import { useAgentManagement } from './useAgentManagement';
 import { useCallManagement } from './useCallManagement';
+import { useContactManagement } from './useContactManagement';
 
 export const usePhoneState = () => {
   const [activeTab, setActiveTab] = useState('dialpad');
   
   const settings = useSettings();
   const agentManagement = useAgentManagement();
+  const contactManagement = useContactManagement();
   const callManagement = useCallManagement({
     silentModeEnabled: settings.silentModeEnabled,
     workingHoursStart: settings.workingHoursStart,
@@ -23,7 +25,7 @@ export const usePhoneState = () => {
     setActiveTab,
     ...settings,
     ...agentManagement,
+    ...contactManagement,
     ...callManagement,
   };
 };
-
