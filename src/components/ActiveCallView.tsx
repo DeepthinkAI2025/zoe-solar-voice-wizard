@@ -8,6 +8,7 @@ import IncomingCallControls from './active-call/IncomingCallControls';
 import ActiveCallControls from './active-call/ActiveCallControls';
 
 type Agent = (typeof aiAgents)[0];
+export type TranscriptLine = { speaker: 'agent' | 'caller' | 'system'; text: string; };
 
 interface ActiveCallViewProps {
   number: string;
@@ -33,27 +34,28 @@ const greetings = [
   "Willkommen bei ZOE Solar. Mein Name ist Alex, Ihr persönlicher KI-Assistent. Womit kann ich Ihnen dienen?",
 ];
 
-const mockConversation = [
-  "Guten Tag, hier ist Müller. Ich habe eine Frage zu meiner letzten Rechnung.",
-  "Selbstverständlich, Herr Müller. Um Ihnen zu helfen, benötige ich bitte Ihre Kunden- oder Rechnungsnummer.",
-  "Moment, die habe ich hier... das ist die 12345.",
-  "Vielen Dank. Ich prüfe das für Sie...",
-  "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen.",
+const mockConversation: { speaker: 'agent' | 'caller'; text: string; }[] = [
+  { speaker: 'caller', text: "Guten Tag, hier ist Müller. Ich habe eine Frage zu meiner letzten Rechnung." },
+  { speaker: 'agent', text: "Selbstverständlich, Herr Müller. Um Ihnen zu helfen, benötige ich bitte Ihre Kunden- oder Rechnungsnummer." },
+  { speaker: 'caller', text: "Moment, die habe ich hier... das ist die 12345." },
+  { speaker: 'agent', text: "Vielen Dank. Ich prüfe das für Sie..." },
+  { speaker: 'agent', text: "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen." },
 ];
 
 const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, onIntervene, isForwarding, duration, onMinimize }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isRingerMuted, setIsRingerMuted] = useState(startMuted ?? false);
-  const [transcript, setTranscript] = useState<string[]>([]);
+  const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
   const [newNote, setNewNote] = useState('');
   const [audioOutput, setAudioOutput] = useState('speaker');
   const [isTranscriptVisible, setIsTranscriptVisible] = useState(true);
   const agent = agents.find(a => a.id === agentId);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const callerName = contactName || 'Anrufer';
 
-  const fullTranscript = useMemo(() => {
+  const fullTranscript: TranscriptLine[] = useMemo(() => {
     const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-    return [randomGreeting, ...mockConversation];
+    return [{ speaker: 'agent', text: randomGreeting }, ...mockConversation];
   }, []);
 
   useEffect(() => {
@@ -144,7 +146,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
     if (!newNote.trim()) return;
     console.log("Sending new note to AI:", newNote);
     // Add to transcript for visual feedback
-    setTranscript(prev => [`[Notiz an KI]: ${newNote}`, ...prev]);
+    setTranscript(prev => [{ speaker: 'system', text: `[Notiz an KI]: ${newNote}` }, ...prev]);
     setNewNote('');
   };
 
@@ -181,6 +183,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
           newNote={newNote}
           onNewNoteChange={setNewNote}
           onSendNote={handleSendNote}
+          callerName={callerName}
         />
       )}
       

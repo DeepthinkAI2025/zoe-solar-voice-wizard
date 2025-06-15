@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
 import type { aiAgents } from '@/data/mock';
+import type { TranscriptLine } from '../ActiveCallView';
 
 type Agent = (typeof aiAgents)[0];
 
@@ -13,10 +14,11 @@ interface TranscriptViewProps {
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   agent?: Agent;
   notes?: string;
-  transcript: string[];
+  transcript: TranscriptLine[];
   newNote: string;
   onNewNoteChange: (value: string) => void;
   onSendNote: () => void;
+  callerName: string;
 }
 
 const TranscriptView: React.FC<TranscriptViewProps> = ({
@@ -27,6 +29,7 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
   newNote,
   onNewNoteChange,
   onSendNote,
+  callerName,
 }) => {
   const [showStartNotice, setShowStartNotice] = useState(true);
 
@@ -40,6 +43,16 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
       return () => clearTimeout(timer);
     }
   }, [agent]);
+
+  const getSpeakerName = (speaker: TranscriptLine['speaker']) => {
+    if (speaker === 'agent') {
+        return agent?.name || 'KI-Assistent';
+    }
+    if (speaker === 'caller') {
+        return callerName;
+    }
+    return null;
+  }
 
   return (
     <>
@@ -60,14 +73,23 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
             </motion.div>
           )}
         </AnimatePresence>
-        {transcript.map((line, index) => (
-          <div key={index} className="text-left p-3 rounded-lg bg-secondary animate-fade-in">
-             <p className="text-foreground">{line.startsWith('[Notiz an KI]:') 
-                ? <><span className="text-primary font-semibold">Notiz an KI:</span>{line.replace('[Notiz an KI]:', '')}</>
-                : line}
-             </p>
-          </div>
-        ))}
+        {transcript.map((line, index) => {
+            const speakerName = getSpeakerName(line.speaker);
+            return (
+              <div key={index} className="text-left p-3 rounded-lg bg-secondary animate-fade-in">
+                 {line.speaker === 'system' ? (
+                    <p className="text-foreground">
+                        <span className="text-primary font-semibold">Notiz an KI:</span>{line.text.replace('[Notiz an KI]:', '')}
+                    </p>
+                 ) : (
+                    <>
+                        {speakerName && <p className="text-sm font-semibold text-primary mb-1">{speakerName}</p>}
+                        <p className="text-foreground">{line.text}</p>
+                    </>
+                 )}
+              </div>
+            );
+        })}
       </div>
 
       {agent && (
