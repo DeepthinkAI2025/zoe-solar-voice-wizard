@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,25 +11,42 @@ interface NewTaskDialogProps {
     isOpen: boolean;
     onOpenChange: (isOpen: boolean) => void;
     onAddTask: (text: string, priority: Task['priority']) => void;
+    onUpdateTask: (id: number, text: string, priority: Task['priority']) => void;
+    taskToEdit: Task | null;
 }
 
-const NewTaskDialog = ({ isOpen, onOpenChange, onAddTask }: NewTaskDialogProps) => {
-    const [newTaskText, setNewTaskText] = useState('');
-    const [newTaskPriority, setNewTaskPriority] = useState<Task['priority']>('medium');
+const NewTaskDialog = ({ isOpen, onOpenChange, onAddTask, onUpdateTask, taskToEdit }: NewTaskDialogProps) => {
+    const [taskText, setTaskText] = useState('');
+    const [taskPriority, setTaskPriority] = useState<Task['priority']>('medium');
+
+    const isEditing = taskToEdit !== null;
+
+    useEffect(() => {
+        if (isEditing) {
+            setTaskText(taskToEdit.text);
+            setTaskPriority(taskToEdit.priority);
+        } else {
+            setTaskText('');
+            setTaskPriority('medium');
+        }
+    }, [taskToEdit, isEditing, isOpen]);
+
 
     const handleSave = () => {
-        onAddTask(newTaskText, newTaskPriority);
-        setNewTaskText('');
-        setNewTaskPriority('medium');
+        if (isEditing) {
+            onUpdateTask(taskToEdit.id, taskText, taskPriority);
+        } else {
+            onAddTask(taskText, taskPriority);
+        }
     };
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Neue Aufgabe erstellen</DialogTitle>
+                    <DialogTitle>{isEditing ? 'Aufgabe bearbeiten' : 'Neue Aufgabe erstellen'}</DialogTitle>
                     <DialogDescription>
-                        Fügen Sie eine neue Aufgabe zu Ihrer Liste hinzu. Klicken Sie auf Speichern, wenn Sie fertig sind.
+                        {isEditing ? 'Ändern Sie die Details der Aufgabe.' : 'Fügen Sie eine neue Aufgabe zu Ihrer Liste hinzu. Klicken Sie auf Speichern, wenn Sie fertig sind.'}
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -39,8 +56,8 @@ const NewTaskDialog = ({ isOpen, onOpenChange, onAddTask }: NewTaskDialogProps) 
                         </Label>
                         <Input
                             id="task-text"
-                            value={newTaskText}
-                            onChange={(e) => setNewTaskText(e.target.value)}
+                            value={taskText}
+                            onChange={(e) => setTaskText(e.target.value)}
                             className="col-span-3"
                             placeholder="z.B. Material bestellen"
                         />
@@ -49,7 +66,7 @@ const NewTaskDialog = ({ isOpen, onOpenChange, onAddTask }: NewTaskDialogProps) 
                         <Label htmlFor="priority" className="text-right">
                             Priorität
                         </Label>
-                        <Select value={newTaskPriority} onValueChange={(value) => setNewTaskPriority(value as Task['priority'])}>
+                        <Select value={taskPriority} onValueChange={(value) => setTaskPriority(value as Task['priority'])}>
                             <SelectTrigger className="col-span-3">
                                 <SelectValue placeholder="Priorität auswählen" />
                             </SelectTrigger>
@@ -62,7 +79,7 @@ const NewTaskDialog = ({ isOpen, onOpenChange, onAddTask }: NewTaskDialogProps) 
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button type="button" onClick={handleSave}>Speichern</Button>
+                    <Button type="button" onClick={handleSave} disabled={!taskText.trim()}>{isEditing ? 'Änderungen speichern' : 'Speichern'}</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

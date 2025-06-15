@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
-import { ChevronRight, PlusCircle, Trash2 } from 'lucide-react';
+import { ChevronRight, PlusCircle, Trash2, Pencil } from 'lucide-react';
 import type { Task } from '@/hooks/useTasks';
 import { getPriorityBadgeInfo } from './utils';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
@@ -15,12 +14,13 @@ interface TaskItemProps {
     task: Task;
     onToggle: (id: number) => void;
     onDelete: (id: number) => void;
+    onEdit: (task: Task) => void;
     onAddSubtask: (taskId: number, text: string) => void;
     onToggleSubtask: (taskId: number, subtaskId: number) => void;
     onDeleteSubtask: (taskId: number, subtaskId: number) => void;
 }
 
-const TaskItem = ({ task, onToggle, onDelete, onAddSubtask, onToggleSubtask, onDeleteSubtask }: TaskItemProps) => {
+const TaskItem = ({ task, onToggle, onDelete, onEdit, onAddSubtask, onToggleSubtask, onDeleteSubtask }: TaskItemProps) => {
     const badgeInfo = getPriorityBadgeInfo(task.priority);
     const [newSubtaskText, setNewSubtaskText] = useState('');
 
@@ -64,6 +64,11 @@ const TaskItem = ({ task, onToggle, onDelete, onAddSubtask, onToggleSubtask, onD
                             <Badge variant={badgeInfo.variant}>
                                 {badgeInfo.label}
                             </Badge>
+                        )}
+                        {!task.completed && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => onEdit(task)}>
+                                <Pencil className="h-4 w-4 text-muted-foreground" />
+                            </Button>
                         )}
                         <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => onDelete(task.id)}>
                             <Trash2 className="h-4 w-4 text-muted-foreground" />

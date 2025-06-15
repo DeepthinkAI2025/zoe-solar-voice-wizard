@@ -14,15 +14,26 @@ const TasksScreen = () => {
         isNewTaskDialogOpen,
         setIsNewTaskDialogOpen,
         taskToDelete,
+        taskToEdit,
         handleToggle,
         handleAddTask,
+        handleUpdateTask,
         handleDeleteTask,
         confirmDeleteTask,
         cancelDeleteTask,
+        startEditingTask,
+        cancelEditingTask,
         handleAddSubtask,
         handleToggleSubtask,
         handleDeleteSubtask,
     } = useTasks();
+
+    const handleDialogClose = (open: boolean) => {
+        if (!open) {
+            setIsNewTaskDialogOpen(false);
+            cancelEditingTask();
+        }
+    };
 
     return (
         <>
@@ -45,6 +56,7 @@ const TasksScreen = () => {
                             tasks={openTasks}
                             onToggle={handleToggle}
                             onDelete={confirmDeleteTask}
+                            onEdit={startEditingTask}
                             emptyMessage="Super! Keine offenen Aufgaben."
                             onAddSubtask={handleAddSubtask}
                             onToggleSubtask={handleToggleSubtask}
@@ -59,6 +71,7 @@ const TasksScreen = () => {
                                 tasks={completedTasks}
                                 onToggle={handleToggle}
                                 onDelete={confirmDeleteTask}
+                                onEdit={startEditingTask}
                                 emptyMessage=""
                                 onAddSubtask={handleAddSubtask}
                                 onToggleSubtask={handleToggleSubtask}
@@ -70,9 +83,11 @@ const TasksScreen = () => {
             </div>
             
             <NewTaskDialog 
-                isOpen={isNewTaskDialogOpen}
-                onOpenChange={setIsNewTaskDialogOpen}
+                isOpen={isNewTaskDialogOpen || !!taskToEdit}
+                onOpenChange={handleDialogClose}
                 onAddTask={handleAddTask}
+                onUpdateTask={handleUpdateTask}
+                taskToEdit={taskToEdit}
             />
 
             <DeleteTaskDialog

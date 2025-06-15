@@ -46,6 +46,7 @@ export const useTasks = () => {
 
     const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
     const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
+    const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
 
     const handleToggle = (id: number) => {
         const task = taskList.find(t => t.id === id);
@@ -84,6 +85,20 @@ export const useTasks = () => {
         toast({
             title: "Aufgabe hinzugefügt",
             description: `"${newTask.text}" wurde zur Liste hinzugefügt.`,
+        });
+    };
+
+    const handleUpdateTask = (id: number, text: string, priority: Task['priority']) => {
+        if (!text.trim()) return;
+        setTaskList(prevTasks =>
+            prevTasks.map(task =>
+                task.id === id ? { ...task, text: text.trim(), priority } : task
+            )
+        );
+        setTaskToEdit(null);
+        toast({
+            title: "Aufgabe aktualisiert",
+            description: `"${text}" wurde erfolgreich geändert.`,
         });
     };
 
@@ -178,6 +193,14 @@ export const useTasks = () => {
             });
         }
     };
+
+    const startEditingTask = (task: Task) => {
+        setTaskToEdit(task);
+    };
+
+    const cancelEditingTask = () => {
+        setTaskToEdit(null);
+    };
     
     const openTasks = taskList.filter(t => !t.completed);
     const completedTasks = taskList.filter(t => t.completed);
@@ -188,11 +211,15 @@ export const useTasks = () => {
         isNewTaskDialogOpen,
         setIsNewTaskDialogOpen,
         taskToDelete,
+        taskToEdit,
         handleToggle,
         handleAddTask,
+        handleUpdateTask,
         handleDeleteTask,
         confirmDeleteTask,
         cancelDeleteTask,
+        startEditingTask,
+        cancelEditingTask,
         handleAddSubtask,
         handleToggleSubtask,
         handleDeleteSubtask,
