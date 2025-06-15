@@ -1,17 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, PanInfo } from 'framer-motion';
-import { Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX, Send, Bluetooth, Share } from 'lucide-react';
-import Icon from './Icon';
+import { PanInfo } from 'framer-motion';
+import { Phone, Volume2, Bluetooth } from 'lucide-react';
 import type { aiAgents } from '@/data/mock';
-import { Textarea } from './ui/textarea';
-import { Button } from './ui/button';
-import { cn } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import CallHeader from './active-call/CallHeader';
+import TranscriptView from './active-call/TranscriptView';
+import IncomingCallControls from './active-call/IncomingCallControls';
+import ActiveCallControls from './active-call/ActiveCallControls';
 
 type Agent = (typeof aiAgents)[0];
 
@@ -106,12 +100,6 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
     setNewNote('');
   };
 
-  const formatDuration = (sec: number) => {
-    const minutes = Math.floor(sec / 60).toString().padStart(2, '0');
-    const seconds = (sec % 60).toString().padStart(2, '0');
-    return `${minutes}:${seconds}`;
-  };
-
   return (
     <div className="fixed inset-0 bg-background z-40 flex flex-col p-6 animate-slide-up">
       {isForwarding && (
@@ -119,140 +107,41 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
               <p className="text-primary text-lg animate-pulse">Einen Moment, die Weiterleitung wird vorbereitet...</p>
           </div>
       )}
-      {/* Header */}
-      <div className="text-center pt-8">
-        <h2 className="text-3xl font-bold text-foreground">{number}</h2>
-        <p className="text-primary mt-2">{status === 'incoming' ? 'Eingehender Anruf' : formatDuration(duration)}</p>
-      </div>
+      
+      <CallHeader number={number} status={status} duration={duration} />
 
-      {/* Transcript & Notes for active call */}
       {status === 'active' && (
-        <>
-          <div ref={scrollContainerRef} className="flex-grow my-8 overflow-y-auto space-y-4 pr-2">
-            {agent && (
-              <div className="flex flex-col gap-3 p-3 rounded-lg bg-secondary text-sm">
-                <div className="flex items-center gap-3">
-                  <Icon name={agent.icon} className="text-primary w-5 h-5 flex-shrink-0" />
-                  <span className="text-secondary-foreground">{agent.name} ist aktiv.</span>
-                </div>
-                {notes && <p className="text-secondary-foreground/80 pl-8 border-l-2 border-primary/20 ml-2.5">Start-Notiz: "{notes}"</p>}
-              </div>
-            )}
-            {transcript.map((line, index) => (
-              <div key={index} className="text-left p-3 rounded-lg bg-secondary animate-fade-in">
-                 <p className="text-foreground">{line.startsWith('[Notiz an KI]:') 
-                    ? <><span className="text-primary font-semibold">Notiz an KI:</span>{line.replace('[Notiz an KI]:', '')}</>
-                    : line}
-                 </p>
-              </div>
-            ))}
-          </div>
-
-          {agentId && (
-              <div className="flex-shrink-0 mb-6 flex gap-2">
-                <Textarea 
-                    value={newNote}
-                    onChange={(e) => setNewNote(e.target.value)}
-                    placeholder={`Live-Notiz für ${agent?.name} eingeben...`}
-                    className="bg-secondary border-border min-h-0 h-12"
-                    rows={1}
-                />
-                <Button onClick={handleSendNote} size="icon" className="w-12 h-12" disabled={!newNote.trim()}>
-                    <Send />
-                </Button>
-              </div>
-          )}
-        </>
+        <TranscriptView
+          scrollContainerRef={scrollContainerRef}
+          agent={agent}
+          notes={notes}
+          transcript={transcript}
+          newNote={newNote}
+          onNewNoteChange={setNewNote}
+          onSendNote={handleSendNote}
+        />
       )}
       
-      {/* Controls */}
       <div className="flex-shrink-0 flex-grow flex flex-col justify-end pb-6">
         {status === 'incoming' ? (
-          <div className="flex-grow flex flex-col">
-            <div className="flex justify-end px-6 mb-4">
-              <button onClick={() => setIsRingerMuted(!isRingerMuted)} className="flex flex-col items-center text-muted-foreground hover:text-foreground transition-colors">
-                  {isRingerMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
-                  <span className="text-xs mt-1">{isRingerMuted ? 'Ton an' : 'Stumm'}</span>
-              </button>
-            </div>
-            <motion.div
-                drag
-                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-                dragElastic={0.7}
-                onDragEnd={handleDragEnd}
-                className="flex-grow flex flex-col items-center justify-center text-center cursor-grab active:cursor-grabbing"
-                aria-label="Anruf annehmen oder Gesten verwenden"
-            >
-              <p className="text-sm text-primary animate-pulse">Nach oben wischen, um mit KI anzunehmen</p>
-              <div className="flex items-center justify-center gap-x-16 my-8">
-                  <motion.div
-                      onTap={onEndCall}
-                      className="w-20 h-20 rounded-full bg-red-600/80 hover:bg-red-600 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
-                      whileTap={{ scale: 1.1 }}
-                      aria-label="Anruf ablehnen"
-                  >
-                      <PhoneOff size={32} className="text-white" />
-                  </motion.div>
-                  <motion.div
-                      onTap={onAcceptCallManually}
-                      className="w-20 h-20 rounded-full bg-green-500/80 hover:bg-green-500 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
-                      whileTap={{ scale: 1.1 }}
-                      aria-label="Anruf annehmen"
-                  >
-                      <Phone size={32} className="text-white" />
-                  </motion.div>
-              </div>
-              <p className="text-sm text-muted-foreground">Oder zum Stummschalten zur Seite/nach unten wischen</p>
-            </motion.div>
-          </div>
+          <IncomingCallControls
+            isRingerMuted={isRingerMuted}
+            onToggleRingerMute={() => setIsRingerMuted(!isRingerMuted)}
+            onDragEnd={handleDragEnd}
+            onEndCall={onEndCall}
+            onAcceptCallManually={onAcceptCallManually}
+          />
         ) : (
-          <div className="flex flex-col items-center">
-            <div className={cn(
-              "grid gap-x-6 mb-8",
-              !agentId && onForward ? "grid-cols-3" : "grid-cols-2"
-            )}>
-              <button onClick={() => setIsMuted(!isMuted)} className="flex flex-col items-center justify-center gap-2 text-foreground/80 hover:text-foreground transition-colors">
-                <div className="w-16 h-16 rounded-full bg-secondary hover:bg-accent flex items-center justify-center">
-                  {isMuted ? <MicOff size={28} /> : <Mic size={28} />}
-                </div>
-                <span className="text-xs">{isMuted ? 'Ton an' : 'Stumm'}</span>
-              </button>
-              
-              {!agentId && onForward && (
-                <button onClick={onForward} className="flex flex-col items-center justify-center gap-2 text-foreground/80 hover:text-foreground transition-colors">
-                  <div className="w-16 h-16 rounded-full bg-secondary hover:bg-accent flex items-center justify-center">
-                    <Share size={28} />
-                  </div>
-                  <span className="text-xs">Weiterleiten</span>
-                </button>
-              )}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex flex-col items-center justify-center gap-2 text-foreground/80 hover:text-foreground transition-colors">
-                    <div className="w-16 h-16 rounded-full bg-secondary hover:bg-accent flex items-center justify-center">
-                      <selectedAudioDevice.icon size={28} />
-                    </div>
-                    <span className="text-xs">{selectedAudioDevice.name}</span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-popover border-border text-popover-foreground">
-                  {audioOutputs.map((output) => (
-                    <DropdownMenuItem
-                      key={output.id}
-                      onClick={() => setAudioOutput(output.id)}
-                      className="flex items-center gap-2 cursor-pointer focus:bg-accent"
-                    >
-                      <output.icon className="w-4 h-4 mr-2" />
-                      <span>{output.name}</span>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <button onClick={onEndCall} className="w-20 h-20 rounded-full bg-red-600/80 hover:bg-red-600 flex items-center justify-center transition-transform hover:scale-105">
-              <PhoneOff size={32} className="text-white" />
-            </button>
-          </div>
+          <ActiveCallControls
+            isMuted={isMuted}
+            onToggleMute={() => setIsMuted(!isMuted)}
+            agentId={agentId}
+            onForward={onForward}
+            audioOutputs={audioOutputs}
+            selectedAudioDevice={selectedAudioDevice}
+            onAudioOutputChange={setAudioOutput}
+            onEndCall={onEndCall}
+          />
         )}
       </div>
     </div>
