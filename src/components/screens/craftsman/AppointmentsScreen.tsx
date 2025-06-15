@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
@@ -126,7 +127,7 @@ const AppointmentsScreen = () => {
 
     const [appointmentIdForNewTask, setAppointmentIdForNewTask] = useState<string | null>(null);
     const [isAiSheetOpen, setIsAiSheetOpen] = useState(false);
-    const [viewMode, setViewMode<'list' | 'calendar'>>('list');
+    const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
     const upcomingAppointments = appointments
@@ -265,7 +266,7 @@ const AppointmentsScreen = () => {
                     <div className="flex flex-col items-center justify-center h-48 text-center text-muted-foreground">
                         <p>Keine anstehenden Termine.</p>
                     </div>
-                )}
+                ))}
             </div>
 
             <NewAppointmentDialog
