@@ -89,7 +89,7 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
           value={number}
           onChange={handleInputChange}
           placeholder="Nummer eingeben"
-          className={`w-full bg-transparent text-center tracking-wider text-foreground focus:outline-none placeholder:text-muted-foreground pr-12 transition-all duration-200 ${getFontSizeClass()}`}
+          className={`w-full bg-transparent text-center tracking-wider text-foreground focus:outline-none placeholder:text-muted-foreground pr-12 transition-all duration-200 ${getFontSizeClass()} placeholder:text-3xl`}
         />
         {number && (
           <motion.button 
