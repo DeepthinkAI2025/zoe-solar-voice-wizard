@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX, Send, Bluetooth, Share } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX, Send, Bluetooth, Share } from 'lucide-react';
 import Icon from './Icon';
 import type { aiAgents } from '@/data/mock';
 import { Textarea } from './ui/textarea';
@@ -121,7 +121,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
       )}
       {/* Header */}
       <div className="text-center pt-8">
-        <h2 className="text-3xl font-bold text-white">{number}</h2>
+        <h2 className="text-3xl font-bold text-foreground">{number}</h2>
         <p className="text-primary mt-2">{status === 'incoming' ? 'Eingehender Anruf' : formatDuration(duration)}</p>
       </div>
 
@@ -130,17 +130,17 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
         <>
           <div ref={scrollContainerRef} className="flex-grow my-8 overflow-y-auto space-y-4 pr-2">
             {agent && (
-              <div className="flex flex-col gap-3 p-3 rounded-lg bg-white/5 text-sm">
+              <div className="flex flex-col gap-3 p-3 rounded-lg bg-secondary text-sm">
                 <div className="flex items-center gap-3">
                   <Icon name={agent.icon} className="text-primary w-5 h-5 flex-shrink-0" />
-                  <span className="text-muted-foreground">{agent.name} ist aktiv.</span>
+                  <span className="text-secondary-foreground">{agent.name} ist aktiv.</span>
                 </div>
-                {notes && <p className="text-white/80 pl-8 border-l-2 border-primary/20 ml-2.5">Start-Notiz: "{notes}"</p>}
+                {notes && <p className="text-secondary-foreground/80 pl-8 border-l-2 border-primary/20 ml-2.5">Start-Notiz: "{notes}"</p>}
               </div>
             )}
             {transcript.map((line, index) => (
-              <div key={index} className="text-left p-3 rounded-lg bg-white/5 animate-fade-in">
-                 <p className="text-white">{line.startsWith('[Notiz an KI]:') 
+              <div key={index} className="text-left p-3 rounded-lg bg-secondary animate-fade-in">
+                 <p className="text-foreground">{line.startsWith('[Notiz an KI]:') 
                     ? <><span className="text-primary font-semibold">Notiz an KI:</span>{line.replace('[Notiz an KI]:', '')}</>
                     : line}
                  </p>
@@ -154,7 +154,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
                     placeholder={`Live-Notiz für ${agent?.name} eingeben...`}
-                    className="bg-white/5 border-white/10 min-h-0 h-12"
+                    className="bg-secondary border-border min-h-0 h-12"
                     rows={1}
                 />
                 <Button onClick={handleSendNote} size="icon" className="w-12 h-12" disabled={!newNote.trim()}>
@@ -170,7 +170,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
         {status === 'incoming' ? (
           <div className="flex-grow flex flex-col">
             <div className="flex justify-end px-6 mb-4">
-              <button onClick={() => setIsRingerMuted(!isRingerMuted)} className="flex flex-col items-center text-muted-foreground hover:text-white transition-colors">
+              <button onClick={() => setIsRingerMuted(!isRingerMuted)} className="flex flex-col items-center text-muted-foreground hover:text-foreground transition-colors">
                   {isRingerMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
                   <span className="text-xs mt-1">{isRingerMuted ? 'Ton an' : 'Stumm'}</span>
               </button>
@@ -211,16 +211,16 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
               "grid gap-x-6 mb-8",
               !agentId && onForward ? "grid-cols-3" : "grid-cols-2"
             )}>
-              <button onClick={() => setIsMuted(!isMuted)} className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
-                <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+              <button onClick={() => setIsMuted(!isMuted)} className="flex flex-col items-center justify-center gap-2 text-foreground/80 hover:text-foreground transition-colors">
+                <div className="w-16 h-16 rounded-full bg-secondary hover:bg-accent flex items-center justify-center">
                   {isMuted ? <MicOff size={28} /> : <Mic size={28} />}
                 </div>
                 <span className="text-xs">{isMuted ? 'Ton an' : 'Stumm'}</span>
               </button>
               
               {!agentId && onForward && (
-                <button onClick={onForward} className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
-                  <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+                <button onClick={onForward} className="flex flex-col items-center justify-center gap-2 text-foreground/80 hover:text-foreground transition-colors">
+                  <div className="w-16 h-16 rounded-full bg-secondary hover:bg-accent flex items-center justify-center">
                     <Share size={28} />
                   </div>
                   <span className="text-xs">Weiterleiten</span>
@@ -228,19 +228,19 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
-                    <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+                  <button className="flex flex-col items-center justify-center gap-2 text-foreground/80 hover:text-foreground transition-colors">
+                    <div className="w-16 h-16 rounded-full bg-secondary hover:bg-accent flex items-center justify-center">
                       <selectedAudioDevice.icon size={28} />
                     </div>
                     <span className="text-xs">{selectedAudioDevice.name}</span>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-zinc-800 border-white/20 text-white">
+                <DropdownMenuContent className="bg-popover border-border text-popover-foreground">
                   {audioOutputs.map((output) => (
                     <DropdownMenuItem
                       key={output.id}
                       onClick={() => setAudioOutput(output.id)}
-                      className="flex items-center gap-2 cursor-pointer focus:bg-white/20"
+                      className="flex items-center gap-2 cursor-pointer focus:bg-accent"
                     >
                       <output.icon className="w-4 h-4 mr-2" />
                       <span>{output.name}</span>

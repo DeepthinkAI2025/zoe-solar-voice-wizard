@@ -77,6 +77,7 @@ const Index = () => {
           // Agent Settings
           agents={agents}
           isVmActive={isVmActive}
+          onVmToggle={handleVmToggle}
           onToggleAgent={handleAgentToggle}
           globalSystemInstructions={globalSystemInstructions}
           onGlobalSystemInstructionsChange={setGlobalSystemInstructions}
