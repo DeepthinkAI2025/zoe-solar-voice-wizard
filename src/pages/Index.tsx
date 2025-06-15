@@ -1,4 +1,3 @@
-
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -137,11 +136,8 @@ const Index = () => {
   return (
     <div ref={containerRef} className="h-screen w-full max-w-md mx-auto bg-background flex flex-col relative rounded-3xl border-4 border-border shadow-2xl shadow-primary/20">
       <header className="flex-shrink-0 py-4 px-6 flex justify-between items-center">
-        <div>
-            <h1 className="text-xl font-bold text-foreground tracking-wider">ZOE <span className="text-primary">Solar</span></h1>
-            <p className="text-xs text-muted-foreground">AI Phone</p>
-        </div>
-        <img src="/lovable-uploads/64be25a8-4e9b-4bbd-9825-e40816d27ade.png" alt="Fapro Logo" className="h-12" />
+        <img src="/lovable-uploads/5cbdb31b-130f-40f1-9ead-f812366683b2.png" alt="Zoe Logo" className="h-12" />
+        <img src="/lovable-uploads/e594e012-04a4-4c20-8ab1-205a18cf7f69.png" alt="Fapro Logo" className="h-12" />
       </header>
 
       <main className="flex-grow flex flex-col overflow-hidden">
