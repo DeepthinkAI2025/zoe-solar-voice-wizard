@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { useSettings } from './useSettings';
 import { useAgentManagement } from './useAgentManagement';
@@ -20,6 +21,7 @@ export const usePhoneState = () => {
     workingHoursStart: settings.workingHoursStart,
     workingHoursEnd: settings.workingHoursEnd,
     autoAnswerEnabled: settings.autoAnswerEnabled,
+    handleInBackground: settings.handleInBackground,
     agents: agentManagement.agents,
     contacts: contactManagement.contacts,
   });

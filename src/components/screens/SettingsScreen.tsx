@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 import { VoiceCloneDialog } from '@/components/VoiceCloneDialog';
@@ -6,6 +7,8 @@ import { CallAutomationSettings } from '../settings/CallAutomationSettings';
 import { SilentModeSettings } from '../settings/SilentModeSettings';
 import { AgentSettings } from '../settings/AgentSettings';
 import { useToast } from "@/components/ui/use-toast";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 // Removed local AgentWithSettings type
 
@@ -18,6 +21,8 @@ interface SettingsScreenProps {
   onWorkingHoursEndChange: (hour: number) => void;
   silentModeEnabled: boolean;
   onSilentModeToggle: (enabled: boolean) => void;
+  handleInBackground: boolean;
+  onHandleInBackgroundToggle: (enabled: boolean) => void;
   agents: AgentWithSettings[];
   isVmActive: boolean;
   onVmToggle: (active: boolean) => void;
@@ -107,6 +112,22 @@ const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
         workingHoursEnd={props.workingHoursEnd}
         onWorkingHoursEndChange={props.onWorkingHoursEndChange}
       />
+      
+      <div className="space-y-4 p-4 bg-secondary rounded-lg">
+        <div className="flex items-center justify-between">
+            <Label htmlFor="handle-in-background-toggle" className="pr-4 text-left font-medium">
+            Anrufe im Hintergrund bearbeiten
+            </Label>
+            <Switch
+            id="handle-in-background-toggle"
+            checked={props.handleInBackground}
+            onCheckedChange={props.onHandleInBackgroundToggle}
+            />
+        </div>
+        <p className="text-xs text-muted-foreground text-left">
+            Wenn aktiviert, werden eingehende Anrufe direkt von einem KI-Agenten im Hintergrund angenommen, ohne den Anrufbildschirm anzuzeigen.
+        </p>
+      </div>
 
       <SilentModeSettings 
         silentModeEnabled={props.silentModeEnabled}

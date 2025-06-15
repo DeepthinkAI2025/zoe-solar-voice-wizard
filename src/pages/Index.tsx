@@ -44,10 +44,12 @@ const Index = () => {
     workingHoursStart,
     workingHoursEnd,
     silentModeEnabled,
+    handleInBackground,
     handleAutoAnswerToggle,
     handleWorkingHoursStartChange,
     handleWorkingHoursEndChange,
     handleSilentModeToggle,
+    handleHandleInBackgroundToggle,
     // Agent Settings
     globalSystemInstructions,
     setGlobalSystemInstructions,
@@ -108,6 +110,8 @@ const Index = () => {
           onWorkingHoursEndChange={handleWorkingHoursEndChange}
           silentModeEnabled={silentModeEnabled}
           onSilentModeToggle={handleSilentModeToggle}
+          handleInBackground={handleInBackground}
+          onHandleInBackgroundToggle={handleHandleInBackgroundToggle}
           // Agent Settings
           agents={agents}
           isVmActive={isVmActive}

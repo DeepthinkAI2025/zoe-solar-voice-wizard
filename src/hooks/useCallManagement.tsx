@@ -1,9 +1,9 @@
-
 import { useEffect, useCallback, useMemo } from 'react';
 import type { AgentWithSettings } from './useAgentManagement';
 import type { Contact } from './useContactManagement';
 import { useCallState, type TranscriptLine } from './useCallState';
 import { useCallTimer } from './useCallTimer';
+import { useToast } from "@/components/ui/use-toast";
 
 const greetings = [
   "Hallo, ZOE Solar, mein Name ist Alex, der KI-Assistent. Wie kann ich Ihnen helfen?",
@@ -26,6 +26,7 @@ interface CallManagementProps {
   silentModeEnabled: boolean;
   workingHoursStart: number;
   workingHoursEnd: number;
+  handleInBackground: boolean;
 }
 
 export const useCallManagement = ({
@@ -35,9 +36,11 @@ export const useCallManagement = ({
   silentModeEnabled,
   workingHoursStart,
   workingHoursEnd,
+  handleInBackground,
 }: CallManagementProps) => {
   const { activeCall, setActiveCall, isForwarding, setIsForwarding } = useCallState();
   const { duration, startTimer, stopTimer } = useCallTimer();
+  const { toast } = useToast();
 
   const fullTranscript: TranscriptLine[] = useMemo(() => {
       if (!activeCall?.agentId) return [];
@@ -100,6 +103,31 @@ export const useCallManagement = ({
   const startIncomingCall = useCallback((number: string) => {
     const currentHour = new Date().getHours();
     const isOutsideWorkingHours = currentHour < workingHoursStart || currentHour >= workingHoursEnd;
+    const contact = contacts.find(c => c.number === number);
+    const displayName = contact?.name || number;
+
+    if (handleInBackground && autoAnswerEnabled && !isOutsideWorkingHours) {
+        const defaultAgent = agents.find(a => a.isDefault) || agents[0];
+        if (!defaultAgent) return;
+
+        toast({
+            title: "KI-Agent ist am Telefon",
+            description: `Anruf von ${displayName} wird im Hintergrund bearbeitet.`,
+        });
+
+        const backgroundCall = {
+            number,
+            contactName: contact?.name,
+            status: 'active' as const,
+            agentId: defaultAgent.id,
+            isMinimized: true,
+            startMuted: false,
+        };
+        
+        setActiveCall(backgroundCall);
+        startTimer();
+        return;
+    }
     
     const shouldBeMuted = silentModeEnabled && isOutsideWorkingHours;
 
@@ -107,7 +135,6 @@ export const useCallManagement = ({
       console.log("Silent mode on: Call will be muted as it's outside of working hours.");
     }
 
-    const contact = contacts.find(c => c.number === number);
     const incomingCall = {
       number,
       contactName: contact?.name,
@@ -133,7 +160,7 @@ export const useCallManagement = ({
         });
       }, randomDelay);
     }
-  }, [contacts, autoAnswerEnabled, agents, setActiveCall, startTimer, silentModeEnabled, workingHoursStart, workingHoursEnd]);
+  }, [contacts, autoAnswerEnabled, agents, setActiveCall, startTimer, silentModeEnabled, workingHoursStart, workingHoursEnd, handleInBackground, toast]);
 
   const startAiCall = useCallback((number: string, agentId: string) => {
     const contact = contacts.find(c => c.number === number);
@@ -221,4 +248,3 @@ export const useCallManagement = ({
     handleSendNote,
   };
 };
-
