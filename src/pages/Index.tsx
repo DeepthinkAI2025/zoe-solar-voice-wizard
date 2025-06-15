@@ -1,9 +1,9 @@
-
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
 import AgentSelector from '@/components/AgentSelector';
 import ActiveCallView from '@/components/ActiveCallView';
+import CallWidget from '@/components/CallWidget';
 import CallDetailsDrawer from '@/components/CallDetailsDrawer';
 import { usePhoneState } from '@/hooks/usePhoneState';
 import HistoryScreen from '@/components/screens/HistoryScreen';
@@ -34,6 +34,10 @@ const Index = () => {
     handleStartCallManually,
     isUiForwarding,
     handleForward,
+    // New state
+    isCallMinimized,
+    setIsCallMinimized,
+    callDuration,
     // Settings
     autoAnswerEnabled,
     workingHoursStart,
@@ -72,6 +76,8 @@ const Index = () => {
   const activeCallContactName = callState?.number
     ? contacts.find(c => c.number === callState.number)?.name
     : undefined;
+  
+  const activeCallAgent = callState?.agentId ? agents.find(a => a.id === callState.agentId) : undefined;
 
   const renderContent = () => {
     switch (activeTab) {
@@ -150,9 +156,10 @@ const Index = () => {
         />
       )}
 
-      {callState && (
+      {callState && !isCallMinimized && (
         <ActiveCallView 
             {...callState} 
+            duration={callDuration}
             agents={agents}
             contactName={activeCallContactName}
             onEndCall={handleEndCall}
@@ -161,6 +168,18 @@ const Index = () => {
             onForward={handleForward}
             onIntervene={handleIntervene}
             isForwarding={isUiForwarding}
+            onMinimize={() => setIsCallMinimized(true)}
+        />
+      )}
+      
+      {callState && isCallMinimized && (
+        <CallWidget
+          callState={callState}
+          contactName={activeCallContactName}
+          agent={activeCallAgent}
+          duration={callDuration}
+          onMaximize={() => setIsCallMinimized(false)}
+          onEndCall={handleEndCall}
         />
       )}
 

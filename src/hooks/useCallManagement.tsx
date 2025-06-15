@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import type { CallHistoryItem, CallState } from '@/types/call';
 import type { AgentWithSettings } from '@/hooks/useAgentManagement';
@@ -21,6 +22,32 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
   const { toast } = useToast();
   const [outboundCallActive, setOutboundCallActive] = useState(false);
   const [isUiForwarding, setIsUiForwarding] = useState(false);
+  const [isCallMinimized, setIsCallMinimized] = useState(false);
+  const [callDuration, setCallDuration] = useState(0);
+  const callStartTimestamp = useRef<number | null>(null);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+
+    if (callState?.status === 'active') {
+      if (callStartTimestamp.current === null) {
+        callStartTimestamp.current = Date.now();
+      }
+      timer = setInterval(() => {
+        if (callStartTimestamp.current) {
+          setCallDuration(Math.floor((Date.now() - callStartTimestamp.current) / 1000));
+        }
+      }, 1000);
+    } else {
+      callStartTimestamp.current = null;
+      setCallDuration(0);
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [callState?.status]);
+
 
   // Simulate an incoming call for demonstration & set muted state based on time
   useEffect(() => {
@@ -178,6 +205,7 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     setOutboundCallActive(false);
     setCallState(null);
     setSelectedCall(null);
+    setIsCallMinimized(false);
   };
   
   const handleForward = () => {
@@ -205,6 +233,9 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     selectedCall,
     setSelectedCall,
     isUiForwarding,
+    isCallMinimized,
+    setIsCallMinimized,
+    callDuration,
     handleStartCall,
     handleStartCallManually,
     handleAgentSelect,

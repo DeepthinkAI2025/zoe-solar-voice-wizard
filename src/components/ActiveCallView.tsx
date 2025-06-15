@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PanInfo } from 'framer-motion';
+import { motion, PanInfo } from 'framer-motion';
 import { Phone, Volume2, Bluetooth } from 'lucide-react';
 import type { aiAgents } from '@/data/mock';
 import CallHeader from './active-call/CallHeader';
@@ -23,6 +23,8 @@ interface ActiveCallViewProps {
   onForward?: () => void;
   onIntervene?: () => void;
   isForwarding?: boolean;
+  duration: number;
+  onMinimize?: () => void;
 }
 
 const mockTranscript = [
@@ -34,8 +36,7 @@ const mockTranscript = [
   "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen.",
 ];
 
-const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, onIntervene, isForwarding }) => {
-  const [duration, setDuration] = useState(0);
+const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, onIntervene, isForwarding, duration, onMinimize }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isRingerMuted, setIsRingerMuted] = useState(startMuted ?? false);
   const [transcript, setTranscript] = useState<string[]>([]);
@@ -60,7 +61,6 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
 
   useEffect(() => {
     if (status === 'active') {
-      const timer = setInterval(() => setDuration(d => d + 1), 1000);
       const transcriptTimer = setInterval(() => {
         setTranscript(prev => {
           if (prev.length < mockTranscript.length) {
@@ -71,7 +71,6 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
       }, 3500);
 
       return () => {
-        clearInterval(timer);
         clearInterval(transcriptTimer);
       };
     }
@@ -87,10 +86,20 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
       return;
     }
     
-    // Swipe down, left, or right to mute the ringer
+    // Swipe down, left, or right to reject call
     if (offset.y > SWIPE_THRESHOLD || Math.abs(offset.x) > SWIPE_THRESHOLD) {
-      setIsRingerMuted(true);
+      onEndCall();
       return;
+    }
+  };
+  
+  const handleActiveCallDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    if (status !== 'active') return;
+    const { offset } = info;
+    const SWIPE_THRESHOLD = 80;
+
+    if (offset.y > SWIPE_THRESHOLD) {
+      onMinimize?.();
     }
   };
 
@@ -103,7 +112,13 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
   };
 
   return (
-    <div className="fixed inset-0 bg-background z-40 flex flex-col p-6 animate-slide-up">
+    <motion.div
+      drag={status === 'active' ? 'y' : false}
+      dragConstraints={{ top: 0, bottom: 0 }}
+      dragElastic={{ top: 0, bottom: 0.8 }}
+      onDragEnd={handleActiveCallDragEnd}
+      className="fixed inset-0 bg-background z-40 flex flex-col p-6 animate-slide-up cursor-grab active:cursor-grabbing"
+    >
       {isForwarding && (
           <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-50 animate-fade-in">
               <p className="text-primary text-lg animate-pulse">Einen Moment, die Weiterleitung wird vorbereitet...</p>
@@ -147,7 +162,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
           />
         )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

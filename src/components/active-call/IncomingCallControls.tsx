@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Phone, PhoneOff, Volume2, VolumeX } from 'lucide-react';
@@ -53,7 +52,7 @@ const IncomingCallControls: React.FC<IncomingCallControlsProps> = ({
                 <Phone size={32} className="text-white" />
             </motion.div>
         </div>
-        <p className="text-sm text-muted-foreground">Oder zum Stummschalten zur Seite/nach unten wischen</p>
+        <p className="text-sm text-muted-foreground">Oder zum Ablehnen zur Seite/nach unten wischen</p>
       </motion.div>
     </div>
   );
