@@ -1,6 +1,7 @@
 
 import { Phone, Delete, Bot, Calendar } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DialpadProps {
   onCall: (number: string) => void;
@@ -25,6 +26,14 @@ const buttonDetails = [
 
 const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule }) => {
   const [number, setNumber] = useState('');
+  const isMobile = useIsMobile();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleDisplayClick = () => {
+    if (isMobile) {
+      inputRef.current?.focus();
+    }
+  };
 
   const handlePress = (char: string) => setNumber(prev => prev + char);
   const handleDelete = () => setNumber(prev => prev.slice(0, -1));
@@ -55,16 +64,19 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
 
   return (
     <div className="flex flex-col h-full justify-between p-6">
-      <div className="h-28 flex items-center justify-center relative">
+      <div className="h-28 flex items-center justify-center relative" onClick={handleDisplayClick}>
         <input
+          ref={inputRef}
           type="tel"
           value={number}
           onChange={handleInputChange}
           placeholder="Nummer eingeben"
-          className={`w-full bg-transparent text-center tracking-wider text-white focus:outline-none placeholder:text-muted-foreground pr-12 transition-all duration-200 ${getFontSizeClass()}`}
+          className={`w-full bg-transparent text-center tracking-wider text-white focus:outline-none placeholder:text-muted-foreground pr-12 transition-all duration-200 ${getFontSizeClass()} ${isMobile ? 'caret-transparent' : ''}`}
         />
         {number && (
-          <button onClick={handleDelete} className="absolute right-0 p-4 text-muted-foreground hover:text-white transition-colors">
+          <button 
+            onClick={(e) => { e.stopPropagation(); handleDelete(); }} 
+            className="absolute right-0 p-4 text-muted-foreground hover:text-white transition-colors">
             <Delete size={28} />
           </button>
         )}
@@ -114,4 +126,3 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
 };
 
 export default Dialpad;
-

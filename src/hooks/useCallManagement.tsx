@@ -1,14 +1,13 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+
+import { useEffect, useCallback } from 'react';
 import type { AgentWithSettings } from './useAgentManagement';
 import type { Contact } from './useContactManagement';
+import { useCallState } from './useCallState';
+import { useCallTimer } from './useCallTimer';
 
 interface CallManagementProps {
-  silentModeEnabled: boolean;
-  workingHoursStart: number;
-  workingHoursEnd: number;
   autoAnswerEnabled: boolean;
   agents: AgentWithSettings[];
-  globalSystemInstructions: string;
   contacts: Contact[];
 }
 
@@ -17,43 +16,30 @@ export const useCallManagement = ({
   contacts,
   agents,
 }: CallManagementProps) => {
-  const [activeCall, setActiveCall] = useState<{ number: string; contactName?: string; agentId?: string; status: 'incoming' | 'active'; isMinimized: boolean } | null>(null);
-  const [duration, setDuration] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [isForwarding, setIsForwarding] = useState(false);
-
-  const startTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setDuration(0);
-    timerRef.current = setInterval(() => {
-      setDuration(prev => prev + 1);
-    }, 1000);
-  };
-
-  const stopTimer = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  };
+  const { activeCall, setActiveCall, isForwarding, setIsForwarding } = useCallState();
+  const { duration, startTimer, stopTimer } = useCallTimer();
 
   const endCall = useCallback(() => {
     setActiveCall(null);
     stopTimer();
     setIsForwarding(false);
-  }, []);
+  }, [setActiveCall, stopTimer, setIsForwarding]);
 
   const acceptCall = useCallback((agentId: string) => {
-    if (!activeCall) return;
-    setActiveCall(prev => prev ? { ...prev, status: 'active', agentId } : null);
+    setActiveCall(prev => {
+        if (!prev) return prev;
+        return { ...prev, status: 'active' as const, agentId };
+    });
     startTimer();
-  }, [activeCall]);
+  }, [setActiveCall, startTimer]);
 
   const acceptCallManually = useCallback(() => {
-    if (!activeCall) return;
-    setActiveCall(prev => prev ? { ...prev, status: 'active', agentId: undefined } : null);
+    setActiveCall(prev => {
+        if (!prev) return prev;
+        return { ...prev, status: 'active' as const, agentId: undefined };
+    });
     startTimer();
-  }, [activeCall]);
+  }, [setActiveCall, startTimer]);
 
   const startIncomingCall = useCallback((number: string) => {
     const contact = contacts.find(c => c.number === number);
@@ -72,14 +58,14 @@ export const useCallManagement = ({
       setTimeout(() => {
         setActiveCall(currentCall => {
           if (currentCall && currentCall.number === number && currentCall.status === 'incoming') {
-            acceptCall(defaultAgent.id);
+            startTimer();
             return { ...currentCall, status: 'active', agentId: defaultAgent.id };
           }
           return currentCall;
         });
       }, 2000);
     }
-  }, [contacts, autoAnswerEnabled, agents, acceptCall]);
+  }, [contacts, autoAnswerEnabled, agents, setActiveCall, startTimer]);
 
   const startAiCall = useCallback((number: string, agentId: string) => {
     const contact = contacts.find(c => c.number === number);
@@ -92,7 +78,7 @@ export const useCallManagement = ({
     };
     setActiveCall(newCall);
     startTimer();
-  }, [contacts]);
+  }, [contacts, setActiveCall, startTimer]);
 
   const startManualCall = useCallback((number: string) => {
     const contact = contacts.find(c => c.number === number);
@@ -105,19 +91,15 @@ export const useCallManagement = ({
     };
     setActiveCall(newCall);
     startTimer();
-  }, [contacts]);
+  }, [contacts, setActiveCall, startTimer]);
 
   const minimizeCall = useCallback(() => {
-    if (activeCall) {
-      setActiveCall(prev => prev ? { ...prev, isMinimized: true } : null);
-    }
-  }, [activeCall]);
+    setActiveCall(prev => prev ? { ...prev, isMinimized: true } : null);
+  }, [setActiveCall]);
 
   const maximizeCall = useCallback(() => {
-    if (activeCall) {
-      setActiveCall(prev => prev ? { ...prev, isMinimized: false } : null);
-    }
-  }, [activeCall]);
+    setActiveCall(prev => prev ? { ...prev, isMinimized: false } : null);
+  }, [setActiveCall]);
 
   const forwardCall = useCallback(() => {
     if (!activeCall || activeCall.status !== 'active') return;
@@ -127,14 +109,12 @@ export const useCallManagement = ({
         console.log("Call forwarded!");
         endCall(); // End call after forwarding
     }, 2500);
-  }, [activeCall, endCall]);
+  }, [activeCall, setIsForwarding, endCall]);
 
   const interveneInCall = useCallback(() => {
     console.log("Human is intervening in the call...");
-    if(activeCall) {
-        setActiveCall(prev => prev ? { ...prev, agentId: undefined } : null);
-    }
-  }, [activeCall]);
+    setActiveCall(prev => prev ? { ...prev, agentId: undefined } : null);
+  }, [setActiveCall]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
