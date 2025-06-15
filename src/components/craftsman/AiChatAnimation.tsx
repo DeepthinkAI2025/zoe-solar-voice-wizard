@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, Easing } from 'framer-motion';
 
 interface AiChatAnimationProps {
   isListening?: boolean;
@@ -21,14 +21,14 @@ const AiChatAnimation: React.FC<AiChatAnimationProps> = ({ isListening = false }
       transition: {
         duration: 1.5,
         repeat: Infinity,
-        ease: 'easeInOut',
+        ease: 'easeInOut' as Easing,
         delay: i * 0.1,
       },
     }),
     idle: {
       y: 0,
       scaleY: 1,
-      transition: { duration: 0.5, ease: 'easeInOut' },
+      transition: { duration: 0.5, ease: 'easeInOut' as Easing },
     },
   };
 

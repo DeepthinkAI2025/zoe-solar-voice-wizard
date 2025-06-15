@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useToast } from "@/components/ui/use-toast";
-import { useAiChat } from '@/hooks/useAiChat';
+import { useAiChat, AiProvider, ApiKeys } from '@/hooks/useAiChat';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,6 +18,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { cn } from '@/lib/utils';
 
 interface Message {
@@ -36,12 +44,14 @@ const AiChatScreen = () => {
   const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
   
   const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
-  const [tempApiKey, setTempApiKey] = useState('');
+  const [provider, setProvider] = useState<AiProvider>('gemini');
+  const [tempApiKeys, setTempApiKeys] = useState<ApiKeys>({ gemini: '', grok: '', openrouter: '' });
 
   const {
-      saveApiKey,
+      apiKeys,
+      saveApiKeys,
       getAiResponse,
-      isApiKeySet
+      hasApiKey
   } = useAiChat();
 
   const {
@@ -73,19 +83,24 @@ const AiChatScreen = () => {
         scrollAreaViewportRef.current.scrollTop = scrollAreaViewportRef.current.scrollHeight;
     }
   }, [messages, isTyping]);
+  
+  useEffect(() => {
+    if (isApiKeyModalOpen) {
+        setTempApiKeys(apiKeys);
+    }
+  }, [isApiKeyModalOpen, apiKeys]);
 
-  const handleSaveApiKey = () => {
-    saveApiKey(tempApiKey);
+  const handleSaveApiKeys = () => {
+    saveApiKeys(tempApiKeys);
     setIsApiKeyModalOpen(false);
-    setTempApiKey('');
   };
 
   const handleSendMessage = async () => {
     if (input.trim() === '' || isTyping) return;
-    if (!isApiKeySet) {
+    if (!hasApiKey(provider)) {
         toast({
             title: "API-Schlüssel fehlt",
-            description: "Bitte klicke auf das Schlüssel-Symbol, um deinen Google AI API-Schlüssel einzugeben.",
+            description: `Bitte klicke auf das Schlüssel-Symbol, um deinen ${provider.charAt(0).toUpperCase() + provider.slice(1)} API-Schlüssel einzugeben.`,
             variant: "destructive"
         })
         setIsApiKeyModalOpen(true);
@@ -107,7 +122,7 @@ const AiChatScreen = () => {
     setInput('');
     setIsTyping(true);
 
-    const aiResponseText = await getAiResponse(newMessages);
+    const aiResponseText = await getAiResponse(newMessages, provider);
       
     if (aiResponseText) {
       const aiResponse: Message = {
@@ -120,11 +135,7 @@ const AiChatScreen = () => {
         // Handle error case, put back the original message in input and remove optimistic message
         setInput(currentInput);
         setMessages(messages);
-        toast({
-            title: 'Senden fehlgeschlagen',
-            description: 'Die Nachricht konnte nicht verarbeitet werden. Bitte prüfe deinen API-Schlüssel und die Internetverbindung.',
-            variant: 'destructive',
-        })
+        // Toast is shown inside useAiChat hook
     }
 
     setIsTyping(false);
@@ -211,10 +222,20 @@ const AiChatScreen = () => {
           onClick={() => setIsApiKeyModalOpen(true)} 
           size="icon" 
           variant="outline" 
-          className={cn(!isApiKeySet && "animate-pulse border-destructive hover:border-destructive text-destructive-foreground")}
+          className={cn(!hasApiKey(provider) && "animate-pulse border-destructive hover:border-destructive text-destructive-foreground")}
         >
             <KeyRound className="h-4 w-4" />
         </Button>
+        <Select value={provider} onValueChange={(value) => setProvider(value as AiProvider)}>
+            <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Anbieter" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectItem value="gemini">Gemini</SelectItem>
+                <SelectItem value="grok">Groq</SelectItem>
+                <SelectItem value="openrouter">OpenRouter</SelectItem>
+            </SelectContent>
+        </Select>
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -236,20 +257,46 @@ const AiChatScreen = () => {
       <AlertDialog open={isApiKeyModalOpen} onOpenChange={setIsApiKeyModalOpen}>
         <AlertDialogContent>
             <AlertDialogHeader>
-                <AlertDialogTitle>Google AI API-Schlüssel</AlertDialogTitle>
+                <AlertDialogTitle>API-Schlüssel verwalten</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Um die KI-Chat-Funktion zu nutzen, gib bitte deinen Google AI API-Schlüssel ein. Er wird sicher in deinem Browser gespeichert. Deinen Schlüssel erhältst du im Google AI Studio.
+                    Gib hier deine API-Schlüssel für die verschiedenen KI-Anbieter ein. Sie werden sicher in deinem Browser gespeichert.
                 </AlertDialogDescription>
             </AlertDialogHeader>
-            <Input 
-                placeholder="API-Schlüssel hier einfügen"
-                value={tempApiKey}
-                onChange={(e) => setTempApiKey(e.target.value)}
-                type="password"
-            />
+            <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                    <Label htmlFor="gemini-key">Google Gemini</Label>
+                    <Input 
+                        id="gemini-key"
+                        placeholder="API-Schlüssel hier einfügen"
+                        value={tempApiKeys.gemini}
+                        onChange={(e) => setTempApiKeys(k => ({...k, gemini: e.target.value}))}
+                        type="password"
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="grok-key">Groq</Label>
+                    <Input 
+                        id="grok-key"
+                        placeholder="API-Schlüssel hier einfügen"
+                        value={tempApiKeys.grok}
+                        onChange={(e) => setTempApiKeys(k => ({...k, grok: e.target.value}))}
+                        type="password"
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="openrouter-key">OpenRouter</Label>
+                    <Input 
+                        id="openrouter-key"
+                        placeholder="API-Schlüssel hier einfügen"
+                        value={tempApiKeys.openrouter}
+                        onChange={(e) => setTempApiKeys(k => ({...k, openrouter: e.target.value}))}
+                        type="password"
+                    />
+                </div>
+            </div>
             <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => setTempApiKey('')}>Abbrechen</AlertDialogCancel>
-                <AlertDialogAction onClick={handleSaveApiKey} disabled={!tempApiKey.trim()}>Speichern</AlertDialogAction>
+                <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                <AlertDialogAction onClick={handleSaveApiKeys}>Speichern</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
