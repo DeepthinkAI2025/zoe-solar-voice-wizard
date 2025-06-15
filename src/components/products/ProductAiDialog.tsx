@@ -30,8 +30,19 @@ const ProductAiDialog = ({ isOpen, onOpenChange, product }: ProductAiDialogProps
   } = useSpeechRecognition();
 
   React.useEffect(() => {
-    setInput(transcript);
-  }, [transcript]);
+    if (isListening) {
+        setInput(transcript);
+    }
+  }, [transcript, isListening]);
+  
+  React.useEffect(() => {
+    // Reset state when dialog opens or product changes
+    if (isOpen) {
+        setInput('');
+        setResponse('');
+    }
+  }, [isOpen, product]);
+
 
   const handleAsk = async () => {
     if (!input.trim()) {
@@ -122,7 +133,7 @@ Sei präzise und praxisorientiert. Gib konkrete Schritte wenn nach Installation 
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Frage zur Installation, Anschluss oder Technik...&#10;&#10;Beispiel: 'Wie schließe ich das Gerät an den Gasanschluss an?' oder 'Welche Komponenten brauche ich für die Installation?'"
+            placeholder="Frage zur Installation, Anschluss oder Technik...&#10;&#10;Beispiel: 'Wie schließe ich das Gerät an den Gasanschluss an?'"
             className="min-h-[80px]"
             disabled={isGenerating}
           />
@@ -161,6 +172,13 @@ Sei präzise und praxisorientiert. Gib konkrete Schritte wenn nach Installation 
             <p className="text-sm text-center text-muted-foreground">
               🎤 Spreche jetzt...
             </p>
+          )}
+
+          {isGenerating && !response && (
+            <div className="mt-4 p-4 bg-secondary/50 rounded-lg flex items-center justify-center">
+                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                 KI denkt nach...
+            </div>
           )}
 
           {response && (

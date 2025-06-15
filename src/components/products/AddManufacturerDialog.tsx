@@ -103,7 +103,7 @@ const AddManufacturerDialog = ({ isOpen, onOpenChange, onAdd }: AddManufacturerD
               </div>
 
               <div>
-                <Label htmlFor="video-url">YouTube Video URL</Label>
+                <Label htmlFor="video-url">YouTube Video URL (embed)</Label>
                 <Input
                   id="video-url"
                   value={videoUrl}

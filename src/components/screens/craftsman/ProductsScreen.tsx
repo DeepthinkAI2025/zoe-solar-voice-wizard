@@ -31,6 +31,18 @@ const ProductsScreen = () => {
   );
 
   const handleAddManufacturer = (manufacturer: { name: string }, product?: any) => {
+    const existingManufacturer = currentManufacturers.find(m => m.name.toLowerCase() === manufacturer.name.toLowerCase());
+
+    if (existingManufacturer) {
+        // TODO: Add product to existing manufacturer
+         toast({
+            title: "Hersteller existiert bereits",
+            description: `Ein Produkt kann zu einem bestehenden Hersteller hinzugefügt werden (Funktion in Entwicklung).`,
+            variant: "destructive"
+        });
+        return;
+    }
+
     const newManufacturer: Manufacturer = {
       id: manufacturer.name.toLowerCase().replace(/\s+/g, '-'),
       name: manufacturer.name,
@@ -88,18 +100,12 @@ const ProductsScreen = () => {
                 <div className="space-y-3">
                     {manufacturer.products.map((product) => (
                         <div key={product.id} className="p-3 bg-background/50 rounded-lg">
-                            <div className="flex justify-between items-start gap-2 mb-2">
+                            <div className="flex justify-between items-start gap-2">
                                 <div className="flex-1">
                                     <h3 className="font-semibold">{product.name}</h3>
                                     <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" onClick={() => {
-                                        setSelectedProduct(product);
-                                        setIsAiDialogOpen(true);
-                                    }}>
-                                        <Bot className="h-4 w-4" />
-                                    </Button>
                                     <Button variant="ghost" size="sm" onClick={() => setSelectedProduct(product)}>
                                         Details
                                     </Button>
@@ -122,7 +128,7 @@ const ProductsScreen = () => {
 
       {/* Product Details Dialog */}
       <Dialog open={!!selectedProduct && !isAiDialogOpen} onOpenChange={(isOpen) => !isOpen && setSelectedProduct(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh]">
           {selectedProduct && (
             <>
               <DialogHeader>
@@ -131,77 +137,63 @@ const ProductsScreen = () => {
                   {selectedProduct.description}
                 </DialogDescription>
               </DialogHeader>
-              
-              {/* Video */}
-              <div className="aspect-video rounded-lg overflow-hidden border">
-                <iframe
-                    className="w-full h-full"
-                    src={selectedProduct.videoUrl}
-                    title="YouTube video player"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                ></iframe>
-              </div>
+              <div className='overflow-y-auto pr-2'>
+              {selectedProduct.videoUrl && (
+                <div className="aspect-video rounded-lg overflow-hidden border mb-4">
+                    <iframe
+                        className="w-full h-full"
+                        src={selectedProduct.videoUrl}
+                        title="YouTube video player"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    ></iframe>
+                </div>
+              )}
 
               {/* Documents */}
               <div className="space-y-4">
                 {selectedProduct.datasheets && selectedProduct.datasheets.length > 0 && (
                   <div>
-                    <h4 className="font-semibold flex items-center mb-2">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Datenblätter
-                    </h4>
-                    <div className="space-y-1">
-                      {selectedProduct.datasheets.map((sheet, index) => (
-                        <div key={index} className="text-sm text-muted-foreground">• {sheet}</div>
-                      ))}
+                    <h4 className="font-semibold flex items-center mb-2"><FileText className="h-4 w-4 mr-2" />Datenblätter</h4>
+                    <div className="space-y-1 pl-6 list-disc text-sm text-muted-foreground">
+                      {selectedProduct.datasheets.map((sheet, index) => <li key={index}>{sheet}</li>)}
                     </div>
                   </div>
                 )}
 
                 {selectedProduct.manuals && selectedProduct.manuals.length > 0 && (
                   <div>
-                    <h4 className="font-semibold flex items-center mb-2">
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      Handbücher
-                    </h4>
-                    <div className="space-y-1">
-                      {selectedProduct.manuals.map((manual, index) => (
-                        <div key={index} className="text-sm text-muted-foreground">• {manual}</div>
-                      ))}
+                    <h4 className="font-semibold flex items-center mb-2"><BookOpen className="h-4 w-4 mr-2" />Handbücher</h4>
+                    <div className="space-y-1 pl-6 list-disc text-sm text-muted-foreground">
+                      {selectedProduct.manuals.map((manual, index) => <li key={index}>{manual}</li>)}
                     </div>
                   </div>
                 )}
 
                 {selectedProduct.installationGuides && selectedProduct.installationGuides.length > 0 && (
                   <div>
-                    <h4 className="font-semibold flex items-center mb-2">
-                      <Wrench className="h-4 w-4 mr-2" />
-                      Installationsanleitungen
-                    </h4>
-                    <div className="space-y-1">
-                      {selectedProduct.installationGuides.map((guide, index) => (
-                        <div key={index} className="text-sm text-muted-foreground">• {guide}</div>
-                      ))}
+                    <h4 className="font-semibold flex items-center mb-2"><Wrench className="h-4 w-4 mr-2" />Installationsanleitungen</h4>
+                    <div className="space-y-1 pl-6 list-disc text-sm text-muted-foreground">
+                      {selectedProduct.installationGuides.map((guide, index) => <li key={index}>{guide}</li>)}
                     </div>
                   </div>
                 )}
               </div>
-
-              <DialogFooter className="flex-col sm:flex-row gap-2">
-                  <Button onClick={() => {
-                      setIsAiDialogOpen(true);
-                  }} variant="outline" className="w-full">
+              </div>
+              <DialogFooter className="flex-col sm:flex-row gap-2 pt-4">
+                  <Button onClick={() => setIsAiDialogOpen(true)} className="w-full">
                       <Bot className="mr-2 h-4 w-4" />
                       KI-Assistent fragen
                   </Button>
-                  <Button asChild variant="outline" className="w-full">
-                      <a href={selectedProduct.videoUrl.replace('embed/', 'watch?v=')} target="_blank" rel="noopener noreferrer">
-                          Auf YouTube ansehen
-                          <ExternalLink className="ml-2 h-4 w-4" />
-                      </a>
-                  </Button>
+                  {selectedProduct.videoUrl && (
+                    <Button asChild variant="outline" className="w-full">
+                        <a href={selectedProduct.videoUrl.replace('embed/', 'watch?v=')} target="_blank" rel="noopener noreferrer">
+                            Auf YouTube ansehen
+                            <ExternalLink className="ml-2 h-4 w-4" />
+                        </a>
+                    </Button>
+                  )}
               </DialogFooter>
             </>
           )}
