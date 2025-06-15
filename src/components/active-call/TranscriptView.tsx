@@ -78,6 +78,7 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
               placeholder={`Live-Notiz für ${agent.name} eingeben...`}
               className="bg-secondary border-border min-h-0 h-12"
               rows={1}
+              inputMode="text"
           />
           <Button onClick={onSendNote} size="icon" className="w-12 h-12" disabled={!newNote.trim()}>
               <Send />

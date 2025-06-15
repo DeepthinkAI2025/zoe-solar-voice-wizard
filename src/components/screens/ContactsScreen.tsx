@@ -90,6 +90,7 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-black/20 border-white/20 placeholder:text-muted-foreground pl-10"
+              inputMode="search"
             />
           </div>
           <Button size="icon" className="flex-shrink-0" onClick={handleOpenCreator}>
