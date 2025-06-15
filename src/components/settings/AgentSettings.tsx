@@ -68,7 +68,10 @@ export const AgentSettings: React.FC<AgentSettingsProps> = ({
             <AccordionItem value={agent.id} key={agent.id} className="bg-muted rounded-md border-b-0">
               <AccordionTrigger className="p-4 hover:no-underline rounded-md [&[data-state=open]]:rounded-b-none">
                 <div className="flex items-center justify-between w-full">
-                  <span className="text-base font-medium">{agent.name} <span className="text-muted-foreground">({agent.purpose})</span></span>
+                  <div className="text-left">
+                    <div className="text-base font-medium">{agent.name}</div>
+                    <div className="text-sm text-muted-foreground">({agent.purpose})</div>
+                  </div>
                   <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     <span className="text-xs text-muted-foreground">{agent.active ? 'Aktiv' : 'Inaktiv'}</span>
                     <Switch
