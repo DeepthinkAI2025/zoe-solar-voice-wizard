@@ -1,3 +1,4 @@
+
 import { useEffect, useCallback, useMemo } from 'react';
 import type { AgentWithSettings } from './useAgentManagement';
 import type { Contact } from './useContactManagement';
@@ -120,7 +121,7 @@ export const useCallManagement = ({
       const defaultAgent = agents.find(a => a.isDefault) || agents[0];
       if (!defaultAgent) return;
       
-      const randomDelay = 3000 + Math.random() * 3000; // 3 to 6 seconds
+      const randomDelay = 3000 + Math.random() * 5000; // 3 to 8 seconds
 
       setTimeout(() => {
         setActiveCall(currentCall => {
@@ -220,3 +221,4 @@ export const useCallManagement = ({
     handleSendNote,
   };
 };
+

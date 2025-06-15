@@ -49,7 +49,7 @@ export const CallAutomationSettings: React.FC<CallAutomationSettingsProps> = ({
       
       {autoAnswerEnabled && (
         <div className="space-y-2 pt-4 border-t border-border mt-4">
-          <Label>Arbeitszeiten (Anrufe werden nach 6s angenommen)</Label>
+          <Label>Arbeitszeiten (Anrufe werden nach 3-8s angenommen)</Label>
           <div className="flex items-center gap-2">
             <Input
               type="number"
