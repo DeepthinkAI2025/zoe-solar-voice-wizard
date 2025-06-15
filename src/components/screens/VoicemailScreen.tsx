@@ -2,7 +2,7 @@
 import React from 'react';
 import CallScreen from '@/components/CallScreen';
 import { voicemails } from '@/data/mock';
-import { CallHistoryItem } from '@/hooks/usePhoneState';
+import type { CallHistoryItem } from '@/types/call';
 
 interface VoicemailScreenProps {
   onVoicemailSelect: (call: CallHistoryItem) => void;
