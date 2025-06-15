@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import AiChatAnimation from '@/components/craftsman/AiChatAnimation';
 import { Input } from '@/components/ui/input';
@@ -13,6 +12,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { cn } from '@/lib/utils';
+import { useRemoteStt } from '@/hooks/useRemoteStt';
+import { useRemoteTts } from '@/hooks/useRemoteTts';
 interface Message {
   id: number;
   text: string;
@@ -134,7 +135,7 @@ const AiChatScreen = () => {
       startListening();
     }
   };
-
+  const { speak } = useRemoteTts();
   // Send message when user stops talking
   useEffect(() => {
     if (!isListening && transcript.trim()) {
@@ -142,6 +143,15 @@ const AiChatScreen = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isListening]);
+
+  // Optional: So kann künftig Text nach Erhalt einer AI-Nachricht per TTS ausgegeben werden, sobald /tts aktiv ist.
+  // Beispiel-Nutzung:
+  // useEffect(() => {
+  //   const lastMsg = messages[messages.length - 1];
+  //   if (lastMsg && lastMsg.sender === 'ai') {
+  //     speak(lastMsg.text);
+  //   }
+  // }, [messages, speak]); // (auskommentiert, bis TTS bereit)
   return <div className="flex flex-col h-full">
       <ScrollArea className="flex-grow" viewportRef={scrollAreaViewportRef}>
         <div className="p-4 space-y-4 pb-4 min-h-[calc(100%-4rem)] flex flex-col">
