@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Phone, Mic } from 'lucide-react';
@@ -14,6 +13,7 @@ interface CallWidgetProps {
   duration: number;
   onMaximize: () => void;
   onEndCall: () => void;
+  dragConstraints?: React.RefObject<HTMLElement>;
 }
 
 const formatDuration = (d: number) => {
@@ -22,7 +22,7 @@ const formatDuration = (d: number) => {
   return `${minutes}:${seconds}`;
 };
 
-const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, duration, onMaximize, onEndCall }) => {
+const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, duration, onMaximize, onEndCall, dragConstraints }) => {
   const isMobile = useIsMobile();
 
   if (!callState) return null;
@@ -42,9 +42,9 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
       initial={{ y: 200, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 200, opacity: 0 }}
-      drag="y"
+      drag
       onDragEnd={handleDragEnd}
-      dragConstraints={{ top: -400, left: 0, right: 0, bottom: 0 }}
+      dragConstraints={dragConstraints}
       dragMomentum={false}
       className={cn(
         "fixed bottom-10 left-1/2 -translate-x-1/2 p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80",

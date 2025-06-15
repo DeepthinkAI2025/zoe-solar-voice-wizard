@@ -1,4 +1,3 @@
-
 import { useEffect, useCallback, useMemo, useState } from 'react';
 import type { AgentWithSettings } from './useAgentManagement';
 import type { Contact } from './useContactManagement';

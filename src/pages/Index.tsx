@@ -1,8 +1,10 @@
+
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
 import AgentSelector from '@/components/AgentSelector';
 import ActiveCallView from '@/components/ActiveCallView';
+import CallWidget from '@/components/CallWidget';
 import CallDetailsDrawer from '@/components/CallDetailsDrawer';
 import { usePhoneState } from '@/hooks/usePhoneState';
 import ContactsScreen from '@/components/screens/ContactsScreen';
@@ -64,6 +66,7 @@ const Index = () => {
     agentToFocusInSettings,
     setAgentToFocusInSettings,
   } = usePhoneState();
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   const handleSelectContactFromHistory = (number: string) => {
     const contact = contacts.find(c => c.number === number);
@@ -132,7 +135,7 @@ const Index = () => {
   };
 
   return (
-    <div className="h-screen w-full max-w-md mx-auto bg-background flex flex-col overflow-hidden rounded-3xl border-4 border-border shadow-2xl shadow-primary/20">
+    <div ref={containerRef} className="h-screen w-full max-w-md mx-auto bg-background flex flex-col relative rounded-3xl border-4 border-border shadow-2xl shadow-primary/20">
       <header className="flex-shrink-0 py-4 px-6 text-left">
         <h1 className="text-xl font-bold text-foreground tracking-wider">ZOE <span className="text-primary">Solar</span></h1>
         <p className="text-xs text-muted-foreground">AI Phone</p>
@@ -175,6 +178,19 @@ const Index = () => {
             onMinimize={() => setIsCallMinimized(true)}
         />
       )}
+      
+      {activeCall && isCallMinimized && (
+        <CallWidget
+          callState={activeCall}
+          contactName={activeCallContactName}
+          agent={activeCallAgent}
+          duration={duration}
+          onMaximize={() => setIsCallMinimized(false)}
+          onEndCall={endCall}
+          dragConstraints={containerRef}
+        />
+      )}
+
 
       <CallDetailsDrawer 
         call={selectedCall} 
