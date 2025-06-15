@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Drawer,
@@ -30,6 +31,8 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
   const [isPlaying, setIsPlaying] = useState(false);
 
   if (!call) return null;
+
+  const displayName = (call.name === 'Unbekannter Anrufer' || call.name === 'Unbekannt') && call.number && call.number !== 'Unbekannt' ? call.number : call.name;
 
   const handleCallback = () => {
     if (call?.number) {
@@ -67,7 +70,7 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
     }}>
       <DrawerContent>
         <DrawerHeader className="text-left relative">
-          <DrawerTitle>{call.name}</DrawerTitle>
+          <DrawerTitle>{displayName}</DrawerTitle>
           <DrawerDescription>
             {call.type} - {call.time}
           </DrawerDescription>

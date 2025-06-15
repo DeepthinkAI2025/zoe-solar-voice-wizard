@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import CallScreen from '@/components/CallScreen';
 import { User, Phone, Bot, Search, PlusCircle, PhoneMissed, PhoneOutgoing } from 'lucide-react';
@@ -102,7 +101,7 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
         </div>
          {filteredCallHistory.map((call, i) => {
            const contact = contacts.find(c => c.number === call.number);
-           const displayName = call.name === 'Unbekannter Anrufer' && call.number !== 'Unbekannt' ? call.number : call.name;
+           const displayName = (call.name === 'Unbekannter Anrufer' || call.name === 'Unbekannt') && call.number !== 'Unbekannt' ? call.number : call.name;
            const isKnownContact = !!contact;
 
            return (
