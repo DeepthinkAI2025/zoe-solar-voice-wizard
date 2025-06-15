@@ -5,9 +5,13 @@ import Dialpad from '@/components/Dialpad';
 import CallScreen from '@/components/CallScreen';
 import AgentSelector from '@/components/AgentSelector';
 import ActiveCallView from '@/components/ActiveCallView';
+import CallDetailsDrawer from '@/components/CallDetailsDrawer';
 import { callHistory, contacts, voicemails } from '@/data/mock';
-import { Phone, PhoneMissed, PhoneOutgoing, User } from 'lucide-react';
+import { Phone, PhoneMissed, PhoneOutgoing, User, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+
+type CallHistoryItem = typeof callHistory[0];
 
 type CallState = null | {
   number: string;
@@ -19,6 +23,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState('dialpad');
   const [callState, setCallState] = useState<CallState>(null);
   const [showAgentSelector, setShowAgentSelector] = useState<string | null>(null);
+  const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
 
   // Simulate an incoming call for demonstration
   useEffect(() => {
@@ -33,6 +38,10 @@ const Index = () => {
 
   const handleStartCall = (number: string) => {
     setShowAgentSelector(number);
+  };
+
+  const handleStartCallManually = (number: string) => {
+    setCallState({ number, status: 'active' });
   };
 
   const handleAgentSelect = (agentId: string) => {
@@ -56,6 +65,7 @@ const Index = () => {
 
   const handleEndCall = () => {
     setCallState(null);
+    setSelectedCall(null);
   };
 
   const renderContent = () => {
@@ -63,15 +73,26 @@ const Index = () => {
       case 'history':
         return <CallScreen title="Anrufliste">
           {callHistory.map((call, i) => (
-             <div key={i} className="flex items-center text-left p-3 rounded-lg bg-white/5">
-                {call.type === 'Eingehend' && <Phone size={20} className="mr-4 text-green-400"/>}
-                {call.type === 'Verpasst' && <PhoneMissed size={20} className="mr-4 text-red-400"/>}
-                {call.type.includes('Ausgehend') && <PhoneOutgoing size={20} className="mr-4 text-blue-400"/>}
-                <div className="flex-grow">
-                    <p className="text-white font-semibold">{call.name}</p>
-                    <p className="text-sm text-muted-foreground">{call.type}</p>
+             <div key={i} className="flex items-center text-left p-3 rounded-lg bg-white/5 transition-colors hover:bg-white/10" onClick={() => call.summary && setSelectedCall(call)}>
+                <div className="flex-grow flex items-center" style={{ cursor: call.summary ? 'pointer' : 'default' }}>
+                    {call.type === 'Eingehend' && <Phone size={20} className="mr-4 text-green-400 flex-shrink-0"/>}
+                    {call.type === 'Verpasst' && <PhoneMissed size={20} className="mr-4 text-red-400 flex-shrink-0"/>}
+                    {call.type.includes('Ausgehend') && <PhoneOutgoing size={20} className="mr-4 text-blue-400 flex-shrink-0"/>}
+                    <div className="flex-grow">
+                        <p className="text-white font-semibold">{call.name}</p>
+                        <p className="text-sm text-muted-foreground">{call.time}</p>
+                    </div>
                 </div>
-                <p className="text-sm text-muted-foreground">{call.time}</p>
+                {call.number !== 'Unbekannt' && (
+                  <div className="flex gap-1 flex-shrink-0">
+                    <Button variant="ghost" size="icon" className="w-10 h-10" onClick={(e) => { e.stopPropagation(); handleStartCallManually(call.number); }}>
+                      <Phone size={18} />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="w-10 h-10" onClick={(e) => { e.stopPropagation(); handleStartCall(call.number); }}>
+                      <Bot size={18} />
+                    </Button>
+                  </div>
+                )}
              </div>
           ))}
         </CallScreen>;
@@ -79,10 +100,20 @@ const Index = () => {
         return <CallScreen title="Kontakte">
            {contacts.map((contact, i) => (
              <div key={i} className="flex items-center text-left p-3 rounded-lg bg-white/5">
-                <User size={20} className="mr-4 text-muted-foreground"/>
-                <div className="flex-grow">
-                    <p className="text-white font-semibold">{contact.name}</p>
-                    <p className="text-sm text-muted-foreground">{contact.number}</p>
+                <div className="flex-grow flex items-center">
+                    <User size={20} className="mr-4 text-muted-foreground flex-shrink-0"/>
+                    <div className="flex-grow">
+                        <p className="text-white font-semibold">{contact.name}</p>
+                        <p className="text-sm text-muted-foreground">{contact.number}</p>
+                    </div>
+                </div>
+                <div className="flex gap-1 flex-shrink-0">
+                  <Button variant="ghost" size="icon" className="w-10 h-10" onClick={() => handleStartCallManually(contact.number)}>
+                    <Phone size={18} />
+                  </Button>
+                  <Button variant="ghost" size="icon" className="w-10 h-10" onClick={() => handleStartCall(contact.number)}>
+                    <Bot size={18} />
+                  </Button>
                 </div>
              </div>
            ))}
@@ -134,6 +165,8 @@ const Index = () => {
             onAcceptCallManually={handleAcceptCallManually}
         />
       )}
+
+      <CallDetailsDrawer call={selectedCall} onClose={() => setSelectedCall(null)} />
     </div>
   );
 };
