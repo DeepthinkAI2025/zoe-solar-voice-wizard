@@ -178,7 +178,13 @@ export const useAiChat = () => {
                         {
                             name: 'update_appointment_status',
                             description: 'Aktualisiert den Status eines Termins.',
-                            parameters: { type: 'OBJECT', properties: { appointmentId: { type: 'STRING', description: 'Die ID des Termins.' }, status: { type: 'STRING', description: 'Der neue Status: "completed" oder "cancelled".' } } },
+                            parameters: { 
+                                type: 'OBJECT', 
+                                properties: { 
+                                    appointmentId: { type: 'STRING', description: 'Die ID des Termins.' }, 
+                                    status: { type: 'STRING', description: 'Der neue Status: "completed" oder "cancelled".' } 
+                                } 
+                            }
                         }
                     ]
                 }];
