@@ -1,4 +1,3 @@
-
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -7,9 +6,10 @@ import ActiveCallView from '@/components/ActiveCallView';
 import CallWidget from '@/components/CallWidget';
 import CallDetailsDrawer from '@/components/CallDetailsDrawer';
 import { usePhoneState } from '@/hooks/usePhoneState';
-import HistoryScreen from '@/components/screens/HistoryScreen';
 import ContactsScreen from '@/components/screens/ContactsScreen';
 import SettingsScreen from '@/components/screens/SettingsScreen';
+import { callHistory } from '@/data/mock';
+import type { CallHistoryItem } from '@/types/call';
 
 const Index = () => {
   const {
@@ -82,14 +82,10 @@ const Index = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'history':
-        return <HistoryScreen 
-          onCallSelect={setSelectedCall} 
-          onStartCall={handleStartCall} 
-          onStartCallManually={handleStartCallManually}
-          onSelectContact={handleSelectContactFromHistory} 
-        />;
-      case 'contacts':
         return <ContactsScreen 
+          callHistory={callHistory}
+          onCallSelect={(call: CallHistoryItem) => setSelectedCall(call)} 
+          onSelectContact={handleSelectContactFromHistory} 
           onStartCall={handleStartCall} 
           onStartCallManually={handleStartCallManually}
           contacts={contacts}
