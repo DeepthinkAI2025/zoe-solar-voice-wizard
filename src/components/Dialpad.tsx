@@ -1,5 +1,5 @@
 
-import { Phone, Delete, Send, Calendar } from 'lucide-react';
+import { Phone, Delete, Bot, Calendar } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface DialpadProps {
@@ -64,7 +64,7 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
       <div className="flex justify-around items-center h-24">
         <div className="flex flex-col items-center gap-1 w-24 text-center">
           <button onClick={handleAICall} className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors disabled:opacity-50" disabled={!number}>
-            <Send size={24} className="text-white" />
+            <Bot size={24} className="text-white" />
           </button>
           <span className="text-xs text-muted-foreground">KI-Anruf</span>
         </div>
