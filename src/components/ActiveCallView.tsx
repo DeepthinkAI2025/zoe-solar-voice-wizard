@@ -1,11 +1,11 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX, Send, Headphones } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX, Send, Headphones, Share } from 'lucide-react';
 import Icon from './Icon';
 import type { aiAgents } from '@/data/mock';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 
 type Agent = (typeof aiAgents)[0];
 
@@ -19,6 +19,8 @@ interface ActiveCallViewProps {
   onAcceptCallManually?: () => void;
   agents: Agent[];
   startMuted?: boolean;
+  onForward?: () => void;
+  isForwarding?: boolean;
 }
 
 const mockTranscript = [
@@ -30,7 +32,7 @@ const mockTranscript = [
   "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen.",
 ];
 
-const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted }) => {
+const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, isForwarding }) => {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isRingerMuted, setIsRingerMuted] = useState(startMuted ?? false);
@@ -97,6 +99,11 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
 
   return (
     <div className="fixed inset-0 bg-background z-40 flex flex-col p-6 animate-slide-up">
+      {isForwarding && (
+          <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-50 animate-fade-in">
+              <p className="text-primary text-lg animate-pulse">Einen Moment, die Weiterleitung wird vorbereitet...</p>
+          </div>
+      )}
       {/* Header */}
       <div className="text-center pt-8">
         <h2 className="text-3xl font-bold text-white">{number}</h2>
@@ -185,7 +192,10 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
           </div>
         ) : (
           <div className="flex flex-col items-center">
-            <div className="grid grid-cols-3 gap-x-8 mb-8">
+            <div className={cn(
+              "grid gap-x-6 mb-8",
+              !agentId && onForward ? "grid-cols-4" : "grid-cols-3"
+            )}>
               <button onClick={() => setIsMuted(!isMuted)} className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
                 <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
                   {isMuted ? <MicOff size={28} /> : <Mic size={28} />}
@@ -198,6 +208,14 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
                 </div>
                 <span className="text-xs">Mithören</span>
               </button>
+              {!agentId && onForward && (
+                <button onClick={onForward} className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
+                  <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+                    <Share size={28} />
+                  </div>
+                  <span className="text-xs">Weiterleiten</span>
+                </button>
+              )}
               <button className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
                 <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
                   <Volume2 size={28} />

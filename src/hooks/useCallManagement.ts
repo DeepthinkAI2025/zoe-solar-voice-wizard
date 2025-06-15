@@ -14,6 +14,8 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
   const [showAgentSelector, setShowAgentSelector] = useState<string | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
   const { toast } = useToast();
+  const [outboundCallActive, setOutboundCallActive] = useState(false);
+  const [isUiForwarding, setIsUiForwarding] = useState(false);
 
   // Simulate an incoming call for demonstration & set muted state based on time
   useEffect(() => {
@@ -34,7 +36,7 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
 
   // Handle auto-answer during working hours
   useEffect(() => {
-    if (callState?.status !== 'incoming' || !autoAnswerEnabled) {
+    if (outboundCallActive || callState?.status !== 'incoming' || !autoAnswerEnabled) {
       return;
     }
 
@@ -61,7 +63,7 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     return () => {
       clearTimeout(autoAnswerTimeout);
     };
-  }, [callState, toast, autoAnswerEnabled]);
+  }, [callState, toast, autoAnswerEnabled, outboundCallActive]);
 
 
   const handleStartCall = (number: string) => {
@@ -69,11 +71,32 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
   };
 
   const handleStartCallManually = (number: string) => {
+    setOutboundCallActive(true);
     setCallState({ number, status: 'active' });
   };
 
   const handleAgentSelect = (agentId: string, notes: string) => {
-    if(showAgentSelector) {
+    if(!showAgentSelector) return;
+
+    const isForward = callState?.status === 'active' && callState?.number === showAgentSelector;
+
+    if (isForward) {
+        // Forwarding logic
+        toast({ title: "Anruf wird weitergeleitet...", description: "Einen Moment bitte." });
+        setIsUiForwarding(true);
+        setShowAgentSelector(null);
+
+        setTimeout(() => {
+            setCallState(cs => cs ? { 
+                ...cs, 
+                agentId, 
+                notes: (cs.notes ? cs.notes + "\n" : "") + "Weitergeleitet mit Notiz: " + notes 
+            } : null);
+            setIsUiForwarding(false);
+        }, 3000);
+    } else {
+        // New call logic
+        setOutboundCallActive(true);
         toast({
           title: "KI-Anruf wird gestartet...",
           description: `Agent wird mit Ihren Notizen vorbereitet.`
@@ -96,9 +119,16 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
   };
 
   const handleEndCall = () => {
+    setOutboundCallActive(false);
     setCallState(null);
     setSelectedCall(null);
   };
+  
+  const handleForward = () => {
+      if (callState) {
+          setShowAgentSelector(callState.number);
+      }
+  }
 
   const handleScheduleCall = (agentId: string, notes: string, date: Date) => {
     if (showAgentSelector) {
@@ -118,6 +148,7 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     setShowAgentSelector,
     selectedCall,
     setSelectedCall,
+    isUiForwarding,
     handleStartCall,
     handleStartCallManually,
     handleAgentSelect,
@@ -125,5 +156,6 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     handleAcceptCallManually,
     handleEndCall,
     handleScheduleCall,
+    handleForward,
   };
 };

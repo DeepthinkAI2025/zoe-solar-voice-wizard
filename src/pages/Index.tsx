@@ -1,3 +1,4 @@
+
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -31,6 +32,8 @@ const Index = () => {
     setShowAgentSelector,
     setSelectedCall,
     handleStartCallManually,
+    isUiForwarding,
+    handleForward,
     // Settings
     autoAnswerEnabled,
     workingHoursStart,
@@ -112,6 +115,8 @@ const Index = () => {
             onEndCall={handleEndCall}
             onAcceptCall={handleAcceptCallWithAI}
             onAcceptCallManually={handleAcceptCallManually}
+            onForward={handleForward}
+            isForwarding={isUiForwarding}
         />
       )}
 
