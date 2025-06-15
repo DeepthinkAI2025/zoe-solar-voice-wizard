@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, MapPin, User } from 'lucide-react';
@@ -71,10 +70,6 @@ const AppointmentsScreen = () => {
 
     return (
         <div className="p-4 flex-grow overflow-y-auto">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold">Termine</h1>
-                <p className="text-muted-foreground">Ihre anstehenden Termine.</p>
-            </div>
             
             {Object.keys(groupedAppointments).length > 0 ? (
                  <div className="space-y-6">

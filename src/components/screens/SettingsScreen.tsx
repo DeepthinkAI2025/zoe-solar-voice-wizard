@@ -98,7 +98,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
         className="hidden"
         accept="audio/*"
       />
-      <h2 className="text-2xl font-bold text-left">Einstellungen</h2>
 
       <AppearanceSettings />
       
