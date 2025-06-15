@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
 import { Clock, MapPin, User, Plus } from 'lucide-react';
 import { useAppointments, type Appointment } from '@/hooks/useAppointments';
@@ -27,6 +27,7 @@ const AppointmentsScreen = () => {
     const { 
         appointments, 
         addAppointment, 
+        updateAppointmentStatus,
         isNewAppointmentDialogOpen, 
         setIsNewAppointmentDialogOpen 
     } = useAppointments();
@@ -78,6 +79,21 @@ const AppointmentsScreen = () => {
                                                     <span>{appointment.address}</span>
                                                 </div>
                                             </CardContent>
+                                            <CardFooter className="flex justify-end gap-2 pt-4 pb-4 pr-4">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => updateAppointmentStatus(appointment.id, 'cancelled')}
+                                                >
+                                                    Stornieren
+                                                </Button>
+                                                <Button 
+                                                    size="sm"
+                                                    onClick={() => updateAppointmentStatus(appointment.id, 'completed')}
+                                                >
+                                                    Abschließen
+                                                </Button>
+                                            </CardFooter>
                                         </Card>
                                     ))}
                                 </div>

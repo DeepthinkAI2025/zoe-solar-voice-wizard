@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 
@@ -65,9 +64,22 @@ export const useAppointments = () => {
         setIsNewAppointmentDialogOpen(false);
     };
 
+    const updateAppointmentStatus = (appointmentId: string, status: 'completed' | 'cancelled') => {
+        setAppointments(prev =>
+            prev.map(app =>
+                app.id === appointmentId ? { ...app, status } : app
+            )
+        );
+        toast({
+            title: `Termin aktualisiert`,
+            description: `Der Termin wurde als ${status === 'completed' ? 'abgeschlossen' : 'storniert'} markiert.`,
+        });
+    };
+
     return {
         appointments,
         addAppointment,
+        updateAppointmentStatus,
         isNewAppointmentDialogOpen,
         setIsNewAppointmentDialogOpen,
     };
