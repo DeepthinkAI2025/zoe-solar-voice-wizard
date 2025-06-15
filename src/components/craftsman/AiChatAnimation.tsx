@@ -2,34 +2,52 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const AiChatAnimation = () => {
-  const colors = ["#8A2BE2", "#4169E1", "#00BFFF", "#32CD32"];
+interface AiChatAnimationProps {
+  isListening?: boolean;
+}
+
+const AiChatAnimation: React.FC<AiChatAnimationProps> = ({ isListening = false }) => {
+  const waveCount = 5;
+  
+  const containerVariants = {
+    listening: { transition: { staggerChildren: 0.1 } },
+    idle: { transition: { staggerChildren: 0.1, staggerDirection: -1 } },
+  };
+  
+  const waveVariants = {
+    listening: (i: number) => ({
+      y: [0, -10, 0, 10, 0, -5, 0],
+      scaleY: [1, 1.5, 1, 0.8, 1, 1.2, 1],
+      transition: {
+        duration: 1.5 + Math.random() * 0.5,
+        repeat: Infinity,
+        ease: 'easeInOut',
+        delay: i * 0.1,
+      },
+    }),
+    idle: {
+      y: 0,
+      scaleY: 1,
+      transition: { duration: 0.5, ease: 'easeInOut' },
+    },
+  };
 
   return (
-    <div className="relative w-40 h-40">
-      {colors.map((color, i) => (
+    <motion.div 
+      className="flex items-center justify-center gap-1.5 h-16 w-40"
+      variants={containerVariants}
+      animate={isListening ? 'listening' : 'idle'}
+      initial="idle"
+    >
+      {[...Array(waveCount)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-full h-full rounded-full"
-          style={{
-            backgroundColor: color,
-            filter: 'blur(20px)',
-            mixBlendMode: 'screen',
-          }}
-          animate={{
-            x: [0, Math.random() * 40 - 20, 0],
-            y: [0, Math.random() * 40 - 20, 0],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 4 + Math.random() * 2,
-            repeat: Infinity,
-            repeatType: 'mirror',
-            ease: 'easeInOut',
-          }}
+          custom={i}
+          variants={waveVariants}
+          className="w-3 h-8 bg-primary rounded-full"
         />
       ))}
-    </div>
+    </motion.div>
   );
 };
 
