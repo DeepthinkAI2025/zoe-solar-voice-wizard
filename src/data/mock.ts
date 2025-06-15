@@ -1,9 +1,9 @@
 
 export const aiAgents = [
-  { id: 'tech', name: 'KI Techniker', icon: 'Building', description: 'Für technische Anfragen zu Solaranlagen.' },
-  { id: 'lead', name: 'KI Lead-Agent', icon: 'Handshake', description: 'Qualifiziert neue Kundenanfragen.' },
-  { id: 'legal', name: 'KI Anwalt', icon: 'Gavel', description: 'Beantwortet rechtliche Standardfragen.' },
-  { id: 'general', name: 'KI Zentrale', icon: 'Bot', description: 'Allgemeine Anfragen und Weiterleitung.' },
+  { id: 'tech', name: 'KI Techniker', icon: 'Building', description: 'Für technische Anfragen zu Solaranlagen.', active: true },
+  { id: 'lead', name: 'KI Lead-Agent', icon: 'Handshake', description: 'Qualifiziert neue Kundenanfragen.', active: true },
+  { id: 'legal', name: 'KI Anwalt', icon: 'Gavel', description: 'Beantwortet rechtliche Standardfragen.', active: false },
+  { id: 'general', name: 'KI Zentrale', icon: 'Bot', description: 'Allgemeine Anfragen und Weiterleitung.', active: true },
 ];
 
 export const contacts = [

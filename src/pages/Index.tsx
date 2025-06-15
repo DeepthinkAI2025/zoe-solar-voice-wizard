@@ -6,10 +6,11 @@ import CallScreen from '@/components/CallScreen';
 import AgentSelector from '@/components/AgentSelector';
 import ActiveCallView from '@/components/ActiveCallView';
 import CallDetailsDrawer from '@/components/CallDetailsDrawer';
-import { callHistory, contacts, voicemails } from '@/data/mock';
+import { callHistory, contacts, voicemails, aiAgents as initialAgents } from '@/data/mock';
 import { Phone, PhoneMissed, PhoneOutgoing, User, Bot } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useToast } from "@/components/ui/use-toast";
 
 type CallHistoryItem = typeof callHistory[0];
 
@@ -24,6 +25,8 @@ const Index = () => {
   const [callState, setCallState] = useState<CallState>(null);
   const [showAgentSelector, setShowAgentSelector] = useState<string | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
+  const [agents, setAgents] = useState(initialAgents);
+  const { toast } = useToast();
 
   // Simulate an incoming call for demonstration
   useEffect(() => {
@@ -49,6 +52,37 @@ const Index = () => {
         setCallState({ number: showAgentSelector, status: 'active', agentId });
         setShowAgentSelector(null);
     }
+  };
+
+  const handleAgentToggle = async (agentId: string, active: boolean) => {
+    const agent = agents.find((a) => a.id === agentId);
+    if (!agent) return;
+
+    toast({
+      title: 'Agent-Status wird aktualisiert...',
+      description: `Simuliere API-Aufruf, um ${agent.name} zu ${active ? 'aktivieren' : 'deaktivieren'}.`,
+    });
+
+    // Simulate API call to fapro CRM
+    console.log(
+      `Simulating API call to fapro CRM for agent ${agent.name} (${agentId}). New status: ${
+        active ? 'active' : 'inactive'
+      }`
+    );
+    
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    setAgents(prevAgents => 
+      prevAgents.map(a => 
+        a.id === agentId ? { ...a, active } : a
+      )
+    );
+
+    toast({
+      title: 'Erfolgreich!',
+      description: `Agent ${agent.name} wurde ${active ? 'aktiviert' : 'deaktiviert'}.`,
+    });
   };
   
   const handleAcceptCallWithAI = () => {
@@ -151,6 +185,8 @@ const Index = () => {
 
       {showAgentSelector && (
         <AgentSelector 
+            agents={agents}
+            onToggleAgent={handleAgentToggle}
             onSelect={handleAgentSelect} 
             onClose={() => setShowAgentSelector(null)} 
             numberToCall={showAgentSelector}
@@ -160,6 +196,7 @@ const Index = () => {
       {callState && (
         <ActiveCallView 
             {...callState} 
+            agents={agents}
             onEndCall={handleEndCall}
             onAcceptCall={handleAcceptCallWithAI}
             onAcceptCallManually={handleAcceptCallManually}

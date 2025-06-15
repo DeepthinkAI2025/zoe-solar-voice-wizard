@@ -1,8 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX } from 'lucide-react';
-import { aiAgents } from '@/data/mock';
 import Icon from './Icon';
+import type { aiAgents } from '@/data/mock';
+
+type Agent = (typeof aiAgents)[0];
 
 interface ActiveCallViewProps {
   number: string;
@@ -11,6 +13,7 @@ interface ActiveCallViewProps {
   onEndCall: () => void;
   onAcceptCall?: () => void;
   onAcceptCallManually?: () => void;
+  agents: Agent[];
 }
 
 const mockTranscript = [
@@ -22,11 +25,11 @@ const mockTranscript = [
   "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen.",
 ];
 
-const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, onEndCall, onAcceptCall, onAcceptCallManually }) => {
+const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, onEndCall, onAcceptCall, onAcceptCallManually, agents }) => {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [transcript, setTranscript] = useState<string[]>([]);
-  const agent = aiAgents.find(a => a.id === agentId);
+  const agent = agents.find(a => a.id === agentId);
 
   useEffect(() => {
     if (status === 'active') {
