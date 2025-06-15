@@ -32,20 +32,27 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
 
   if (!call) return null;
 
-  const displayName = (call.name === 'Unbekannter Anrufer' || call.name === 'Unbekannt') && call.number && call.number !== 'Unbekannt' ? call.number : call.name;
-  const canCallback = call.number && call.number !== 'Unbekannt';
+  const numberToUse = (call.number === 'Unbekannt' || !call.number) && call.name !== 'Unbekannt' && call.name !== 'Unbekannter Anrufer'
+    ? call.name
+    : call.number ?? 'Unbekannt';
+
+  const displayName = (call.name === 'Unbekannter Anrufer' || call.name === 'Unbekannt') && numberToUse !== 'Unbekannt' && numberToUse !== 'Unbekannter Anrufer' 
+    ? numberToUse 
+    : call.name;
+    
+  const canCallback = numberToUse !== 'Unbekannt' && numberToUse !== 'Unbekannter Anrufer';
 
   const handleCallback = () => {
-    if (canCallback && call.number) {
+    if (canCallback) {
       onClose();
-      onStartCallManually(call.number);
+      onStartCallManually(numberToUse);
     }
   };
 
   const handleAiCallback = () => {
-    if (canCallback && call.number) {
+    if (canCallback) {
       onClose();
-      onStartCall(call.number);
+      onStartCall(numberToUse);
     }
   };
 
