@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+
+import React, { useState } from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { Phone, Volume2, Bluetooth, Eye, EyeOff, Mic, MicOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import type { aiAgents } from '@/data/mock';
 import CallHeader from './active-call/CallHeader';
 import TranscriptView from './active-call/TranscriptView';
 import IncomingCallControls from './active-call/IncomingCallControls';
 import ActiveCallControls from './active-call/ActiveCallControls';
+import { useActiveCallLogic } from '@/hooks/useActiveCallLogic';
 
 type Agent = (typeof aiAgents)[0];
 export type TranscriptLine = { speaker: 'agent' | 'caller' | 'system'; text: string; };
@@ -28,92 +30,25 @@ interface ActiveCallViewProps {
   onMinimize?: () => void;
 }
 
-const greetings = [
-  "Hallo, ZOE Solar, mein Name ist Alex, der KI-Assistent. Wie kann ich Ihnen helfen?",
-  "Guten Tag, hier ZOE Solar. Sie sprechen mit Alex, dem KI-Assistenten. Was kann ich für Sie tun?",
-  "Willkommen bei ZOE Solar. Mein Name ist Alex, Ihr persönlicher KI-Assistent. Womit kann ich Ihnen dienen?",
-];
-
-const mockConversation: { speaker: 'agent' | 'caller'; text: string; }[] = [
-  { speaker: 'caller', text: "Guten Tag, hier ist Müller. Ich habe eine Frage zu meiner letzten Rechnung." },
-  { speaker: 'agent', text: "Selbstverständlich, Herr Müller. Um Ihnen zu helfen, benötige ich bitte Ihre Kunden- oder Rechnungsnummer." },
-  { speaker: 'caller', text: "Moment, die habe ich hier... das ist die 12345." },
-  { speaker: 'agent', text: "Vielen Dank. Ich prüfe das für Sie..." },
-  { speaker: 'agent', text: "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen." },
-];
-
 const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, onIntervene, isForwarding, duration, onMinimize }) => {
-  const [isMuted, setIsMuted] = useState(false);
-  const [isRingerMuted, setIsRingerMuted] = useState(startMuted ?? false);
-  const [transcript, setTranscript] = useState<TranscriptLine[]>([]);
-  const [newNote, setNewNote] = useState('');
-  const [audioOutput, setAudioOutput] = useState('speaker');
   const [isTranscriptVisible, setIsTranscriptVisible] = useState(true);
   const agent = agents.find(a => a.id === agentId);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const callerName = contactName || 'Anrufer';
 
-  const fullTranscript: TranscriptLine[] = useMemo(() => {
-    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
-    return [{ speaker: 'agent', text: randomGreeting }, ...mockConversation];
-  }, []);
-
-  useEffect(() => {
-    // Mute if agent is active, unmute on human intervention
-    setIsMuted(!!agentId);
-  }, [agentId]);
-
-  const audioOutputs = [
-    { id: 'speaker', name: 'Lautsprecher', icon: Volume2 },
-    { id: 'earpiece', name: 'Telefonhörer', icon: Phone },
-    { id: 'bluetooth_airpods', name: 'AirPods Pro', icon: Bluetooth },
-    { id: 'bluetooth_car', name: 'Auto-HiFi', icon: Bluetooth },
-  ];
-  const audioOptionsWithMute = [
-      ...audioOutputs,
-      { id: 'mute-toggle', name: isMuted ? 'Ton an' : 'Stumm', icon: isMuted ? Mic : MicOff }
-  ];
-  const selectedAudioDevice = audioOutputs.find(o => o.id === audioOutput) || audioOutputs[0];
-
-  const handleAudioOutputChange = (id: string) => {
-    if (id === 'mute-toggle') {
-        setIsMuted(prev => !prev);
-    } else {
-        setAudioOutput(id);
-    }
-  };
-
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 0;
-    }
-  }, [transcript]);
-
-  useEffect(() => {
-    if (status === 'active') {
-      let transcriptIndex = 0;
-      // Set initial greeting
-      if (fullTranscript.length > 0) {
-        setTranscript([fullTranscript[0]]);
-        transcriptIndex = 1;
-      } else {
-        setTranscript([]);
-      }
-
-      const transcriptTimer = setInterval(() => {
-        if (transcriptIndex < fullTranscript.length) {
-          setTranscript(prev => [fullTranscript[transcriptIndex], ...prev]);
-          transcriptIndex++;
-        } else {
-          clearInterval(transcriptTimer);
-        }
-      }, 3500);
-
-      return () => {
-        clearInterval(transcriptTimer);
-      };
-    }
-  }, [status, fullTranscript]);
+  const {
+    isMuted,
+    setIsMuted,
+    isRingerMuted,
+    setIsRingerMuted,
+    transcript,
+    newNote,
+    onNewNoteChange,
+    scrollContainerRef,
+    callerName,
+    handleSendNote,
+    audioOptionsWithMute,
+    selectedAudioDevice,
+    handleAudioOutputChange,
+  } = useActiveCallLogic({ status, agentId, contactName, startMuted });
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const { offset } = info;
@@ -140,14 +75,6 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
     if (offset.y > SWIPE_THRESHOLD) {
       onMinimize?.();
     }
-  };
-
-  const handleSendNote = () => {
-    if (!newNote.trim()) return;
-    console.log("Sending new note to AI:", newNote);
-    // Add to transcript for visual feedback
-    setTranscript(prev => [{ speaker: 'system', text: `[Notiz an KI]: ${newNote}` }, ...prev]);
-    setNewNote('');
   };
 
   return (
@@ -181,7 +108,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
           notes={notes}
           transcript={transcript}
           newNote={newNote}
-          onNewNoteChange={setNewNote}
+          onNewNoteChange={onNewNoteChange}
           onSendNote={handleSendNote}
           callerName={callerName}
         />
