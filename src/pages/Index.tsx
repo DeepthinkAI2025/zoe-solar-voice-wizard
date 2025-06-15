@@ -1,3 +1,4 @@
+
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -60,6 +61,8 @@ const Index = () => {
     contactToEditId,
     openContactEditor,
     clearContactToEdit,
+    agentToFocusInSettings,
+    setAgentToFocusInSettings,
   } = usePhoneState();
 
   const handleSelectContactFromHistory = (number: string) => {
@@ -113,6 +116,8 @@ const Index = () => {
           globalSystemInstructions={globalSystemInstructions}
           onGlobalSystemInstructionsChange={setGlobalSystemInstructions}
           onUpdateAgentDetails={handleUpdateAgentDetails}
+          agentToFocusInSettings={agentToFocusInSettings}
+          setAgentToFocusInSettings={setAgentToFocusInSettings}
         />;
       case 'dialpad':
       default:
