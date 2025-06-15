@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Phone, PhoneOff, Maximize, Mic } from 'lucide-react';
+import { motion, PanInfo } from 'framer-motion';
+import { Phone, Mic } from 'lucide-react';
 import type { ActiveCall } from '@/hooks/useCallState';
 import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 
@@ -26,17 +26,25 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
   const displayName = contactName || callState.number;
   const lastMessage = agent && callState.transcript?.[0]?.speaker !== 'system' ? callState.transcript?.[0]?.text : null;
 
+  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    // End call if dragged down
+    if (info.offset.y > 80) {
+      onEndCall();
+    }
+  };
+
   return (
     <motion.div
       initial={{ y: 200, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 200, opacity: 0 }}
-      drag
-      dragConstraints={{ top: -400, left: -150, right: 150, bottom: 0 }}
+      drag="y"
+      onDragEnd={handleDragEnd}
+      dragConstraints={{ top: -400, left: 0, right: 0, bottom: 0 }}
       dragMomentum={false}
-      className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[90%] max-w-sm p-3 bg-black/50 backdrop-blur-xl rounded-2xl shadow-2xl flex items-center justify-between text-white z-50 cursor-grab active:cursor-grabbing border border-white/10"
+      className="fixed bottom-24 left-1/2 -translate-x-1/2 w-[90%] max-w-sm p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80"
     >
-      <div className="flex items-center gap-3 overflow-hidden cursor-pointer" onClick={onMaximize}>
+      <div className="flex items-center gap-3 overflow-hidden cursor-pointer w-full" onClick={onMaximize}>
         {agent ? (
           <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 animate-pulse">
             <Mic size={16} />
@@ -47,7 +55,7 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
           </div>
         )}
         <div className="flex flex-col min-w-0">
-          <span className="font-bold text-sm truncate">{displayName}</span>
+          <span className="font-bold text-sm truncate text-foreground">{displayName}</span>
           <span className="text-xs text-muted-foreground truncate">
             {callState.status === 'incoming' 
               ? 'Eingehender Anruf' 
@@ -56,15 +64,6 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
                 : `Anruf ${formatDuration(duration)}`}
           </span>
         </div>
-      </div>
-      
-      <div className="flex items-center gap-2 pl-2">
-        <button onClick={onMaximize} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors flex-shrink-0">
-          <Maximize size={20} />
-        </button>
-        <button onClick={onEndCall} className="w-10 h-10 flex items-center justify-center rounded-full bg-red-600/80 hover:bg-red-600 transition-colors flex-shrink-0">
-          <PhoneOff size={20} />
-        </button>
       </div>
     </motion.div>
   );
