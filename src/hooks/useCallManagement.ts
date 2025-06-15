@@ -38,13 +38,6 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
       return;
     }
 
-    const hour = new Date().getHours();
-    const isWorkingHours = hour >= workingHoursStart && hour < workingHoursEnd;
-
-    if (!isWorkingHours) {
-      return;
-    }
-
     const autoAnswerTimeout = setTimeout(() => {
       setCallState(currentCallState => {
         // Check again in case the user answered/rejected in the meantime
@@ -68,7 +61,7 @@ export const useCallManagement = ({ silentModeEnabled, workingHoursStart, workin
     return () => {
       clearTimeout(autoAnswerTimeout);
     };
-  }, [callState, toast, autoAnswerEnabled, workingHoursStart, workingHoursEnd]);
+  }, [callState, toast, autoAnswerEnabled]);
 
 
   const handleStartCall = (number: string) => {
