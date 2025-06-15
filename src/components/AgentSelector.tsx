@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
-import { X, Phone, CalendarClock } from 'lucide-react';
+import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
 import { Switch } from './ui/switch';
 import { cn } from '@/lib/utils';
 import type { aiAgents } from '@/data/mock';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 type Agent = (typeof aiAgents)[0];
 
@@ -16,27 +17,37 @@ interface AgentSelectorProps {
   numberToCall: string;
   agents: Agent[];
   onToggleAgent: (agentId: string, active: boolean) => void;
+  onUpdateAgentName: (agentId: string, newName: string) => void;
   isVmActive: boolean;
   onToggleVm: (active: boolean) => void;
 }
 
-const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, agents, onToggleAgent, isVmActive, onToggleVm }) => {
+const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, agents, onToggleAgent, onUpdateAgentName, isVmActive, onToggleVm }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
+  const [editingAgentId, setEditingAgentId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState('');
 
   useEffect(() => {
-    if (selectedAgentId) {
-      const selectedAgent = agents.find(a => a.id === selectedAgentId);
-      if (!selectedAgent?.active) {
-        setSelectedAgentId(null);
-      }
+    const activeAgent = agents.find(a => a.active);
+    if (activeAgent) {
+      setSelectedAgentId(activeAgent.id);
+    } else {
+      setSelectedAgentId(null);
     }
-  }, [agents, selectedAgentId]);
+  }, [agents]);
 
   const handleSelectAndCall = () => {
     if (selectedAgentId) {
       onSelect(selectedAgentId, notes);
     }
+  };
+
+  const handleNameUpdate = () => {
+    if (editingAgentId && editingName.trim()) {
+      onUpdateAgentName(editingAgentId, editingName.trim());
+    }
+    setEditingAgentId(null);
   };
 
   return (
@@ -64,15 +75,12 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
         
         <div className="space-y-3 overflow-y-auto pr-2 flex-grow">
           {agents.map(agent => (
-            <button
+            <div
               key={agent.id}
-              onClick={() => setSelectedAgentId(agent.id)}
-              disabled={!agent.active}
               className={cn(
                 "w-full flex items-center p-4 rounded-lg bg-white/5 border transition-all text-left",
                 selectedAgentId === agent.id ? 'border-primary' : 'border-transparent',
-                "disabled:opacity-60 disabled:cursor-not-allowed",
-                agent.active && "hover:bg-white/10"
+                !agent.active && "opacity-60 cursor-not-allowed"
               )}
             >
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-4 flex-shrink-0">
@@ -80,7 +88,35 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
               </div>
               <div className="flex-grow">
                 <div className="flex justify-between items-center">
-                    <p className="font-semibold text-white">{agent.name}</p>
+                    {editingAgentId === agent.id ? (
+                        <Input
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            onBlur={handleNameUpdate}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleNameUpdate();
+                                if (e.key === 'Escape') setEditingAgentId(null);
+                            }}
+                            className="bg-white/10 border-primary h-8 text-white"
+                            autoFocus
+                            onClick={(e) => e.stopPropagation()}
+                        />
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            <p className="font-semibold text-white">{agent.name}</p>
+                            <button 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingAgentId(agent.id);
+                                    setEditingName(agent.name);
+                                }}
+                                className="text-muted-foreground hover:text-white"
+                                aria-label={`Namen von ${agent.name} bearbeiten`}
+                            >
+                                <Pencil size={14} />
+                            </button>
+                        </div>
+                    )}
                     <Switch
                         checked={agent.active}
                         onCheckedChange={(checked) => onToggleAgent(agent.id, checked)}
@@ -91,7 +127,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
                 </div>
                 <p className="text-sm text-muted-foreground mt-1 pr-4">{agent.description}</p>
               </div>
-            </button>
+            </div>
           ))}
         </div>
 
@@ -103,7 +139,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Was soll der KI-Agent wissen? z.B. Kontext zum Anruf, Kundennummer, etc."
                 className="bg-white/5 border-white/10"
-                disabled={!isVmActive}
+                disabled={!selectedAgentId}
             />
         </div>
 

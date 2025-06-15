@@ -25,8 +25,20 @@ const Index = () => {
   const [callState, setCallState] = useState<CallState>(null);
   const [showAgentSelector, setShowAgentSelector] = useState<string | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
-  const [agents, setAgents] = useState(initialAgents);
-  const [isVmActive, setIsVmActive] = useState(true); // New state for VM
+  const [agents, setAgents] = useState(() => {
+    // Ensure only one agent is active initially from the mock data, if multiple are marked active.
+    const firstActiveAgent = initialAgents.find(a => a.active);
+    if (firstActiveAgent) {
+      return initialAgents.map(a => 
+        a.id === firstActiveAgent.id ? { ...a, active: true } : { ...a, active: false }
+      );
+    }
+    // If no agent is marked active in mock data, activate the 'general' one as a fallback.
+    return initialAgents.map(a => 
+        a.id === 'general' ? { ...a, active: true } : { ...a, active: false }
+    );
+  });
+  const [isVmActive, setIsVmActive] = useState(true);
   const { toast } = useToast();
 
   // Simulate an incoming call for demonstration
@@ -70,16 +82,18 @@ const Index = () => {
     setIsVmActive(active);
 
     if (active) {
-      // When activating VM, ensure at least one agent is active.
-      // Let's activate the 'general' one as a default.
+      // When activating VM, ensure exactly one agent is active.
+      // Activate 'general' and deactivate others.
       setAgents(prev => 
         prev.map(a => 
-          a.id === 'general' ? { ...a, active: true } : a
+          a.id === 'general' ? { ...a, active: true } : { ...a, active: false }
         )
       );
+      const generalAgent = agents.find(a => a.id === 'general');
+      const agentName = generalAgent ? generalAgent.name : "KI-Zentrale";
       toast({
         title: 'Erfolgreich!',
-        description: 'VoIP VM wurde aktiviert. KI-Agenten sind jetzt verfügbar.',
+        description: `VoIP VM wurde aktiviert. Agent ${agentName} ist jetzt aktiv.`,
       });
     } else {
       // When deactivating VM, deactivate all agents.
@@ -123,16 +137,39 @@ const Index = () => {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    setAgents(prevAgents => 
-      prevAgents.map(a => 
-        a.id === agentId ? { ...a, active } : a
-      )
-    );
+    if (active) {
+      // When activating an agent, set it as the only active one.
+      setAgents(prevAgents => 
+        prevAgents.map(a => 
+          a.id === agentId ? { ...a, active: true } : { ...a, active: false }
+        )
+      );
+    } else {
+      // This case should ideally not be hit if VM is active due to the guard clause.
+      // It allows deactivating an agent if more than one is active, or if VM is off.
+      setAgents(prevAgents => 
+        prevAgents.map(a => 
+          a.id === agentId ? { ...a, active: false } : a
+        )
+      );
+    }
 
     toast({
       title: 'Erfolgreich!',
       description: `Agent ${agent.name} wurde ${active ? 'aktiviert' : 'deaktiviert'}.`,
     });
+  };
+  
+  const handleUpdateAgentName = (agentId: string, newName: string) => {
+    setAgents(prevAgents =>
+      prevAgents.map(a =>
+        a.id === agentId ? { ...a, name: newName } : a
+      )
+    );
+    toast({
+        title: "Agent umbenannt",
+        description: `Der Agent wurde erfolgreich in "${newName}" umbenannt.`
+    })
   };
   
   const handleAcceptCallWithAI = () => {
@@ -239,6 +276,7 @@ const Index = () => {
             isVmActive={isVmActive}
             onToggleVm={handleVmToggle}
             onToggleAgent={handleAgentToggle}
+            onUpdateAgentName={handleUpdateAgentName}
             onSelect={handleAgentSelect} 
             onClose={() => setShowAgentSelector(null)} 
             numberToCall={showAgentSelector}
