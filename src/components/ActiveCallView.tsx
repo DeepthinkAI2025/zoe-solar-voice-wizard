@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX, Send } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX, Send, Headphones } from 'lucide-react';
 import Icon from './Icon';
 import type { aiAgents } from '@/data/mock';
 import { Textarea } from './ui/textarea';
@@ -37,6 +37,13 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
   const [transcript, setTranscript] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
   const agent = agents.find(a => a.id === agentId);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [transcript]);
 
   useEffect(() => {
     if (status === 'active') {
@@ -44,7 +51,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
       const transcriptTimer = setInterval(() => {
         setTranscript(prev => {
           if (prev.length < mockTranscript.length) {
-            return [...prev, mockTranscript[prev.length]];
+            return [mockTranscript[prev.length], ...prev];
           }
           return prev;
         });
@@ -78,7 +85,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
     if (!newNote.trim()) return;
     console.log("Sending new note to AI:", newNote);
     // Add to transcript for visual feedback
-    setTranscript(prev => [...prev, `[Notiz an KI]: ${newNote}`]);
+    setTranscript(prev => [`[Notiz an KI]: ${newNote}`, ...prev]);
     setNewNote('');
   };
 
@@ -99,7 +106,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
       {/* Transcript & Notes for active call */}
       {status === 'active' && (
         <>
-          <div className="flex-grow my-8 overflow-y-auto space-y-4 pr-2">
+          <div ref={scrollContainerRef} className="flex-grow my-8 overflow-y-auto space-y-4 pr-2">
             {agent && (
               <div className="flex flex-col gap-3 p-3 rounded-lg bg-white/5 text-sm">
                 <div className="flex items-center gap-3">
@@ -137,7 +144,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
       )}
       
       {/* Controls */}
-      <div className="flex-shrink-0 flex-grow flex flex-col">
+      <div className="flex-shrink-0 flex-grow flex flex-col justify-end pb-6">
         {status === 'incoming' ? (
           <div className="flex-grow flex flex-col">
             <div className="flex justify-end px-6 mb-4">
@@ -177,15 +184,29 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
             </motion.div>
           </div>
         ) : (
-          <div className="flex justify-around items-center pt-4">
-            <button onClick={() => setIsMuted(!isMuted)} className="w-20 h-20 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
-              {isMuted ? <MicOff size={28} /> : <Mic size={28} />}
-            </button>
+          <div className="flex flex-col items-center">
+            <div className="grid grid-cols-3 gap-x-8 mb-8">
+              <button onClick={() => setIsMuted(!isMuted)} className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
+                <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+                  {isMuted ? <MicOff size={28} /> : <Mic size={28} />}
+                </div>
+                <span className="text-xs">{isMuted ? 'Ton an' : 'Stumm'}</span>
+              </button>
+              <button onClick={() => alert('Live-Mithören gestartet!')} className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
+                <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+                  <Headphones size={28} />
+                </div>
+                <span className="text-xs">Mithören</span>
+              </button>
+              <button className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
+                <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+                  <Volume2 size={28} />
+                </div>
+                <span className="text-xs">Laut</span>
+              </button>
+            </div>
             <button onClick={onEndCall} className="w-20 h-20 rounded-full bg-red-600/80 hover:bg-red-600 flex items-center justify-center transition-transform hover:scale-105">
               <PhoneOff size={32} className="text-white" />
-            </button>
-            <button className="w-20 h-20 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
-              <Volume2 size={28} />
             </button>
           </div>
         )}
