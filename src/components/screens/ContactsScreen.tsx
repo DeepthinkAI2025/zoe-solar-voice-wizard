@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import CallScreen from '@/components/CallScreen';
-import { User, Phone, Bot, Search, PlusCircle, PhoneMissed, PhoneOutgoing } from 'lucide-react';
+import { User, Phone, Bot, Search, PhoneMissed, PhoneOutgoing } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ContactEditor } from '@/components/ContactEditor';
@@ -8,6 +9,7 @@ import type { Contact } from '@/hooks/useContactManagement';
 import { Badge } from '@/components/ui/badge';
 import type { CallHistoryItem } from '@/types/call';
 import { contactCategoryLabels } from '@/hooks/useContactManagement';
+import { ContactsListDialog } from '@/components/ContactsListDialog';
 
 interface ContactsScreenProps {
   onStartCall: (number: string, context?: string) => void;
@@ -39,6 +41,7 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [isContactsListOpen, setIsContactsListOpen] = useState(false);
 
   useEffect(() => {
     if (contactToEditId) {
@@ -80,6 +83,19 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
     setIsCreating(true);
   }
 
+  const handleOpenContacts = () => {
+    setIsContactsListOpen(true);
+  };
+  
+  const handleAddFromDialog = () => {
+    handleOpenCreator();
+  };
+
+  const handleEditFromDialog = (contact: Contact) => {
+    setEditingContact(contact);
+    setIsCreating(false);
+  };
+
   return (
     <>
       <CallScreen title="Anrufliste">
@@ -95,8 +111,8 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
               inputMode="search"
             />
           </div>
-          <Button size="icon" className="flex-shrink-0" onClick={handleOpenCreator}>
-            <PlusCircle size={20} />
+          <Button variant="outline" className="flex-shrink-0" onClick={handleOpenContacts}>
+            Kontakte
           </Button>
         </div>
          {filteredCallHistory.map((call, i) => {
@@ -156,6 +172,13 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
            );
          })}
       </CallScreen>
+      <ContactsListDialog
+        contacts={contacts}
+        open={isContactsListOpen}
+        onOpenChange={setIsContactsListOpen}
+        onAddContact={handleAddFromDialog}
+        onEditContact={handleEditFromDialog}
+      />
       {(isCreating || !!editingContact) && (
         <ContactEditor 
           contact={editingContact ?? undefined}
