@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
@@ -81,59 +82,61 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
             </div>
         </div>
         
-        <div className="space-y-3 overflow-y-auto pr-2 flex-grow">
+        <div className="grid grid-cols-2 gap-3 overflow-y-auto pr-2 flex-grow">
           {agents.map(agent => (
             <div
               key={agent.id}
+              onClick={() => agent.active && setSelectedAgentId(agent.id)}
               className={cn(
-                "w-full flex items-center p-4 rounded-lg bg-white/5 border transition-all text-left",
+                "relative flex flex-col p-4 rounded-lg bg-white/5 border transition-all text-left",
                 selectedAgentId === agent.id ? 'border-primary' : 'border-transparent',
-                !agent.active && "opacity-60 cursor-not-allowed"
+                !agent.active && "opacity-60 cursor-not-allowed",
+                agent.active && "cursor-pointer"
               )}
             >
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-4 flex-shrink-0">
+              <Switch
+                  checked={agent.active}
+                  onCheckedChange={(checked) => onToggleAgent(agent.id, checked)}
+                  onClick={(e) => e.stopPropagation()}
+                  disabled={!isVmActive}
+                  aria-label={`Agent ${agent.name} ${agent.active ? 'deaktivieren' : 'aktivieren'}`}
+                  className="absolute top-4 right-4"
+              />
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mb-3 flex-shrink-0">
                   <Icon name={agent.icon} size={20} className="text-primary" />
               </div>
               <div className="flex-grow">
-                <div className="flex justify-between items-center">
-                    {editingAgentId === agent.id ? (
-                        <Input
-                            value={editingName}
-                            onChange={(e) => setEditingName(e.target.value)}
-                            onBlur={handleNameUpdate}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') handleNameUpdate();
-                                if (e.key === 'Escape') setEditingAgentId(null);
-                            }}
-                            className="bg-white/10 border-primary h-8 text-white"
-                            autoFocus
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            <p className="font-semibold text-white">{agent.name}</p>
-                            <button 
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEditingAgentId(agent.id);
-                                    setEditingName(agent.name);
-                                }}
-                                className="text-muted-foreground hover:text-white"
-                                aria-label={`Namen von ${agent.name} bearbeiten`}
-                            >
-                                <Pencil size={14} />
-                            </button>
-                        </div>
-                    )}
-                    <Switch
-                        checked={agent.active}
-                        onCheckedChange={(checked) => onToggleAgent(agent.id, checked)}
+                {editingAgentId === agent.id ? (
+                    <Input
+                        value={editingName}
+                        onChange={(e) => setEditingName(e.target.value)}
+                        onBlur={handleNameUpdate}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleNameUpdate();
+                            if (e.key === 'Escape') setEditingAgentId(null);
+                        }}
+                        className="bg-white/10 border-primary h-8 text-white w-full"
+                        autoFocus
                         onClick={(e) => e.stopPropagation()}
-                        disabled={!isVmActive}
-                        aria-label={`Agent ${agent.name} ${agent.active ? 'deaktivieren' : 'aktivieren'}`}
                     />
-                </div>
-                <p className="text-sm text-muted-foreground mt-1 pr-4">{agent.description}</p>
+                ) : (
+                    <div className="flex items-center gap-2">
+                        <p className="font-semibold text-white">{agent.name}</p>
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingAgentId(agent.id);
+                                setEditingName(agent.name);
+                            }}
+                            className="text-muted-foreground hover:text-white"
+                            aria-label={`Namen von ${agent.name} bearbeiten`}
+                            disabled={!agent.active}
+                        >
+                            <Pencil size={14} />
+                        </button>
+                    </div>
+                )}
+                <p className="text-sm text-muted-foreground mt-1">{agent.description}</p>
               </div>
             </div>
           ))}
