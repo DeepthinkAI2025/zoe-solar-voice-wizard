@@ -16,7 +16,8 @@ const Index = () => {
     activeTab,
     setActiveTab,
     activeCall,
-    showAgentSelector,
+    agentSelectorState,
+    closeAgentSelector,
     selectedCall,
     agents,
     isVmActive,
@@ -30,7 +31,6 @@ const Index = () => {
     endCall,
     interveneInCall,
     handleScheduleCall,
-    setShowAgentSelector,
     setSelectedCall,
     handleStartCallManually,
     isForwarding,
@@ -69,8 +69,8 @@ const Index = () => {
     }
   };
 
-  const contactName = showAgentSelector
-    ? contacts.find(c => c.number === showAgentSelector)?.name
+  const contactName = agentSelectorState?.number
+    ? contacts.find(c => c.number === agentSelectorState.number)?.name
     : undefined;
   
   const activeCallContactName = activeCall?.number
@@ -137,7 +137,7 @@ const Index = () => {
 
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} className="flex-shrink-0" />
 
-      {showAgentSelector && (
+      {agentSelectorState && (
         <AgentSelector 
             agents={agents}
             isVmActive={isVmActive}
@@ -146,9 +146,10 @@ const Index = () => {
             onUpdateAgentName={handleUpdateAgentName}
             onSelect={handleAgentSelect}
             onScheduleCall={handleScheduleCall}
-            onClose={() => setShowAgentSelector(null)} 
-            numberToCall={showAgentSelector}
+            onClose={closeAgentSelector} 
+            numberToCall={agentSelectorState.number}
             contactName={contactName}
+            context={agentSelectorState.context}
         />
       )}
 

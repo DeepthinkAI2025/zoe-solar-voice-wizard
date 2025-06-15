@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
@@ -22,9 +23,10 @@ interface AgentSelectorProps {
   isVmActive: boolean;
   onToggleVm: (active: boolean) => void;
   onScheduleCall: (agentId: string, notes: string, date: Date) => void;
+  context?: string;
 }
 
-const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, contactName, agents, onToggleAgent, onUpdateAgentName, isVmActive, onToggleVm, onScheduleCall }) => {
+const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, contactName, agents, onToggleAgent, onUpdateAgentName, isVmActive, onToggleVm, onScheduleCall, context }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
   const [editingAgentId, setEditingAgentId] = useState<string | null>(null);
@@ -38,7 +40,13 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
     } else {
       setSelectedAgentId(null);
     }
-  }, [agents]);
+
+    if (context === 'missed-call-callback') {
+      setNotes('Es handelt sich um einen Rückruf bezüglich eines verpassten Anrufs. Bitte kläre das Anliegen des Anrufers.');
+    } else {
+      setNotes('');
+    }
+  }, [agents, context]);
 
   const handleSelectAndCall = () => {
     if (selectedAgentId) {

@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { useSettings } from './useSettings';
 import { useAgentManagement } from './useAgentManagement';
@@ -8,7 +9,7 @@ import type { CallHistoryItem } from '@/types/call';
 export const usePhoneState = () => {
   const [activeTab, setActiveTab] = useState('dialpad');
   const [contactToEditId, setContactToEditId] = useState<string | null>(null);
-  const [showAgentSelector, setShowAgentSelector] = useState<string | null>(null);
+  const [agentSelectorState, setAgentSelectorState] = useState<{ number: string; context?: string } | null>(null);
   const [selectedCall, setSelectedCall] = useState<CallHistoryItem | null>(null);
   
   const settings = useSettings();
@@ -42,16 +43,20 @@ export const usePhoneState = () => {
     }
   }, [callManagement]);
 
-  const handleStartCall = useCallback((number: string) => {
-    setShowAgentSelector(number);
+  const handleStartCall = useCallback((number: string, context?: string) => {
+    setAgentSelectorState({ number, context });
+  }, []);
+
+  const closeAgentSelector = useCallback(() => {
+    setAgentSelectorState(null);
   }, []);
 
   const handleAgentSelect = useCallback((agentId: string) => {
-    if (showAgentSelector) {
-        callManagement.startAiCall(showAgentSelector, agentId);
-        setShowAgentSelector(null);
+    if (agentSelectorState) {
+        callManagement.startAiCall(agentSelectorState.number, agentId);
+        setAgentSelectorState(null);
     }
-  }, [showAgentSelector, callManagement]);
+  }, [agentSelectorState, callManagement]);
 
   const handleStartCallManually = useCallback((number: string) => {
       callManagement.startManualCall(number);
@@ -79,8 +84,8 @@ export const usePhoneState = () => {
     ...agentManagement,
     ...contactManagement,
     ...callManagement,
-    showAgentSelector,
-    setShowAgentSelector,
+    agentSelectorState,
+    closeAgentSelector,
     selectedCall,
     setSelectedCall,
     isCallMinimized,
