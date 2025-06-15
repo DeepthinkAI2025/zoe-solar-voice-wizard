@@ -1,4 +1,3 @@
-
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import AgentSelector from '@/components/AgentSelector';
@@ -9,6 +8,8 @@ import { usePhoneState } from '@/hooks/usePhoneState';
 import { callHistory } from '@/data/mock';
 import AppHeader from '@/components/AppHeader';
 import AppContent from '@/components/AppContent';
+import AppSwitcher from '@/components/AppSwitcher';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const Index = () => {
   const phoneState = usePhoneState();
@@ -32,45 +33,57 @@ const Index = () => {
   const activeCallAgent = phoneState.activeCall?.agentId ? phoneState.agents.find(a => a.id === phoneState.activeCall.agentId) : undefined;
 
   return (
-    <div ref={containerRef} className="h-screen w-full max-w-md mx-auto bg-background flex flex-col relative rounded-3xl border-4 border-border shadow-2xl shadow-primary/20">
-      <AppHeader onLogoClick={phoneState.switchApp} />
+    <div ref={containerRef} className="h-screen w-full max-w-md mx-auto bg-background flex flex-col relative rounded-3xl border-4 border-border shadow-2xl shadow-primary/20 overflow-hidden">
+      <AppHeader />
+      <AppSwitcher onClick={phoneState.switchApp} activeApp={phoneState.activeApp} />
 
       <main className="flex-grow flex flex-col overflow-hidden">
-        <AppContent
-          activeApp={phoneState.activeApp}
-          activeTab={phoneState.activeTab}
-          callHistory={callHistory}
-          onCallSelect={phoneState.setSelectedCall}
-          onSelectContact={handleSelectContactFromHistory}
-          onStartCall={phoneState.handleStartCall}
-          onStartCallManually={phoneState.handleStartCallManually}
-          contacts={phoneState.contacts}
-          addContact={phoneState.addContact}
-          updateContact={phoneState.updateContact}
-          deleteContact={phoneState.deleteContact}
-          contactToEditId={phoneState.contactToEditId}
-          onEditorClose={phoneState.clearContactToEdit}
-          autoAnswerEnabled={phoneState.autoAnswerEnabled}
-          onAutoAnswerToggle={phoneState.handleAutoAnswerToggle}
-          workingHoursStart={phoneState.workingHoursStart}
-          onWorkingHoursStartChange={phoneState.handleWorkingHoursStartChange}
-          workingHoursEnd={phoneState.workingHoursEnd}
-          onWorkingHoursEndChange={phoneState.handleWorkingHoursEndChange}
-          silentModeEnabled={phoneState.silentModeEnabled}
-          onSilentModeToggle={phoneState.handleSilentModeToggle}
-          handleInBackground={phoneState.handleInBackground}
-          onHandleInBackgroundToggle={phoneState.handleHandleInBackgroundToggle}
-          agents={phoneState.agents}
-          isVmActive={phoneState.isVmActive}
-          onVmToggle={phoneState.handleVmToggle}
-          onToggleAgent={phoneState.handleAgentToggle}
-          globalSystemInstructions={phoneState.globalSystemInstructions}
-          onGlobalSystemInstructionsChange={phoneState.setGlobalSystemInstructions}
-          onUpdateAgentDetails={phoneState.handleUpdateAgentDetails}
-          agentToFocusInSettings={phoneState.agentToFocusInSettings}
-          setAgentToFocusInSettings={phoneState.setAgentToFocusInSettings}
-          onSchedule={phoneState.handleScheduleCall}
-        />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={phoneState.activeApp}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.25 }}
+            className="flex-grow flex flex-col overflow-hidden"
+          >
+            <AppContent
+              activeApp={phoneState.activeApp}
+              activeTab={phoneState.activeTab}
+              callHistory={callHistory}
+              onCallSelect={phoneState.setSelectedCall}
+              onSelectContact={handleSelectContactFromHistory}
+              onStartCall={phoneState.handleStartCall}
+              onStartCallManually={phoneState.handleStartCallManually}
+              contacts={phoneState.contacts}
+              addContact={phoneState.addContact}
+              updateContact={phoneState.updateContact}
+              deleteContact={phoneState.deleteContact}
+              contactToEditId={phoneState.contactToEditId}
+              onEditorClose={phoneState.clearContactToEdit}
+              autoAnswerEnabled={phoneState.autoAnswerEnabled}
+              onAutoAnswerToggle={phoneState.handleAutoAnswerToggle}
+              workingHoursStart={phoneState.workingHoursStart}
+              onWorkingHoursStartChange={phoneState.handleWorkingHoursStartChange}
+              workingHoursEnd={phoneState.workingHoursEnd}
+              onWorkingHoursEndChange={phoneState.handleWorkingHoursEndChange}
+              silentModeEnabled={phoneState.silentModeEnabled}
+              onSilentModeToggle={phoneState.handleSilentModeToggle}
+              handleInBackground={phoneState.handleInBackground}
+              onHandleInBackgroundToggle={phoneState.handleHandleInBackgroundToggle}
+              agents={phoneState.agents}
+              isVmActive={phoneState.isVmActive}
+              onVmToggle={phoneState.handleVmToggle}
+              onToggleAgent={phoneState.handleAgentToggle}
+              globalSystemInstructions={phoneState.globalSystemInstructions}
+              onGlobalSystemInstructionsChange={phoneState.setGlobalSystemInstructions}
+              onUpdateAgentDetails={phoneState.handleUpdateAgentDetails}
+              agentToFocusInSettings={phoneState.agentToFocusInSettings}
+              setAgentToFocusInSettings={phoneState.setAgentToFocusInSettings}
+              onSchedule={phoneState.handleScheduleCall}
+            />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       <BottomNav 
