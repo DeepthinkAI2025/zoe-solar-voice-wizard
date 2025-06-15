@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -23,25 +22,23 @@ export const AgentCard: React.FC<AgentCardProps> = ({
   return (
     <>
       <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
-            <div>
-                <Label htmlFor={`agent-name-${agent.id}`} className="text-xs text-muted-foreground">Name (für KI)</Label>
-                <Input
-                  id={`agent-name-${agent.id}`}
-                  value={agent.name}
-                  onChange={(e) => onUpdateAgentDetails(agent.id, { name: e.target.value })}
-                   className="text-sm h-9"
-                />
-            </div>
-            <div>
-                <Label htmlFor={`agent-purpose-${agent.id}`} className="text-xs text-muted-foreground">Zweck (intern)</Label>
-                <Input
-                  id={`agent-purpose-${agent.id}`}
-                  value={agent.purpose}
-                  onChange={(e) => onUpdateAgentDetails(agent.id, { purpose: e.target.value })}
-                   className="text-sm h-9"
-                />
-            </div>
+        <div>
+            <Label htmlFor={`agent-name-${agent.id}`} className="text-xs text-muted-foreground">Name (für KI)</Label>
+            <Input
+              id={`agent-name-${agent.id}`}
+              value={agent.name}
+              onChange={(e) => onUpdateAgentDetails(agent.id, { name: e.target.value })}
+               className="text-sm h-9"
+            />
+        </div>
+        <div>
+            <Label htmlFor={`agent-purpose-${agent.id}`} className="text-xs text-muted-foreground">Zweck (intern)</Label>
+            <Input
+              id={`agent-purpose-${agent.id}`}
+              value={agent.purpose}
+              onChange={(e) => onUpdateAgentDetails(agent.id, { purpose: e.target.value })}
+               className="text-sm h-9"
+            />
         </div>
         <div>
           <Label htmlFor={`agent-instructions-${agent.id}`} className="text-xs text-muted-foreground">Spezifische Anweisungen</Label>
