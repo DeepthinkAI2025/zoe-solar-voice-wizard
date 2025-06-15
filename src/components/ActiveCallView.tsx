@@ -120,6 +120,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
             onDragEnd={handleDragEnd}
             onEndCall={onEndCall}
             onAcceptCallManually={onAcceptCallManually}
+            onAcceptCall={onAcceptCall}
           />
         ) : (
           <ActiveCallControls

@@ -9,6 +9,7 @@ interface IncomingCallControlsProps {
   onDragEnd: (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => void;
   onEndCall: () => void;
   onAcceptCallManually?: () => void;
+  onAcceptCall?: () => void;
 }
 
 const IncomingCallControls: React.FC<IncomingCallControlsProps> = ({
@@ -17,6 +18,7 @@ const IncomingCallControls: React.FC<IncomingCallControlsProps> = ({
   onDragEnd,
   onEndCall,
   onAcceptCallManually,
+  onAcceptCall,
 }) => {
   return (
     <div className="flex-grow flex flex-col">
@@ -34,7 +36,9 @@ const IncomingCallControls: React.FC<IncomingCallControlsProps> = ({
           className="flex-grow flex flex-col items-center justify-center text-center cursor-grab active:cursor-grabbing"
           aria-label="Anruf annehmen oder Gesten verwenden"
       >
-        <p className="text-sm text-primary animate-pulse">Nach oben wischen, um mit KI anzunehmen</p>
+        <p className="text-sm text-primary animate-pulse cursor-pointer" onClick={onAcceptCall}>
+          Nach oben wischen, um mit KI anzunehmen
+        </p>
         <div className="flex items-center justify-center gap-x-16 my-8">
             <motion.div
                 onTap={onEndCall}
