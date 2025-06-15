@@ -1,6 +1,6 @@
+
 import React from 'react';
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -9,32 +9,17 @@ import { CheckCircle } from 'lucide-react';
 
 interface AgentCardProps {
   agent: AgentWithSettings;
-  isVmActive: boolean;
-  onToggleAgent: (agentId: string, active: boolean) => void;
   onUpdateAgentDetails: (agentId: string, details: Partial<Omit<AgentWithSettings, 'id' | 'icon' | 'active'>>) => void;
   onStartVoiceClone: (agentId: string) => void;
 }
 
 export const AgentCard: React.FC<AgentCardProps> = ({
   agent,
-  isVmActive,
-  onToggleAgent,
   onUpdateAgentDetails,
   onStartVoiceClone,
 }) => {
   return (
-    <div className="p-4 bg-muted rounded-md">
-      <div className="flex items-center justify-between mb-4">
-        <Label className="text-base font-medium">{agent.name} <span className="text-muted-foreground">({agent.purpose})</span></Label>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">{agent.active ? 'Aktiv' : 'Inaktiv'}</span>
-          <Switch
-            checked={agent.active}
-            onCheckedChange={(checked) => onToggleAgent(agent.id, checked)}
-            disabled={!isVmActive}
-          />
-        </div>
-      </div>
+    <>
       <div className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
             <div>
@@ -95,6 +80,6 @@ export const AgentCard: React.FC<AgentCardProps> = ({
             </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
