@@ -181,7 +181,7 @@ export const useAiChat = () => {
                             parameters: { 
                                 type: 'OBJECT', 
                                 properties: { 
-                                    appointmentId: { type: 'STRING', description: 'Die ID des Termins.' }, 
+                                    appointmentId: { type: 'STRING', description: 'Die ID des Termins.' },
                                     status: { type: 'STRING', description: 'Der neue Status: "completed" oder "cancelled".' } 
                                 } 
                             }
