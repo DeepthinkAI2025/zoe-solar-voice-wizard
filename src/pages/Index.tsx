@@ -1,4 +1,3 @@
-
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -71,7 +70,11 @@ const Index = () => {
         />;
       case 'dialpad':
       default:
-        return <Dialpad onCall={handleStartCall} />;
+        return <Dialpad 
+          onCall={handleStartCall}
+          onCallManually={handleStartCallManually}
+          onSchedule={handleStartCall}
+        />;
     }
   };
 
