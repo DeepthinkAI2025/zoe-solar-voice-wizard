@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,11 +20,19 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import type { Contact } from '@/hooks/useContactManagement';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { contactCategories, type Contact } from '@/hooks/useContactManagement';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name muss mindestens 2 Zeichen lang sein.' }),
   number: z.string().min(5, { message: 'Nummer muss mindestens 5 Zeichen lang sein.' }),
+  category: z.enum(contactCategories).optional(),
 });
 
 interface ContactEditorProps {
@@ -42,6 +49,7 @@ export const ContactEditor: React.FC<ContactEditorProps> = ({ contact, isOpen, o
     defaultValues: {
       name: '',
       number: '',
+      category: undefined,
     },
   });
 
@@ -50,11 +58,13 @@ export const ContactEditor: React.FC<ContactEditorProps> = ({ contact, isOpen, o
       form.reset({
         name: contact.name,
         number: contact.number,
+        category: contact.category,
       });
     } else {
       form.reset({
         name: '',
         number: '',
+        category: undefined,
       });
     }
   }, [contact, form, isOpen]);
@@ -108,6 +118,30 @@ export const ContactEditor: React.FC<ContactEditorProps> = ({ contact, isOpen, o
                   <FormControl>
                     <Input placeholder="+49 123 456789" {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Kategorie</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Kategorie auswählen" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {contactCategories.map(category => (
+                        <SelectItem key={category} value={category}>
+                          {category.charAt(0).toUpperCase() + category.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

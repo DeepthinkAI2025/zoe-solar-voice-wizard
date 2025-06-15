@@ -3,10 +3,14 @@ import { useState } from 'react';
 import { contacts as initialContactsData } from '@/data/mock';
 import { toast } from "sonner"
 
+export const contactCategories = ["partner", "mitarbeiter", "kunde", "händler", "werbung", "privat", "sonstige"] as const;
+export type ContactCategory = typeof contactCategories[number];
+
 export interface Contact {
   id: string;
   name: string;
   number: string;
+  category?: ContactCategory;
 }
 
 const initialContacts: Contact[] = initialContactsData.map((c, i) => ({

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ContactEditor } from '@/components/ContactEditor';
 import type { Contact } from '@/hooks/useContactManagement';
+import { Badge } from '@/components/ui/badge';
 
 interface ContactsScreenProps {
   onStartCall: (number: string) => void;
@@ -80,7 +81,10 @@ const ContactsScreen: React.FC<ContactsScreenProps> = ({
               <div className="flex-grow flex items-center">
                   <User size={20} className="mr-4 text-muted-foreground flex-shrink-0"/>
                   <div className="flex-grow">
-                      <p className="text-white font-semibold">{contact.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-white font-semibold">{contact.name}</p>
+                        {contact.category && <Badge variant="outline" className="border-primary text-primary capitalize">{contact.category}</Badge>}
+                      </div>
                       <p className="text-sm text-muted-foreground">{contact.number}</p>
                   </div>
               </div>
