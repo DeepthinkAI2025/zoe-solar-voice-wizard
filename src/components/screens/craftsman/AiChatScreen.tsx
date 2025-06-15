@@ -3,11 +3,23 @@ import React, { useState, useEffect, useRef } from 'react';
 import AiChatAnimation from '@/components/craftsman/AiChatAnimation';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Mic, Send } from 'lucide-react';
+import { Mic, Send, KeyRound } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSpeechRecognition } from '@/hooks/useSpeechRecognition';
 import { useToast } from "@/components/ui/use-toast";
+import { useAiChat } from '@/hooks/useAiChat';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { cn } from '@/lib/utils';
 
 interface Message {
   id: number;
@@ -23,6 +35,15 @@ const AiChatScreen = () => {
   const [isTyping, setIsTyping] = useState(false);
   const { toast } = useToast();
   const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
+  
+  const [isApiKeyModalOpen, setIsApiKeyModalOpen] = useState(false);
+  const [tempApiKey, setTempApiKey] = useState('');
+
+  const {
+      saveApiKey,
+      getAiResponse,
+      isApiKeySet
+  } = useAiChat();
 
   const {
     isListening,
@@ -54,9 +75,23 @@ const AiChatScreen = () => {
     }
   }, [messages, isTyping]);
 
+  const handleSaveApiKey = () => {
+    saveApiKey(tempApiKey);
+    setIsApiKeyModalOpen(false);
+    setTempApiKey('');
+  };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (input.trim() === '' || isTyping) return;
+    if (!isApiKeySet) {
+        toast({
+            title: "API-Schlüssel fehlt",
+            description: "Bitte klicke auf das Schlüssel-Symbol, um deinen API-Schlüssel einzugeben.",
+            variant: "destructive"
+        })
+        setIsApiKeyModalOpen(true);
+        return;
+    }
     if (isListening) {
       stopListening();
     }
@@ -66,20 +101,34 @@ const AiChatScreen = () => {
       text: input,
       sender: 'user',
     };
-    setMessages(prev => [...prev, newUserMessage]);
+    
+    const newMessages = [...messages, newUserMessage];
+    setMessages(newMessages);
+    const currentInput = input;
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    const aiResponseText = await getAiResponse(newMessages);
+      
+    if (aiResponseText) {
       const aiResponse: Message = {
         id: Date.now() + 1,
-        text: `Ich verarbeite deine Anfrage: "${input}".\n\nDie Anbindung an deine Systeme wird bald verfügbar sein, um Aktionen wie "Markiere Aufgabe X als erledigt" auszuführen.`,
+        text: aiResponseText,
         sender: 'ai',
       };
       setMessages(prev => [...prev, aiResponse]);
-      setIsTyping(false);
-    }, 1500);
+    } else {
+        // Handle error case, put back the original message in input and remove optimistic message
+        setInput(currentInput);
+        setMessages(messages);
+        toast({
+            title: 'Senden fehlgeschlagen',
+            description: 'Die Nachricht konnte nicht verarbeitet werden. Bitte prüfe deinen API-Schlüssel.',
+            variant: 'destructive',
+        })
+    }
+
+    setIsTyping(false);
   };
   
   const handleMicClick = () => {
@@ -159,6 +208,14 @@ const AiChatScreen = () => {
       )}
       
       <div className="flex items-center space-x-2 p-4 border-t">
+        <Button 
+          onClick={() => setIsApiKeyModalOpen(true)} 
+          size="icon" 
+          variant="outline" 
+          className={cn(!isApiKeySet && "animate-pulse border-destructive hover:border-destructive text-destructive-foreground")}
+        >
+            <KeyRound className="h-4 w-4" />
+        </Button>
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -176,6 +233,28 @@ const AiChatScreen = () => {
           <Send className="h-4 w-4" />
         </Button>
       </div>
+
+      <AlertDialog open={isApiKeyModalOpen} onOpenChange={setIsApiKeyModalOpen}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Perplexity API-Schlüssel</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Um die KI-Chat-Funktion zu nutzen, gib bitte deinen Perplexity API-Schlüssel ein. Er wird sicher in deinem Browser gespeichert.
+                    Wir empfehlen, für eine sichere Verwaltung deiner Schlüssel unsere Supabase-Integration zu nutzen.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <Input 
+                placeholder="API-Schlüssel hier einfügen"
+                value={tempApiKey}
+                onChange={(e) => setTempApiKey(e.target.value)}
+                type="password"
+            />
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setTempApiKey('')}>Abbrechen</AlertDialogCancel>
+                <AlertDialogAction onClick={handleSaveApiKey} disabled={!tempApiKey.trim()}>Speichern</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
