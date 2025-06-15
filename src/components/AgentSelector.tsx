@@ -1,23 +1,20 @@
-
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
 import { Switch } from './ui/switch';
 import { cn } from '@/lib/utils';
-import type { aiAgents } from '@/data/mock';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import ScheduleCallDialog from './ScheduleCallDialog';
-
-type Agent = (typeof aiAgents)[0];
+import type { AgentWithSettings } from '@/hooks/useAgentManagement';
 
 interface AgentSelectorProps {
   onSelect: (agentId: string, notes: string) => void;
   onClose: () => void;
   numberToCall: string;
   contactName?: string;
-  agents: Agent[];
+  agents: AgentWithSettings[];
   onToggleAgent: (agentId: string, active: boolean) => void;
   onUpdateAgentName: (agentId: string, newName: string) => void;
   isVmActive: boolean;
@@ -158,7 +155,7 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
                         </button>
                     </div>
                 )}
-                <p className="text-sm text-muted-foreground mt-1">{agent.description}</p>
+                <p className="text-sm text-muted-foreground mt-1">({agent.purpose})</p>
               </div>
             </div>
           ))}
