@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Phone, Mic } from 'lucide-react';
@@ -41,7 +42,7 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
       onDragEnd={handleDragEnd}
       dragConstraints={{ top: -400, left: 0, right: 0, bottom: 0 }}
       dragMomentum={false}
-      className="fixed bottom-28 left-1/2 -translate-x-1/2 w-[90%] max-w-sm p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80"
+      className="fixed bottom-36 left-1/2 -translate-x-1/2 w-[90%] max-w-sm p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80"
     >
       <div className="flex items-center gap-3 overflow-hidden cursor-pointer w-full" onClick={onMaximize}>
         {agent ? (
