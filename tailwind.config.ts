@@ -94,6 +94,10 @@ export default {
             transform: 'translateY(0)'
           }
         },
+        'fade-in-zoom': {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -101,6 +105,7 @@ export default {
         'slide-up': 'slide-up 0.5s cubic-bezier(0.25, 1, 0.5, 1)',
         'pulse-ring': 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'fade-in-up': 'fade-in-up 0.4s ease-out forwards',
+        'fade-in-zoom': 'fade-in-zoom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
 			}
 		}
 	},
