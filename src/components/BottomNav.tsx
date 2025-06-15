@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Icon from './Icon';
 import { cn } from '@/lib/utils';
@@ -13,7 +12,6 @@ const navItems = [
     { id: 'dialpad', label: 'Wähltastatur', icon: 'Phone' },
     { id: 'history', label: 'Anrufliste', icon: 'History' },
     { id: 'contacts', label: 'Kontakte', icon: 'Users' },
-    { id: 'voicemail', label: 'Voicemail', icon: 'Voicemail' },
     { id: 'settings', label: 'Einstellungen', icon: 'Settings' },
 ];
 

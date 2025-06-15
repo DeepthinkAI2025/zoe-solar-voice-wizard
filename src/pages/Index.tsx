@@ -1,3 +1,4 @@
+
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -7,9 +8,7 @@ import CallDetailsDrawer from '@/components/CallDetailsDrawer';
 import { usePhoneState } from '@/hooks/usePhoneState';
 import HistoryScreen from '@/components/screens/HistoryScreen';
 import ContactsScreen from '@/components/screens/ContactsScreen';
-import VoicemailScreen from '@/components/screens/VoicemailScreen';
 import SettingsScreen from '@/components/screens/SettingsScreen';
-// import { contacts } from '@/data/mock';
 
 const Index = () => {
   const {
@@ -94,8 +93,6 @@ const Index = () => {
           contactToEditId={contactToEditId}
           onEditorClose={clearContactToEdit}
         />;
-      case 'voicemail':
-        return <VoicemailScreen onVoicemailSelect={setSelectedCall} />;
       case 'settings':
         return <SettingsScreen
           autoAnswerEnabled={autoAnswerEnabled}

@@ -43,6 +43,8 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
     }
   };
 
+  const shouldShowCallbackButtons = call.number && call.number !== 'Unbekannt';
+
   return (
     <Drawer open={!!call} onClose={onClose} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent>
@@ -82,7 +84,7 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
           )}
         </div>
         <DrawerFooter>
-          {call.type === 'Voicemail' && call.number && (
+          {shouldShowCallbackButtons && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
               <Button variant="outline" className="w-full" onClick={handleCallback}>
                 <Phone size={16} className="mr-2" />
