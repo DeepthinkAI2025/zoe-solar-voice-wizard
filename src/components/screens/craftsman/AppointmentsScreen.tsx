@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Clock, MapPin, User, Plus, ListTodo, CheckSquare, Square, FolderPlus, Bot, Send } from 'lucide-react';
+import { Clock, MapPin, User, Plus, ListTodo, CheckSquare, Square, FolderPlus, Bot, Send, Calendar, List } from 'lucide-react';
 import { useAppointments, type Appointment } from '@/hooks/useAppointments';
 import NewAppointmentDialog from '@/components/appointments/NewAppointmentDialog';
+import CalendarView from '@/components/appointments/CalendarView';
 import { useTasks } from '@/hooks/useTasks';
 import NewTaskForAppointmentDialog from '@/components/appointments/NewTaskForAppointmentDialog';
 import { cn } from '@/lib/utils';
@@ -12,7 +13,6 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAiChat } from '@/hooks/useAiChat';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
 
 const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -126,9 +126,11 @@ const AppointmentsScreen = () => {
 
     const [appointmentIdForNewTask, setAppointmentIdForNewTask] = useState<string | null>(null);
     const [isAiSheetOpen, setIsAiSheetOpen] = useState(false);
+    const [viewMode, setViewMode<'list' | 'calendar'>>('list');
+    const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
     const upcomingAppointments = appointments
-      .filter(a => a.status === 'upcoming' && new Date(a.date) >= new Date('2025-06-15')) // Show only future or today's appointments
+      .filter(a => a.status === 'upcoming' && new Date(a.date) >= new Date('2025-06-15'))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     
     const groupedAppointments = upcomingAppointments.reduce((acc, appointment) => {
@@ -140,33 +142,63 @@ const AppointmentsScreen = () => {
         return acc;
     }, {} as Record<string, Appointment[]>);
 
+    const handleAppointmentClick = (appointment: Appointment) => {
+        setSelectedAppointment(appointment);
+    };
+
     return (
         <>
-            <div className="p-4 flex-grow overflow-y-auto">
-                <div className="flex justify-end items-center gap-2 mb-6">
-                    <Button onClick={() => setIsAiSheetOpen(true)} variant="outline">
-                        <Bot className="mr-2 h-4 w-4" />
-                        KI-Assistentin
-                    </Button>
-                    <Button onClick={() => setIsNewAppointmentDialogOpen(true)}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Neuer Termin
-                    </Button>
+            <div className="px-4 py-2 flex-grow overflow-y-auto">
+                <div className="flex justify-between items-center gap-2 mb-6">
+                    <div className="flex gap-2">
+                        <Button 
+                            variant={viewMode === 'list' ? 'default' : 'outline'} 
+                            size="sm"
+                            onClick={() => setViewMode('list')}
+                        >
+                            <List className="mr-2 h-4 w-4" />
+                            Liste
+                        </Button>
+                        <Button 
+                            variant={viewMode === 'calendar' ? 'default' : 'outline'} 
+                            size="sm"
+                            onClick={() => setViewMode('calendar')}
+                        >
+                            <Calendar className="mr-2 h-4 w-4" />
+                            Kalender
+                        </Button>
+                    </div>
+                    <div className="flex gap-2">
+                        <Button onClick={() => setIsAiSheetOpen(true)} variant="outline">
+                            <Bot className="mr-2 h-4 w-4" />
+                            KI-Assistentin
+                        </Button>
+                        <Button onClick={() => setIsNewAppointmentDialogOpen(true)}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Neuer Termin
+                        </Button>
+                    </div>
                 </div>
                 
-                {Object.keys(groupedAppointments).length > 0 ? (
-                     <div className="space-y-6">
-                        {Object.entries(groupedAppointments).map(([date, appointmentsForDay]) => (
-                            <div key={date}>
-                                <h2 className="font-semibold mb-3 text-lg">{date}</h2>
-                                <div className="space-y-4">
-                                    {appointmentsForDay.map((appointment) => {
-                                        const appointmentTasks = allTasks.filter(
-                                            (task) => task.appointmentId === appointment.id
-                                        );
-                                        
-                                        return (
-                                        <Card key={appointment.id} className="bg-secondary/50 border-none">
+                {viewMode === 'calendar' ? (
+                    <CalendarView 
+                        appointments={upcomingAppointments} 
+                        onAppointmentClick={handleAppointmentClick}
+                    />
+                ) : (
+                    Object.keys(groupedAppointments).length > 0 ? (
+                         <div className="space-y-6">
+                            {Object.entries(groupedAppointments).map(([date, appointmentsForDay]) => (
+                                <div key={date}>
+                                    <h2 className="font-semibold mb-3 text-lg">{date}</h2>
+                                    <div className="space-y-4">
+                                        {appointmentsForDay.map((appointment) => {
+                                            const appointmentTasks = allTasks.filter(
+                                                (task) => task.appointmentId === appointment.id
+                                            );
+                                            
+                                            return (
+                                            <Card key={appointment.id} className="bg-secondary/50 border-none">
                                             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                                                 <CardTitle className="text-base font-medium">{appointment.reason}</CardTitle>
                                                 <div className="flex items-center gap-2">
@@ -235,6 +267,7 @@ const AppointmentsScreen = () => {
                     </div>
                 )}
             </div>
+
             <NewAppointmentDialog
                 isOpen={isNewAppointmentDialogOpen}
                 onOpenChange={setIsNewAppointmentDialogOpen}

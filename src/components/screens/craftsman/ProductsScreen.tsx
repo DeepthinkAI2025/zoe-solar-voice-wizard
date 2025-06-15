@@ -1,13 +1,14 @@
-
 import React, { useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { ExternalLink, Search, Plus, Bot, FileText, BookOpen, Wrench } from 'lucide-react';
+import { ExternalLink, Search, Plus, Bot, FileText, BookOpen, Wrench, Package } from 'lucide-react';
 import { manufacturers, Product, Manufacturer } from '@/data/products';
 import ProductAiDialog from '@/components/products/ProductAiDialog';
 import AddManufacturerDialog from '@/components/products/AddManufacturerDialog';
+import InventoryManager from '@/components/products/InventoryManager';
 import { toast } from "@/components/ui/use-toast";
 
 const ProductsScreen = () => {
@@ -69,61 +70,80 @@ const ProductsScreen = () => {
     <>
       <div className="p-4 flex-grow overflow-y-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold">Produkte</h1>
-          <p className="text-muted-foreground">Hersteller und Montageinformationen.</p>
+          <h1 className="text-2xl font-bold">Produkte & Lager</h1>
+          <p className="text-muted-foreground">Hersteller, Montageinformationen und Lagerbestand.</p>
         </div>
 
-        {/* Search and Add Controls */}
-        <div className="flex gap-2 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Produkte oder Hersteller suchen..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <Button onClick={() => setIsAddDialogOpen(true)} variant="outline">
-            <Plus className="h-4 w-4 mr-2" />
-            Hinzufügen
-          </Button>
-        </div>
+        <Tabs defaultValue="products" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="products" className="flex items-center gap-2">
+              <Wrench className="h-4 w-4" />
+              Produkte
+            </TabsTrigger>
+            <TabsTrigger value="inventory" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              Lager
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="products" className="space-y-6">
+            {/* Search and Add Controls */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Produkte oder Hersteller suchen..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button onClick={() => setIsAddDialogOpen(true)} variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Hinzufügen
+              </Button>
+            </div>
 
-        <Accordion type="single" collapsible className="w-full space-y-4">
-          {filteredManufacturers.map((manufacturer) => (
-            <AccordionItem key={manufacturer.id} value={manufacturer.id} className="bg-secondary/50 border-none rounded-xl overflow-hidden">
-              <AccordionTrigger className="p-4 font-bold text-lg hover:no-underline">
-                {manufacturer.name}
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 pt-0">
-                <div className="space-y-3">
-                    {manufacturer.products.map((product) => (
-                        <div key={product.id} className="p-3 bg-background/50 rounded-lg">
-                            <div className="flex justify-between items-start gap-2">
-                                <div className="flex-1">
-                                    <h3 className="font-semibold">{product.name}</h3>
-                                    <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button variant="ghost" size="sm" onClick={() => setSelectedProduct(product)}>
-                                        Details
-                                    </Button>
+            <Accordion type="single" collapsible className="w-full space-y-4">
+              {filteredManufacturers.map((manufacturer) => (
+                <AccordionItem key={manufacturer.id} value={manufacturer.id} className="bg-secondary/50 border-none rounded-xl overflow-hidden">
+                  <AccordionTrigger className="p-4 font-bold text-lg hover:no-underline">
+                    {manufacturer.name}
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4 pt-0">
+                    <div className="space-y-3">
+                        {manufacturer.products.map((product) => (
+                            <div key={product.id} className="p-3 bg-background/50 rounded-lg">
+                                <div className="flex justify-between items-start gap-2">
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold">{product.name}</h3>
+                                        <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <Button variant="ghost" size="sm" onClick={() => setSelectedProduct(product)}>
+                                            Details
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+                        ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
 
-        {filteredManufacturers.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">Keine Produkte gefunden.</p>
-          </div>
-        )}
+            {filteredManufacturers.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Keine Produkte gefunden.</p>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="inventory">
+            <InventoryManager />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Product Details Dialog */}
