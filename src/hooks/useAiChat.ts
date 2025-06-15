@@ -263,6 +263,77 @@ export const useAiChat = () => {
                         description: 'Durchsuche die Produktdatenbank nach Name, Beschreibung oder Hersteller.',
                         parameters: { type: 'object', properties: { query: { type: 'string', description: 'Der Suchbegriff, z.B. "ecoTEC".' } } },
                     },
+                }, {
+                    type: 'function' as const,
+                    function: {
+                        name: 'add_task',
+                        description: 'Erstellt eine neue Aufgabe.',
+                        parameters: {
+                            type: 'object',
+                            properties: {
+                                text: { type: 'string', description: 'Der Text der Aufgabe.' },
+                                priority: { type: 'string', enum: ['high', 'medium', 'low'], description: 'Die Priorität.' },
+                                appointmentId: { type: 'string', description: 'Optionale ID des Termins.' }
+                            },
+                            required: ["text"],
+                        },
+                    },
+                }, {
+                    type: 'function' as const,
+                    function: {
+                        name: 'toggle_task_completion',
+                        description: 'Markiert eine Aufgabe als erledigt oder offen.',
+                        parameters: {
+                            type: 'object',
+                            properties: { taskId: { type: 'number', description: 'Die ID der Aufgabe.' } },
+                            required: ["taskId"],
+                        },
+                    },
+                }, {
+                    type: 'function' as const,
+                    function: {
+                        name: 'update_task',
+                        description: 'Aktualisiert Text oder Priorität einer bestehenden Aufgabe.',
+                        parameters: {
+                            type: 'object',
+                            properties: {
+                                taskId: { type: 'number', description: 'Die ID der Aufgabe.' },
+                                text: { type: 'string', description: 'Der neue Text.' },
+                                priority: { type: 'string', enum: ['high', 'medium', 'low'], description: 'Die neue Priorität.' }
+                            },
+                            required: ["taskId"],
+                        },
+                    },
+                }, {
+                    type: 'function' as const,
+                    function: {
+                        name: 'add_appointment',
+                        description: 'Erstellt einen neuen Termin.',
+                        parameters: {
+                            type: 'object',
+                            properties: {
+                                date: { type: 'string', description: 'Datum/Uhrzeit (ISO 8601), z.B. "2025-06-17T14:00:00".' },
+                                customer: { type: 'string', description: 'Name des Kunden.' },
+                                address: { type: 'string', description: 'Adresse des Kunden.' },
+                                reason: { type: 'string', description: 'Grund des Termins.' }
+                            },
+                            required: ["date", "customer", "address", "reason"],
+                        },
+                    },
+                }, {
+                    type: 'function' as const,
+                    function: {
+                        name: 'update_appointment_status',
+                        description: 'Aktualisiert den Status eines Termins.',
+                        parameters: {
+                            type: 'object',
+                            properties: {
+                                appointmentId: { type: 'string', description: 'Die ID des Termins.' },
+                                status: { type: 'string', enum: ['completed', 'cancelled'], description: 'Der neue Status.' }
+                            },
+                            required: ["appointmentId", "status"],
+                        },
+                    },
                 }];
 
                 let body = {
