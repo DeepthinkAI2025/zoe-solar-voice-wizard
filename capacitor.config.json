@@ -1,0 +1,11 @@
+
+{
+  "appId": "app.lovable.d26cd3f51479495f987747ea582767f2",
+  "appName": "zoe-solar-voice-wizard",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://d26cd3f5-1479-495f-9877-47ea582767f2.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  }
+}
