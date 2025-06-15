@@ -1,10 +1,11 @@
 
-import { useEffect, useCallback, useMemo } from 'react';
+import { useEffect, useCallback, useMemo, useState } from 'react';
 import type { AgentWithSettings } from './useAgentManagement';
 import type { Contact } from './useContactManagement';
 import { useCallState, type TranscriptLine } from './useCallState';
 import { useCallTimer } from './useCallTimer';
 import { useToast } from "@/components/ui/use-toast";
+import { toast as sonnerToast } from "@/components/ui/sonner";
 
 const greetings = [
   "Hallo, ZOE Solar, mein Name ist Alex, der KI-Assistent. Wie kann ich Ihnen helfen?",
@@ -42,6 +43,7 @@ export const useCallManagement = ({
   const { activeCall, setActiveCall, isForwarding, setIsForwarding } = useCallState();
   const { duration, startTimer, stopTimer } = useCallTimer();
   const { toast } = useToast();
+  const [minimizedCallToastId, setMinimizedCallToastId] = useState<string | number | undefined>();
 
   const fullTranscript: TranscriptLine[] = useMemo(() => {
       if (!activeCall?.agentId) return [];
@@ -85,12 +87,68 @@ export const useCallManagement = ({
     }
 }, [activeCall?.status, activeCall?.agentId, fullTranscript, setActiveCall]);
 
+  const maximizeCall = useCallback(() => {
+    setActiveCall(prev => prev ? { ...prev, isMinimized: false } : null);
+  }, [setActiveCall]);
+
+  useEffect(() => {
+    if (activeCall?.isMinimized) {
+        const lastMessage = activeCall.transcript?.[activeCall.transcript.length - 1];
+        const contact = contacts.find(c => c.number === activeCall.number);
+        const displayName = contact?.name || activeCall.number;
+
+        let title: string;
+        let description: string;
+
+        if (lastMessage) {
+            title = `KI-Agent im Gespräch mit ${displayName}`;
+            const speakerName = lastMessage.speaker === 'agent' ? 'KI' : (contact?.name || 'Anrufer');
+            description = `${speakerName}: ${lastMessage.text}`;
+        } else {
+            title = "KI-Agent ist am Telefon";
+            description = `Anruf von ${displayName} wird im Hintergrund bearbeitet.`;
+        }
+
+        const toastOptions = {
+            description: description,
+            duration: Infinity,
+            onClick: () => {
+                if (activeCall?.isMinimized) {
+                    maximizeCall();
+                }
+            },
+        };
+
+        if (minimizedCallToastId) {
+            sonnerToast.message(title, { id: minimizedCallToastId, ...toastOptions });
+        } else {
+            const newToastId = sonnerToast.message(title, toastOptions);
+            setMinimizedCallToastId(newToastId);
+        }
+    } else {
+        if (minimizedCallToastId) {
+            sonnerToast.dismiss(minimizedCallToastId);
+            setMinimizedCallToastId(undefined);
+        }
+    }
+
+    return () => {
+        if (minimizedCallToastId && !activeCall) {
+            sonnerToast.dismiss(minimizedCallToastId);
+            setMinimizedCallToastId(undefined);
+        }
+    };
+  }, [activeCall, contacts, minimizedCallToastId, maximizeCall]);
 
   const endCall = useCallback(() => {
+    if (minimizedCallToastId) {
+        sonnerToast.dismiss(minimizedCallToastId);
+        setMinimizedCallToastId(undefined);
+    }
     setActiveCall(null);
     stopTimer();
     setIsForwarding(false);
-  }, [setActiveCall, stopTimer, setIsForwarding]);
+  }, [setActiveCall, stopTimer, setIsForwarding, minimizedCallToastId]);
 
   const acceptCall = useCallback((agentId: string) => {
     setActiveCall(prev => {
@@ -117,11 +175,6 @@ export const useCallManagement = ({
     if (handleInBackground && autoAnswerEnabled && !isOutsideWorkingHours) {
         const defaultAgent = agents.find(a => a.isDefault) || agents[0];
         if (!defaultAgent) return;
-
-        toast({
-            title: "KI-Agent ist am Telefon",
-            description: `Anruf von ${displayName} wird im Hintergrund bearbeitet.`,
-        });
 
         const backgroundCall = {
             number,
@@ -200,10 +253,6 @@ export const useCallManagement = ({
     setActiveCall(prev => prev ? { ...prev, isMinimized: true } : null);
   }, [setActiveCall]);
 
-  const maximizeCall = useCallback(() => {
-    setActiveCall(prev => prev ? { ...prev, isMinimized: false } : null);
-  }, [setActiveCall]);
-
   const forwardCall = useCallback(() => {
     if (!activeCall || activeCall.status !== 'active') return;
     setIsForwarding(true);
@@ -256,4 +305,3 @@ export const useCallManagement = ({
     handleSendNote,
   };
 };
-

@@ -1,10 +1,8 @@
-
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
 import AgentSelector from '@/components/AgentSelector';
 import ActiveCallView from '@/components/ActiveCallView';
-import CallWidget from '@/components/CallWidget';
 import CallDetailsDrawer from '@/components/CallDetailsDrawer';
 import { usePhoneState } from '@/hooks/usePhoneState';
 import ContactsScreen from '@/components/screens/ContactsScreen';
@@ -175,17 +173,6 @@ const Index = () => {
             onIntervene={interveneInCall}
             isForwarding={isForwarding}
             onMinimize={() => setIsCallMinimized(true)}
-        />
-      )}
-      
-      {activeCall && isCallMinimized && (
-        <CallWidget
-          callState={activeCall}
-          contactName={activeCallContactName}
-          agent={activeCallAgent}
-          duration={duration}
-          onMaximize={() => setIsCallMinimized(false)}
-          onEndCall={endCall}
         />
       )}
 
