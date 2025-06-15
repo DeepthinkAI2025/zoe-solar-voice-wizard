@@ -32,6 +32,7 @@ const mockTranscript = [
 const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents }) => {
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [isRingerMuted, setIsRingerMuted] = useState(false);
   const [transcript, setTranscript] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
   const agent = agents.find(a => a.id === agentId);
@@ -65,9 +66,9 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
       return;
     }
     
-    // Swipe down, left, or right to reject
+    // Swipe down, left, or right to mute the ringer
     if (offset.y > SWIPE_THRESHOLD || Math.abs(offset.x) > SWIPE_THRESHOLD) {
-      onEndCall();
+      setIsRingerMuted(true);
       return;
     }
   };
@@ -139,9 +140,9 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
         {status === 'incoming' ? (
           <div className="flex-grow flex flex-col">
             <div className="flex justify-end px-6 mb-4">
-              <button className="flex flex-col items-center text-muted-foreground hover:text-white transition-colors">
-                  <VolumeX size={20} />
-                  <span className="text-xs mt-1">Stumm</span>
+              <button onClick={() => setIsRingerMuted(!isRingerMuted)} className="flex flex-col items-center text-muted-foreground hover:text-white transition-colors">
+                  {isRingerMuted ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                  <span className="text-xs mt-1">{isRingerMuted ? 'Ton an' : 'Stumm'}</span>
               </button>
             </div>
             <motion.div
@@ -153,15 +154,25 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
                 aria-label="Anruf annehmen oder Gesten verwenden"
             >
               <p className="text-sm text-primary animate-pulse">Nach oben wischen, um mit KI anzunehmen</p>
-              <motion.div
-                  onTap={onAcceptCallManually}
-                  className="w-20 h-20 my-8 rounded-full bg-green-500/80 hover:bg-green-500 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
-                  whileTap={{ scale: 1.1 }}
-                  aria-label="Anruf annehmen"
-              >
-                  <Phone size={32} className="text-white" />
-              </motion.div>
-              <p className="text-sm text-muted-foreground">Zum Ablehnen zur Seite oder nach unten wischen</p>
+              <div className="flex items-center justify-center gap-x-16 my-8">
+                  <motion.div
+                      onTap={onEndCall}
+                      className="w-20 h-20 rounded-full bg-red-600/80 hover:bg-red-600 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
+                      whileTap={{ scale: 1.1 }}
+                      aria-label="Anruf ablehnen"
+                  >
+                      <PhoneOff size={32} className="text-white" />
+                  </motion.div>
+                  <motion.div
+                      onTap={onAcceptCallManually}
+                      className="w-20 h-20 rounded-full bg-green-500/80 hover:bg-green-500 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
+                      whileTap={{ scale: 1.1 }}
+                      aria-label="Anruf annehmen"
+                  >
+                      <Phone size={32} className="text-white" />
+                  </motion.div>
+              </div>
+              <p className="text-sm text-muted-foreground">Oder zum Stummschalten zur Seite/nach unten wischen</p>
             </motion.div>
           </div>
         ) : (
