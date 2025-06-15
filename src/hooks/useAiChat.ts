@@ -136,7 +136,14 @@ export const useAiChat = () => {
                         {
                             name: 'add_task',
                             description: 'Erstellt eine neue Aufgabe.',
-                            parameters: { type: 'OBJECT', properties: { text: { type: 'STRING', description: 'Der Text der Aufgabe.' }, priority: { type: 'STRING', description: 'Die Priorität: "high", "medium", oder "low".' }, appointmentId: { type: 'STRING', description: 'Optionale ID des Termins, dem die Aufgabe zugeordnet ist.' } } },
+                            parameters: { 
+                                type: 'OBJECT', 
+                                properties: { 
+                                    text: { type: 'STRING', description: 'Der Text der Aufgabe.' }, 
+                                    priority: { type: 'STRING', description: 'Die Priorität: "high", "medium", oder "low".' }, 
+                                    appointmentId: { type: 'STRING', description: 'Optionale ID des Termins, dem die Aufgabe zugeordnet ist.' } 
+                                } 
+                            },
                         },
                         {
                             name: 'toggle_task_completion',
@@ -146,12 +153,27 @@ export const useAiChat = () => {
                         {
                             name: 'update_task',
                             description: 'Aktualisiert Text oder Priorität einer bestehenden Aufgabe.',
-                            parameters: { type: 'OBJECT', properties: { taskId: { type: 'NUMBER', description: 'Die ID der Aufgabe.' }, text: { type: 'STRING', description: 'Der neue Text.' }, priority: { type: 'STRING', description: 'Die neue Priorität.' } } },
+                            parameters: { 
+                                type: 'OBJECT', 
+                                properties: { 
+                                    taskId: { type: 'NUMBER', description: 'Die ID der Aufgabe.' }, 
+                                    text: { type: 'STRING', description: 'Der neue Text.' }, 
+                                    priority: { type: 'STRING', description: 'Die neue Priorität.' } 
+                                } 
+                            },
                         },
                         {
                             name: 'add_appointment',
                             description: 'Erstellt einen neuen Termin.',
-                            parameters: { type: 'OBJECT', properties: { date: { type: 'STRING', description: 'Datum und Uhrzeit im ISO 8601 Format, z.B. "2025-06-17T14:00:00".' }, customer: { type: 'STRING', description: 'Name des Kunden.' }, address: { type: 'STRING', description: 'Adresse des Kunden.' }, reason: { type: 'STRING', description: 'Grund des Termins.' } } },
+                            parameters: { 
+                                type: 'OBJECT', 
+                                properties: { 
+                                    date: { type: 'STRING', description: 'Datum und Uhrzeit im ISO 8601 Format, z.B. "2025-06-17T14:00:00".' }, 
+                                    customer: { type: 'STRING', description: 'Name des Kunden.' }, 
+                                    address: { type: 'STRING', description: 'Adresse des Kunden.' }, 
+                                    reason: { type: 'STRING', description: 'Grund des Termins.' } 
+                                } 
+                            },
                         },
                         {
                             name: 'update_appointment_status',
