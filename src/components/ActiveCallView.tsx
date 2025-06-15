@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { EyeOff } from 'lucide-react';
@@ -97,7 +96,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
       dragConstraints={{ top: 0, bottom: 0 }}
       dragElastic={{ top: 0, bottom: 0.8 }}
       onDragEnd={handleActiveCallDragEnd}
-      className="fixed inset-0 bg-background z-40 flex flex-col p-6 animate-slide-up cursor-grab active:cursor-grabbing"
+      className="fixed inset-0 bg-gradient-to-br from-background via-card to-background z-40 flex flex-col p-6 animate-slide-up cursor-grab active:cursor-grabbing"
     >
       {isForwarding && (
           <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-50 animate-fade-in">

@@ -16,8 +16,7 @@ const mockConversation: { speaker: 'agent' | 'caller'; text: string; }[] = [
   { speaker: 'caller', text: "Guten Tag, hier ist Müller. Ich habe eine Frage zu meiner letzten Rechnung." },
   { speaker: 'agent', text: "Selbstverständlich, Herr Müller. Um Ihnen zu helfen, benötige ich bitte Ihre Kunden- oder Rechnungsnummer." },
   { speaker: 'caller', text: "Moment, die habe ich hier... das ist die 12345." },
-  { speaker: 'agent', text: "Vielen Dank. Ich prüfe das für Sie..." },
-  { speaker: 'agent', text: "Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen." },
+  { speaker: 'agent', text: "Vielen Dank. Ich prüfe das für Sie... Es scheint ein Problem mit der Abrechnung der sonderleistung zu geben. Ich verbinde Sie mit einem Menschen." },
 ];
 
 interface CallManagementProps {
@@ -46,9 +45,18 @@ export const useCallManagement = ({
 
   const fullTranscript: TranscriptLine[] = useMemo(() => {
       if (!activeCall?.agentId) return [];
+      const agent = agents.find(a => a.id === activeCall.agentId);
+      const agentName = agent?.name || 'Alex'; // Default to Alex if not found
+      
+      const greetings = [
+        `Hallo, ZOE Solar, mein Name ist ${agentName}, der KI-Assistent. Wie kann ich Ihnen helfen?`,
+        `Guten Tag, hier ZOE Solar. Sie sprechen mit ${agentName}, dem KI-Assistenten. Was kann ich für Sie tun?`,
+        `Willkommen bei ZOE Solar. Mein Name ist ${agentName}, Ihr persönlicher KI-Assistent. Womit kann ich Ihnen dienen?`,
+      ];
+      
       const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
       return [{ speaker: 'agent', text: randomGreeting }, ...mockConversation];
-  }, [activeCall?.agentId]);
+  }, [activeCall?.agentId, agents]);
 
   useEffect(() => {
     if (activeCall?.status === 'active' && activeCall.agentId && fullTranscript.length > 0) {

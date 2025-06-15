@@ -83,6 +83,7 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
         <AnimatePresence initial={false}>
           {transcript.map((line, index) => {
               const speakerName = getSpeakerName(line.speaker);
+              const isAgent = line.speaker === 'agent';
               
               if (line.speaker === 'system') {
                 return (
@@ -102,17 +103,27 @@ const TranscriptView: React.FC<TranscriptViewProps> = ({
               }
 
               return (
-                <motion.div 
-                  key={index} 
+                <motion.div
+                  key={index}
                   layout
-                  initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.4, ease: [0.25, 1, 0.5, 1] }}
-                  className="text-left p-4 rounded-xl bg-secondary dark:bg-secondary/80 border border-black/5 dark:border-white/10 shadow-sm"
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                  className={`flex w-full ${isAgent ? 'justify-start' : 'justify-end'}`}
                 >
-                   <p className="text-sm font-semibold text-primary mb-1.5">{speakerName}</p>
-                   <p className="text-foreground/90 whitespace-pre-wrap">{line.text}</p>
+                  <div className="max-w-[80%]">
+                    <p className={`text-xs mb-1 ${isAgent ? 'text-left' : 'text-right'} text-muted-foreground`}>{speakerName}</p>
+                    <div
+                      className={`px-4 py-3 rounded-2xl shadow-md ${
+                        isAgent
+                          ? 'bg-muted rounded-bl-none'
+                          : 'bg-primary text-primary-foreground rounded-br-none'
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{line.text}</p>
+                    </div>
+                  </div>
                 </motion.div>
               );
           })}

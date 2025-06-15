@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { Phone, PhoneOff, Volume2, VolumeX } from 'lucide-react';
+import { Phone, PhoneOff, Volume2, VolumeX, ChevronUp } from 'lucide-react';
 
 interface IncomingCallControlsProps {
   isRingerMuted: boolean;
@@ -36,25 +36,28 @@ const IncomingCallControls: React.FC<IncomingCallControlsProps> = ({
           className="flex-grow flex flex-col items-center justify-center text-center cursor-grab active:cursor-grabbing"
           aria-label="Anruf annehmen oder Gesten verwenden"
       >
-        <p className="text-sm text-primary animate-pulse cursor-pointer" onClick={onAcceptCall}>
-          Nach oben wischen, um mit KI anzunehmen
-        </p>
+        <div className="flex flex-col items-center animate-bounce cursor-pointer" onClick={onAcceptCall}>
+            <ChevronUp className="text-primary h-6 w-6" />
+            <p className="text-sm text-primary">
+              Nach oben wischen, um mit KI anzunehmen
+            </p>
+        </div>
         <div className="flex items-center justify-center gap-x-16 my-8">
             <motion.div
                 onTap={onEndCall}
-                className="w-20 h-20 rounded-full bg-red-600/80 hover:bg-red-600 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
-                whileTap={{ scale: 1.1 }}
+                className="w-24 h-24 rounded-full bg-red-600/80 hover:bg-red-600 flex items-center justify-center transition-all hover:scale-110 cursor-pointer shadow-lg shadow-red-500/30"
+                whileTap={{ scale: 1.2 }}
                 aria-label="Anruf ablehnen"
             >
-                <PhoneOff size={32} className="text-white" />
+                <PhoneOff size={40} className="text-white" />
             </motion.div>
             <motion.div
                 onTap={onAcceptCallManually}
-                className="w-20 h-20 rounded-full bg-green-500/80 hover:bg-green-500 flex items-center justify-center transition-transform hover:scale-105 cursor-pointer"
-                whileTap={{ scale: 1.1 }}
+                className="w-24 h-24 rounded-full bg-green-500/80 hover:bg-green-500 flex items-center justify-center transition-all hover:scale-110 cursor-pointer shadow-lg shadow-green-500/30"
+                whileTap={{ scale: 1.2 }}
                 aria-label="Anruf annehmen"
             >
-                <Phone size={32} className="text-white" />
+                <Phone size={40} className="text-white" />
             </motion.div>
         </div>
         <p className="text-sm text-muted-foreground">Oder zum Ablehnen zur Seite/nach unten wischen</p>
