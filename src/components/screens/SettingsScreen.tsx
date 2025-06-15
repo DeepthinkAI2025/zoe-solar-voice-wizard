@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -63,22 +64,22 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
   };
 
   return (
-    <div className="p-4 space-y-6 text-white h-full overflow-y-auto">
+    <div className="p-4 space-y-6 h-full overflow-y-auto">
       <h2 className="text-2xl font-bold">Einstellungen</h2>
 
-      <div className="space-y-4 p-4 bg-white/5 rounded-lg">
+      <div className="space-y-4 p-4 bg-secondary rounded-lg">
         <h3 className="text-lg font-semibold">Darstellung</h3>
         <div className="flex items-center justify-between">
           <Label>Theme</Label>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setTheme('light')} className="bg-transparent hover:bg-white/10">Hell</Button>
-            <Button variant="outline" onClick={() => setTheme('dark')} className="bg-transparent hover:bg-white/10">Dunkel</Button>
-            <Button variant="outline" onClick={() => setTheme('system')} className="bg-transparent hover:bg-white/10">System</Button>
+            <Button variant="outline" onClick={() => setTheme('light')} className="hover:bg-accent">Hell</Button>
+            <Button variant="outline" onClick={() => setTheme('dark')} className="hover:bg-accent">Dunkel</Button>
+            <Button variant="outline" onClick={() => setTheme('system')} className="hover:bg-accent">System</Button>
           </div>
         </div>
       </div>
       
-      <div className="space-y-4 p-4 bg-white/5 rounded-lg">
+      <div className="space-y-4 p-4 bg-secondary rounded-lg">
         <h3 className="text-lg font-semibold">Anruf-Automatisierung</h3>
         <div className="flex items-center justify-between">
           <Label htmlFor="auto-answer-toggle" className="pr-4">Anrufe während der Arbeitszeit automatisch annehmen</Label>
@@ -90,7 +91,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
         </div>
         
         {autoAnswerEnabled && (
-          <div className="space-y-2 pt-4 border-t border-white/10 mt-4">
+          <div className="space-y-2 pt-4 border-t border-border mt-4">
             <Label>Arbeitszeiten (Anrufe werden nach 6s angenommen)</Label>
             <div className="flex items-center gap-2">
               <Input
@@ -99,7 +100,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 max="23"
                 value={workingHoursStart}
                 onChange={handleStartHourChange}
-                className="w-20 bg-black/20 border-white/20"
+                className="w-20"
               />
               <span>bis</span>
               <Input
@@ -108,7 +109,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 max="23"
                 value={workingHoursEnd}
                 onChange={handleEndHourChange}
-                className="w-20 bg-black/20 border-white/20"
+                className="w-20"
               />
               <span>Uhr</span>
             </div>
@@ -116,7 +117,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
         )}
       </div>
 
-      <div className="space-y-4 p-4 bg-white/5 rounded-lg">
+      <div className="space-y-4 p-4 bg-secondary rounded-lg">
         <h3 className="text-lg font-semibold">Stumm-Modus</h3>
         <div className="flex items-center justify-between">
           <Label htmlFor="silent-mode-toggle" className="pr-4">Eingehende Anrufe außerhalb der Arbeitszeiten stummschalten</Label>
@@ -128,7 +129,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
         </div>
       </div>
 
-      <div className="space-y-4 p-4 bg-white/5 rounded-lg">
+      <div className="space-y-4 p-4 bg-secondary rounded-lg">
         <h3 className="text-lg font-semibold">KI-Agenten</h3>
         <div className="space-y-2">
           <Label htmlFor="global-instructions">Globale System-Anweisung</Label>
@@ -137,14 +138,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
             placeholder="z.B. Sei immer freundlich und professionell."
             value={globalSystemInstructions}
             onChange={(e) => onGlobalSystemInstructionsChange(e.target.value)}
-            className="bg-black/20 border-white/20"
           />
           <p className="text-xs text-muted-foreground">Diese Anweisung gilt für alle Agenten.</p>
         </div>
 
-        <div className="space-y-4 pt-4 border-t border-white/10 mt-4">
+        <div className="space-y-4 pt-4 border-t border-border mt-4">
           {agents.map((agent) => (
-            <div key={agent.id} className="p-4 bg-black/20 rounded-md">
+            <div key={agent.id} className="p-4 bg-muted rounded-md">
               <div className="flex items-center justify-between mb-4">
                 <Label className="text-base font-medium">{agent.name} <span className="text-muted-foreground">({agent.purpose})</span></Label>
                 <div className="flex items-center gap-2">
@@ -164,7 +164,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                           id={`agent-name-${agent.id}`}
                           value={agent.name}
                           onChange={(e) => onUpdateAgentDetails(agent.id, { name: e.target.value })}
-                           className="bg-black/30 border-white/20 text-sm h-9"
+                           className="text-sm h-9"
                         />
                     </div>
                     <div>
@@ -173,7 +173,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                           id={`agent-purpose-${agent.id}`}
                           value={agent.purpose}
                           onChange={(e) => onUpdateAgentDetails(agent.id, { purpose: e.target.value })}
-                           className="bg-black/30 border-white/20 text-sm h-9"
+                           className="text-sm h-9"
                         />
                     </div>
                 </div>
@@ -184,7 +184,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                     placeholder={`Spezifische Anweisungen für ${agent.name}...`}
                     value={agent.systemInstructions}
                     onChange={(e) => onUpdateAgentDetails(agent.id, { systemInstructions: e.target.value })}
-                    className="bg-black/30 border-white/20 text-sm"
+                    className="text-sm"
                     rows={3}
                   />
                 </div>
