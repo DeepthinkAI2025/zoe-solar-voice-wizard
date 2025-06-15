@@ -10,6 +10,7 @@ import HistoryScreen from '@/components/screens/HistoryScreen';
 import ContactsScreen from '@/components/screens/ContactsScreen';
 import VoicemailScreen from '@/components/screens/VoicemailScreen';
 import SettingsScreen from '@/components/screens/SettingsScreen';
+import { contacts } from '@/data/mock';
 
 const Index = () => {
   const {
@@ -48,6 +49,10 @@ const Index = () => {
     setGlobalSystemInstructions,
     handleUpdateAgentDetails,
   } = usePhoneState();
+
+  const contactName = showAgentSelector
+    ? contacts.find(c => c.number === showAgentSelector)?.name
+    : undefined;
 
   const renderContent = () => {
     switch (activeTab) {
@@ -117,6 +122,7 @@ const Index = () => {
             onScheduleCall={handleScheduleCall}
             onClose={() => setShowAgentSelector(null)} 
             numberToCall={showAgentSelector}
+            contactName={contactName}
         />
       )}
 

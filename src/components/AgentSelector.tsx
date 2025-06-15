@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
@@ -16,6 +15,7 @@ interface AgentSelectorProps {
   onSelect: (agentId: string, notes: string) => void;
   onClose: () => void;
   numberToCall: string;
+  contactName?: string;
   agents: Agent[];
   onToggleAgent: (agentId: string, active: boolean) => void;
   onUpdateAgentName: (agentId: string, newName: string) => void;
@@ -24,7 +24,7 @@ interface AgentSelectorProps {
   onScheduleCall: (agentId: string, notes: string, date: Date) => void;
 }
 
-const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, agents, onToggleAgent, onUpdateAgentName, isVmActive, onToggleVm, onScheduleCall }) => {
+const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, contactName, agents, onToggleAgent, onUpdateAgentName, isVmActive, onToggleVm, onScheduleCall }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
   const [editingAgentId, setEditingAgentId] = useState<string | null>(null);
@@ -66,7 +66,17 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
           <X size={24} />
         </button>
         <h2 className="text-xl font-bold text-white mb-2">KI-Agent auswählen</h2>
-        <p className="text-muted-foreground mb-6">für Anruf an <span className="text-primary">{numberToCall}</span></p>
+        <p className="text-muted-foreground mb-6">
+          für Anruf an{' '}
+          {contactName ? (
+            <>
+              <span className="text-white font-semibold">{contactName}</span>
+              <span className="text-primary ml-1.5">({numberToCall})</span>
+            </>
+          ) : (
+            <span className="text-primary">{numberToCall}</span>
+          )}
+        </p>
         
         <div className="border border-border p-4 rounded-lg mb-6 bg-white/5">
             <div className="flex items-center justify-between">
