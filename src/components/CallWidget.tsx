@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Phone, Mic } from 'lucide-react';
@@ -43,17 +42,17 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 200, opacity: 0 }}
       drag="y"
-      onDragEnd={handleDragEnd}
+      onDragEnd={onEndCall}
       dragConstraints={{ top: -400, left: 0, right: 0, bottom: 0 }}
       dragMomentum={false}
       className={cn(
-        "fixed bottom-36 left-1/2 -translate-x-1/2 p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80",
+        "fixed bottom-10 left-1/2 -translate-x-1/2 p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80",
         isMobile ? "w-48" : "w-[90%] max-w-sm"
       )}
     >
       <div 
         className={cn(
-          "flex gap-3 overflow-hidden cursor-pointer w-full",
+          "flex gap-3 cursor-pointer w-full",
           isMobile ? "flex-col items-center text-center" : "items-center"
         )}
         onClick={onMaximize}
@@ -69,7 +68,7 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
         )}
         <div className={cn("flex flex-col min-w-0", isMobile && "items-center")}>
           <span className="font-bold text-sm truncate text-foreground w-full">{displayName}</span>
-          <span className="text-xs text-muted-foreground truncate w-full">
+          <span className="text-xs text-muted-foreground w-full">
             {callState.status === 'incoming' 
               ? 'Eingehender Anruf' 
               : agent 
