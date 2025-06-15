@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, PanInfo } from 'framer-motion';
-import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX, Send, Headphones, Share } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Volume2, Bot, VolumeX, Send, Bluetooth, Share } from 'lucide-react';
 import Icon from './Icon';
 import type { aiAgents } from '@/data/mock';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Agent = (typeof aiAgents)[0];
 
@@ -38,8 +44,17 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
   const [isRingerMuted, setIsRingerMuted] = useState(startMuted ?? false);
   const [transcript, setTranscript] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
+  const [audioOutput, setAudioOutput] = useState('speaker');
   const agent = agents.find(a => a.id === agentId);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const audioOutputs = [
+    { id: 'speaker', name: 'Lautsprecher', icon: Volume2 },
+    { id: 'earpiece', name: 'Telefonhörer', icon: Phone },
+    { id: 'bluetooth_airpods', name: 'AirPods Pro', icon: Bluetooth },
+    { id: 'bluetooth_car', name: 'Auto-HiFi', icon: Bluetooth },
+  ];
+  const selectedAudioDevice = audioOutputs.find(o => o.id === audioOutput) || audioOutputs[0];
 
   useEffect(() => {
     if (scrollContainerRef.current) {
@@ -194,7 +209,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
           <div className="flex flex-col items-center">
             <div className={cn(
               "grid gap-x-6 mb-8",
-              !agentId && onForward ? "grid-cols-4" : "grid-cols-3"
+              !agentId && onForward ? "grid-cols-3" : "grid-cols-2"
             )}>
               <button onClick={() => setIsMuted(!isMuted)} className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
                 <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
@@ -202,12 +217,7 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
                 </div>
                 <span className="text-xs">{isMuted ? 'Ton an' : 'Stumm'}</span>
               </button>
-              <button onClick={() => alert('Live-Mithören gestartet!')} className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
-                <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
-                  <Headphones size={28} />
-                </div>
-                <span className="text-xs">Mithören</span>
-              </button>
+              
               {!agentId && onForward && (
                 <button onClick={onForward} className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
                   <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
@@ -216,12 +226,28 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, status, agentId
                   <span className="text-xs">Weiterleiten</span>
                 </button>
               )}
-              <button className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
-                <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
-                  <Volume2 size={28} />
-                </div>
-                <span className="text-xs">Laut</span>
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex flex-col items-center justify-center gap-2 text-white/80 hover:text-white transition-colors">
+                    <div className="w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">
+                      <selectedAudioDevice.icon size={28} />
+                    </div>
+                    <span className="text-xs">{selectedAudioDevice.name}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-zinc-800 border-white/20 text-white">
+                  {audioOutputs.map((output) => (
+                    <DropdownMenuItem
+                      key={output.id}
+                      onClick={() => setAudioOutput(output.id)}
+                      className="flex items-center gap-2 cursor-pointer focus:bg-white/20"
+                    >
+                      <output.icon className="w-4 h-4 mr-2" />
+                      <span>{output.name}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <button onClick={onEndCall} className="w-20 h-20 rounded-full bg-red-600/80 hover:bg-red-600 flex items-center justify-center transition-transform hover:scale-105">
               <PhoneOff size={32} className="text-white" />
