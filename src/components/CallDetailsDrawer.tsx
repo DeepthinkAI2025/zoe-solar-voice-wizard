@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Drawer,
@@ -20,6 +19,7 @@ interface CallDetailsDrawerProps {
     time: string;
     summary: string | null;
     transcript: string[] | null;
+    duration?: string;
   } | null;
   onClose: () => void;
   onStartCall: (number: string) => void;
@@ -93,7 +93,10 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
               className="w-full justify-between items-center bg-white/5 hover:bg-white/10 p-3 rounded-lg h-auto"
               onClick={handleTogglePlay}
             >
-              <span className="text-muted-foreground text-sm font-normal">Aufnahme abhören</span>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground text-sm font-normal">Aufnahme abhören</span>
+                {call.duration && <span className="text-muted-foreground text-xs">({call.duration})</span>}
+              </div>
               {isPlaying ? <Pause className="text-primary" /> : <Play className="text-primary" />}
             </Button>
           </div>
@@ -101,7 +104,7 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
           {call.transcript && (
             <div>
               <h3 className="font-semibold text-white mb-2 flex items-center gap-2"><FileText size={16}/> Gesprächsprotokoll</h3>
-              <div className="space-y-3 bg-white/5 p-3 rounded-lg">
+              <div className="space-y-3 bg-white/5 p-3 rounded-lg max-h-48 overflow-y-auto">
                 {call.transcript.map((line, i) => (
                   <p key={i} className="text-muted-foreground text-sm">{line}</p>
                 ))}
