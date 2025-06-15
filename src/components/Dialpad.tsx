@@ -58,6 +58,7 @@ const Dialpad: React.FC<DialpadProps> = ({ onCall, onCallManually, onSchedule })
 
   const getFontSizeClass = () => {
     const length = number.length;
+    if (length > 18) return 'text-2xl';
     if (length > 14) return 'text-3xl';
     if (length > 10) return 'text-4xl';
     return 'text-5xl';
