@@ -1,11 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { aiAgents } from '@/data/mock';
 import { VoiceCloneDialog } from '@/components/VoiceCloneDialog';
 import { AppearanceSettings } from '../settings/AppearanceSettings';
 import { CallAutomationSettings } from '../settings/CallAutomationSettings';
 import { SilentModeSettings } from '../settings/SilentModeSettings';
 import { AgentSettings } from '../settings/AgentSettings';
+import { useToast } from "@/components/ui/use-toast";
 
 type AgentWithSettings = (typeof aiAgents)[0] & {
   purpose: string;
@@ -33,9 +34,49 @@ interface SettingsScreenProps {
 
 const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
   const [cloningAgentId, setCloningAgentId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && cloningAgentId) {
+      const agent = props.agents.find(a => a.id === cloningAgentId);
+      toast({
+          title: "Upload erfolgreich",
+          description: `Die Stimmdatei "${file.name}" für ${agent?.name || 'unbekannt'} wird verarbeitet.`
+      });
+      console.log('Uploading file:', file.name, 'for agent:', cloningAgentId);
+      // In a real app, you'd upload the file here.
+      setCloningAgentId(null);
+    }
+  };
+
+  const handleRecordComplete = (blob: Blob) => {
+    if (cloningAgentId) {
+      const agent = props.agents.find(a => a.id === cloningAgentId);
+       toast({
+          title: "Aufnahme erfolgreich",
+          description: `Die Aufnahme für ${agent?.name || 'unbekannt'} wird verarbeitet.`
+      });
+      console.log('Recording complete for agent:', cloningAgentId, blob);
+      // In a real app, you'd upload the blob here.
+      setCloningAgentId(null);
+    }
+  };
 
   return (
     <div className="p-4 space-y-6 h-full overflow-y-auto">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+        accept="audio/*"
+      />
       <h2 className="text-2xl font-bold">Einstellungen</h2>
 
       <AppearanceSettings />
@@ -69,14 +110,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = (props) => {
         <VoiceCloneDialog
           agent={props.agents.find(a => a.id === cloningAgentId)}
           onClose={() => setCloningAgentId(null)}
-          onUpload={() => {
-            console.log('Upload for', cloningAgentId);
-            setCloningAgentId(null);
-          }}
-          onRecord={() => {
-            console.log('Record for', cloningAgentId);
-            setCloningAgentId(null);
-          }}
+          onUpload={handleUploadClick}
+          onRecordComplete={handleRecordComplete}
         />
       )}
     </div>
