@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,6 +18,8 @@ export const AgentCard: React.FC<AgentCardProps> = ({
   onUpdateAgentDetails,
   onStartVoiceClone,
 }) => {
+  const [isEditingVoiceLabel, setIsEditingVoiceLabel] = useState(false);
+
   return (
     <>
       <div className="space-y-3">
@@ -58,23 +60,28 @@ export const AgentCard: React.FC<AgentCardProps> = ({
           <Button variant="outline" onClick={() => onStartVoiceClone(agent.id)}>
               {agent.voiceCloned ? 'Stimme erneut klonen' : 'Stimme klonen'}
           </Button>
-          {agent.voiceCloned && (
-              <div className="flex items-center gap-1 text-sm text-green-600 font-medium">
+          {agent.voiceCloned && !isEditingVoiceLabel && (
+              <div
+                className="flex items-center gap-1 text-sm text-green-600 font-medium cursor-pointer"
+                onClick={() => setIsEditingVoiceLabel(true)}
+              >
                   <CheckCircle className="h-4 w-4" />
                   <span>{agent.voiceLabel || 'Stimme geklont'}</span>
               </div>
           )}
         </div>
-        {agent.voiceCloned && (
+        {agent.voiceCloned && isEditingVoiceLabel && (
             <div className="mt-3">
                 <Label htmlFor={`agent-voice-label-${agent.id}`} className="text-xs text-muted-foreground">
-                    Bezeichnung der Stimme (optional)
+                    Bezeichnung der Stimme
                 </Label>
                 <Input
                   id={`agent-voice-label-${agent.id}`}
                   placeholder="z.B. Freundliche Frauenstimme"
                   value={agent.voiceLabel || ''}
                   onChange={(e) => onUpdateAgentDetails(agent.id, { voiceLabel: e.target.value })}
+                  onBlur={() => setIsEditingVoiceLabel(false)}
+                  autoFocus
                   className="text-sm h-9"
                 />
             </div>
