@@ -163,11 +163,11 @@ export const useOpenRouterProvider = () => {
             const newApiMessages = [...apiMessages, messageFromApi];
 
             for (const toolCall of messageFromApi.tool_calls) {
-                const functionName = toolCall.function.name as keyof typeof availableTools;
+                const functionName = toolCall.function.name;
                 const functionToCall = availableTools[functionName];
                 if (functionToCall) {
                     const functionArgs = JSON.parse(toolCall.function.arguments);
-                    console.log(`OpenAI compatible API is calling function "${functionName}" with args:`, functionArgs);
+                    console.log(`OpenAI compatible API is calling function "${String(functionName)}" with args:`, functionArgs);
                     // @ts-ignore
                     const functionResponse = functionToCall(functionArgs);
                     newApiMessages.push({

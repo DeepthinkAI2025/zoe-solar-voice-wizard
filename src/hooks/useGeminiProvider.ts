@@ -104,12 +104,12 @@ export const useGeminiProvider = () => {
         const part = data.candidates?.[0]?.content?.parts?.[0];
         if (part?.functionCall) {
             const functionCall = part.functionCall;
-            const functionName = functionCall.name as keyof typeof availableTools;
+            const functionName = functionCall.name;
             const functionToCall = availableTools[functionName];
 
             if (functionToCall) {
                 const functionArgs = functionCall.args || {};
-                console.log(`Gemini is calling function "${functionName}" with args:`, functionArgs);
+                console.log(`Gemini is calling function "${String(functionName)}" with args:`, functionArgs);
                 // @ts-ignore
                 const functionResponse = functionToCall(functionArgs);
 
