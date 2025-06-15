@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -7,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTheme } from "@/components/theme-provider";
 import { Button } from "@/components/ui/button";
 import type { aiAgents } from '@/data/mock';
+import { VoiceCloneDialog } from '@/components/VoiceCloneDialog';
 
 type AgentWithSettings = (typeof aiAgents)[0] & {
   purpose: string;
@@ -31,6 +31,7 @@ interface SettingsScreenProps {
   onUpdateAgentDetails: (agentId: string, details: Partial<Omit<AgentWithSettings, 'id' | 'icon' | 'active'>>) => void;
 }
 
+
 const SettingsScreen: React.FC<SettingsScreenProps> = ({
   autoAnswerEnabled,
   onAutoAnswerToggle,
@@ -48,6 +49,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onUpdateAgentDetails,
 }) => {
   const { setTheme } = useTheme();
+  const [cloningAgentId, setCloningAgentId] = useState<string | null>(null);
 
   const handleStartHourChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
@@ -63,6 +65,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
     }
   };
 
+
   return (
     <div className="p-4 space-y-6 h-full overflow-y-auto">
       <h2 className="text-2xl font-bold">Einstellungen</h2>
@@ -72,9 +75,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
         <div className="flex items-center justify-between">
           <Label>Theme</Label>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setTheme('light')} className="hover:bg-accent">Hell</Button>
-            <Button variant="outline" onClick={() => setTheme('dark')} className="hover:bg-accent">Dunkel</Button>
-            <Button variant="outline" onClick={() => setTheme('system')} className="hover:bg-accent">System</Button>
+            <Button variant="outline" onClick={() => setTheme('light')} className="hover:bg-accent hover:text-accent-foreground">Hell</Button>
+            <Button variant="outline" onClick={() => setTheme('dark')} className="hover:bg-accent hover:text-accent-foreground">Dunkel</Button>
+            <Button variant="outline" onClick={() => setTheme('system')} className="hover:bg-accent hover:text-accent-foreground">System</Button>
           </div>
         </div>
       </div>
@@ -189,10 +192,31 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({
                   />
                 </div>
               </div>
+              <div className="mt-4 pt-4 border-t border-border">
+                <Button variant="outline" onClick={() => setCloningAgentId(agent.id)}>
+                    Stimme klonen
+                </Button>
+              </div>
             </div>
           ))}
         </div>
       </div>
+      {cloningAgentId && (
+        <VoiceCloneDialog
+          agent={agents.find(a => a.id === cloningAgentId)}
+          onClose={() => setCloningAgentId(null)}
+          onUpload={() => {
+            console.log('Upload for', cloningAgentId);
+            // Hier würde die Logik für den Datei-Upload ausgelöst
+            setCloningAgentId(null);
+          }}
+          onRecord={() => {
+            console.log('Record for', cloningAgentId);
+            // Hier würde die Logik für die Audio-Aufnahme ausgelöst
+            setCloningAgentId(null);
+          }}
+        />
+      )}
     </div>
   );
 };
