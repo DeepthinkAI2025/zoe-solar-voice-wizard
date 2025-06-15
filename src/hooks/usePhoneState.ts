@@ -28,7 +28,7 @@ export const usePhoneState = () => {
 
   const openContactEditor = (contactId: string) => {
     setContactToEditId(contactId);
-    setActiveTab('contacts');
+    setActiveTab('history');
   };
 
   const clearContactToEdit = () => {

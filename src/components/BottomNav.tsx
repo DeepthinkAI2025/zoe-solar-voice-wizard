@@ -4,13 +4,15 @@ import { motion } from 'framer-motion';
 import Icon from './Icon';
 import { cn } from '@/lib/utils';
 
+type NavItemId = 'dialpad' | 'history' | 'settings';
+
 interface BottomNavProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  activeTab: NavItemId;
+  setActiveTab: (tab: NavItemId) => void;
   className?: string;
 }
 
-const navItems = [
+const navItems: { id: NavItemId; label: string; icon: string }[] = [
     { id: 'dialpad', label: 'Wähltastatur', icon: 'Phone' },
     { id: 'history', label: 'Anrufliste', icon: 'History' },
     { id: 'settings', label: 'Einstellungen', icon: 'Settings' },
