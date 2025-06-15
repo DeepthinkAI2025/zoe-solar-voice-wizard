@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { Phone, Mic } from 'lucide-react';
@@ -31,23 +32,23 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
   const lastMessage = agent && callState.transcript?.length && callState.transcript[0].speaker !== 'system' ? callState.transcript[0].text : null;
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    // End call if dragged down
-    if (info.offset.y > 80) {
+    // End call if dragged up
+    if (info.offset.y < -80) {
       onEndCall();
     }
   };
 
   return (
     <motion.div
-      initial={{ y: 200, opacity: 0 }}
+      initial={{ y: -200, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      exit={{ y: 200, opacity: 0 }}
+      exit={{ y: -200, opacity: 0 }}
       drag
       onDragEnd={handleDragEnd}
       dragConstraints={dragConstraints}
       dragMomentum={false}
       className={cn(
-        "fixed bottom-10 left-1/2 -translate-x-1/2 p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80",
+        "fixed top-6 left-1/2 -translate-x-1/2 p-3 backdrop-blur-xl rounded-2xl shadow-lg dark:shadow-2xl flex items-center z-50 cursor-grab active:cursor-grabbing border dark:border-white/10 dark:bg-black/30 bg-secondary/80",
         isMobile ? "w-48" : "w-[90%] max-w-sm"
       )}
     >
