@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { toast } from "@/components/ui/use-toast";
 import type { Task } from '@/types/task';
@@ -46,6 +45,7 @@ export const addTask = (
         completed: false,
         subtasks: [],
         appointmentId,
+        createdAt: new Date().toISOString(),
     };
     setTaskList(prevTasks => [newTask, ...prevTasks]);
     setIsNewTaskDialogOpen(false);
