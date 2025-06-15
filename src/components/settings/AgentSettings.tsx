@@ -71,7 +71,7 @@ export const AgentSettings: React.FC<AgentSettingsProps> = ({
               agent.active && "ring-2 ring-primary/30"
             )}>
               <AccordionTrigger className="p-4 hover:no-underline bg-muted rounded-lg data-[state=open]:rounded-b-none">
-                <div className="flex items-center justify-between w-full">
+                <div className="flex items-center justify-between flex-1">
                   <div className="flex items-center gap-4 text-left">
                     <div className="bg-primary/10 p-2 rounded-lg">
                       <Bot className="h-6 w-6 text-primary" />
