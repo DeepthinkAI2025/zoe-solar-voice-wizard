@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
 import type { aiAgents } from '@/data/mock';
-import type { TranscriptLine } from '../ActiveCallView';
+import type { TranscriptLine } from '@/hooks/useCallState';
 
 type Agent = (typeof aiAgents)[0];
 

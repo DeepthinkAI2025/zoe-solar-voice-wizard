@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { motion, PanInfo } from 'framer-motion';
 import { EyeOff } from 'lucide-react';
 import type { aiAgents } from '@/data/mock';
@@ -7,9 +8,10 @@ import TranscriptView from './active-call/TranscriptView';
 import IncomingCallControls from './active-call/IncomingCallControls';
 import ActiveCallControls from './active-call/ActiveCallControls';
 import { useActiveCallLogic } from '@/hooks/useActiveCallLogic';
+import type { TranscriptLine } from '@/hooks/useCallState';
+import { usePhoneState } from '@/hooks/usePhoneState';
 
 type Agent = (typeof aiAgents)[0];
-export type TranscriptLine = { speaker: 'agent' | 'caller' | 'system'; text: string; };
 
 interface ActiveCallViewProps {
   number: string;
@@ -30,23 +32,35 @@ interface ActiveCallViewProps {
 }
 
 const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, status, agentId, notes, onEndCall, onAcceptCall, onAcceptCallManually, agents, startMuted, onForward, onIntervene, isForwarding, duration, onMinimize }) => {
+  const { activeCall, handleSendNote: onSendNote } = usePhoneState();
+  const transcript = activeCall?.transcript;
   const agent = agents.find(a => a.id === agentId);
+  const [newNote, setNewNote] = useState('');
 
   const {
     isMuted,
     setIsMuted,
     isRingerMuted,
     setIsRingerMuted,
-    transcript,
-    newNote,
-    onNewNoteChange,
     scrollContainerRef,
     callerName,
-    handleSendNote,
     audioOptionsWithMute,
     selectedAudioDevice,
     handleAudioOutputChange,
-  } = useActiveCallLogic({ status, agentId, contactName, startMuted });
+  } = useActiveCallLogic({ agentId, contactName, startMuted });
+
+  const handleSendNote = () => {
+    if (newNote.trim() && onSendNote) {
+      onSendNote(newNote);
+      setNewNote('');
+    }
+  };
+
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [transcript, scrollContainerRef]);
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const { offset } = info;
@@ -104,9 +118,9 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
           scrollContainerRef={scrollContainerRef}
           agent={agent}
           notes={notes}
-          transcript={transcript}
+          transcript={transcript || []}
           newNote={newNote}
-          onNewNoteChange={onNewNoteChange}
+          onNewNoteChange={setNewNote}
           onSendNote={handleSendNote}
           callerName={callerName}
         />

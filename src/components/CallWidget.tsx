@@ -24,6 +24,7 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
   if (!callState) return null;
   
   const displayName = contactName || callState.number;
+  const lastMessage = agent && callState.transcript?.[0]?.speaker !== 'system' ? callState.transcript?.[0]?.text : null;
 
   return (
     <motion.div
@@ -47,11 +48,11 @@ const CallWidget: React.FC<CallWidgetProps> = ({ callState, contactName, agent, 
         )}
         <div className="flex flex-col min-w-0">
           <span className="font-bold text-sm truncate">{displayName}</span>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground truncate">
             {callState.status === 'incoming' 
               ? 'Eingehender Anruf' 
               : agent 
-                ? `KI: ${agent.name}` 
+                ? lastMessage || `KI: ${agent.name}` 
                 : `Anruf ${formatDuration(duration)}`}
           </span>
         </div>
