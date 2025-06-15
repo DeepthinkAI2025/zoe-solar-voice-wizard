@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { toast } from "@/components/ui/use-toast";
 
 export type Task = {
     id: number;
@@ -21,11 +22,26 @@ export const useTasks = () => {
     const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
 
     const handleToggle = (id: number) => {
+        const task = taskList.find(t => t.id === id);
+        if (!task) return;
+
         setTaskList(
-            taskList.map(task =>
-                task.id === id ? { ...task, completed: !task.completed } : task
+            taskList.map(t =>
+                t.id === id ? { ...t, completed: !t.completed } : t
             )
         );
+
+        if (task.completed) {
+            toast({
+                title: "Aufgabe wieder geöffnet",
+                description: `"${task.text}" ist jetzt wieder offen.`,
+            });
+        } else {
+            toast({
+                title: "Aufgabe erledigt!",
+                description: `"${task.text}" wurde als erledigt markiert.`,
+            });
+        }
     };
 
     const handleAddTask = (text: string, priority: Task['priority']) => {
@@ -38,6 +54,10 @@ export const useTasks = () => {
         };
         setTaskList(prevTasks => [newTask, ...prevTasks]);
         setIsNewTaskDialogOpen(false);
+        toast({
+            title: "Aufgabe hinzugefügt",
+            description: `"${newTask.text}" wurde zur Liste hinzugefügt.`,
+        });
     };
 
     const confirmDeleteTask = (id: number) => {
@@ -50,8 +70,18 @@ export const useTasks = () => {
 
     const handleDeleteTask = () => {
         if (taskToDelete === null) return;
+        const task = taskList.find(t => t.id === taskToDelete);
+
         setTaskList(prevTasks => prevTasks.filter(task => task.id !== taskToDelete));
         setTaskToDelete(null);
+
+        if (task) {
+            toast({
+                title: "Aufgabe gelöscht",
+                description: `"${task.text}" wurde entfernt.`,
+                variant: "destructive"
+            });
+        }
     };
     
     const openTasks = taskList.filter(t => !t.completed);
