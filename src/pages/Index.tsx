@@ -1,3 +1,4 @@
+
 import React from 'react';
 import BottomNav from '@/components/BottomNav';
 import Dialpad from '@/components/Dialpad';
@@ -27,6 +28,7 @@ const Index = () => {
     handleAcceptCallWithAI,
     handleAcceptCallManually,
     handleEndCall,
+    handleScheduleCall,
     setShowAgentSelector,
     setSelectedCall,
     handleStartCallManually,
@@ -93,7 +95,8 @@ const Index = () => {
             onToggleVm={handleVmToggle}
             onToggleAgent={handleAgentToggle}
             onUpdateAgentName={handleUpdateAgentName}
-            onSelect={handleAgentSelect} 
+            onSelect={handleAgentSelect}
+            onScheduleCall={handleScheduleCall}
             onClose={() => setShowAgentSelector(null)} 
             numberToCall={showAgentSelector}
         />

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Icon from './Icon';
 import { X, Phone, CalendarClock, Pencil } from 'lucide-react';
@@ -8,6 +7,7 @@ import type { aiAgents } from '@/data/mock';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import ScheduleCallDialog from './ScheduleCallDialog';
 
 type Agent = (typeof aiAgents)[0];
 
@@ -20,13 +20,15 @@ interface AgentSelectorProps {
   onUpdateAgentName: (agentId: string, newName: string) => void;
   isVmActive: boolean;
   onToggleVm: (active: boolean) => void;
+  onScheduleCall: (agentId: string, notes: string, date: Date) => void;
 }
 
-const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, agents, onToggleAgent, onUpdateAgentName, isVmActive, onToggleVm }) => {
+const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, numberToCall, agents, onToggleAgent, onUpdateAgentName, isVmActive, onToggleVm, onScheduleCall }) => {
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [notes, setNotes] = useState('');
   const [editingAgentId, setEditingAgentId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  const [isScheduling, setIsScheduling] = useState(false);
 
   useEffect(() => {
     const activeAgent = agents.find(a => a.active);
@@ -40,6 +42,12 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
   const handleSelectAndCall = () => {
     if (selectedAgentId) {
       onSelect(selectedAgentId, notes);
+    }
+  };
+
+  const handleSchedule = (date: Date) => {
+    if (selectedAgentId) {
+      onScheduleCall(selectedAgentId, notes, date);
     }
   };
 
@@ -148,11 +156,18 @@ const AgentSelector: React.FC<AgentSelectorProps> = ({ onSelect, onClose, number
                 <Phone />
                 Anruf mit KI starten
             </Button>
-            <Button variant="outline" disabled>
+            <Button variant="outline" onClick={() => setIsScheduling(true)} disabled={!selectedAgentId}>
                 <CalendarClock />
                 Planen
             </Button>
         </div>
+
+        <ScheduleCallDialog
+            isOpen={isScheduling}
+            onClose={() => setIsScheduling(false)}
+            onSchedule={handleSchedule}
+            numberToCall={numberToCall}
+        />
 
       </div>
     </div>

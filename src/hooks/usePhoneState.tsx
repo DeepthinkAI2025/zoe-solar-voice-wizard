@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { aiAgents as initialAgents, callHistory } from '@/data/mock';
@@ -230,6 +229,18 @@ export const usePhoneState = () => {
     setSelectedCall(null);
   };
 
+  const handleScheduleCall = (agentId: string, notes: string, date: Date) => {
+    if (showAgentSelector) {
+      toast({
+        title: "Anruf geplant",
+        description: `KI-Anruf an ${showAgentSelector} für ${date.toLocaleString('de-DE')} wurde geplant.`,
+      });
+      // In a real app this would be sent to a backend service.
+      console.log('Scheduling call...', { number: showAgentSelector, agentId, notes, date: date.toISOString() });
+      setShowAgentSelector(null);
+    }
+  };
+
   // Handlers for settings
   const handleAutoAnswerToggle = (enabled: boolean) => setAutoAnswerEnabled(enabled);
   const handleWorkingHoursStartChange = (hour: number) => setWorkingHoursStart(hour);
@@ -252,6 +263,7 @@ export const usePhoneState = () => {
     handleAcceptCallWithAI,
     handleAcceptCallManually,
     handleEndCall,
+    handleScheduleCall,
     // Settings state and handlers
     autoAnswerEnabled,
     workingHoursStart,
