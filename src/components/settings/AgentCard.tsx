@@ -68,14 +68,30 @@ export const AgentCard: React.FC<AgentCardProps> = ({
           />
         </div>
       </div>
-      <div className="mt-4 pt-4 border-t border-border flex items-center gap-4">
-        <Button variant="outline" onClick={() => onStartVoiceClone(agent.id)}>
-            {agent.voiceCloned ? 'Stimme erneut klonen' : 'Stimme klonen'}
-        </Button>
+      <div className="mt-4 pt-4 border-t border-border">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => onStartVoiceClone(agent.id)}>
+              {agent.voiceCloned ? 'Stimme erneut klonen' : 'Stimme klonen'}
+          </Button>
+          {agent.voiceCloned && (
+              <div className="flex items-center gap-1 text-sm text-green-600 font-medium">
+                  <CheckCircle className="h-4 w-4" />
+                  <span>{agent.voiceLabel || 'Stimme geklont'}</span>
+              </div>
+          )}
+        </div>
         {agent.voiceCloned && (
-            <div className="flex items-center gap-1 text-sm text-green-600 font-medium">
-                <CheckCircle className="h-4 w-4" />
-                <span>Stimme aktiv</span>
+            <div className="mt-3">
+                <Label htmlFor={`agent-voice-label-${agent.id}`} className="text-xs text-muted-foreground">
+                    Bezeichnung der Stimme (optional)
+                </Label>
+                <Input
+                  id={`agent-voice-label-${agent.id}`}
+                  placeholder="z.B. Freundliche Frauenstimme"
+                  value={agent.voiceLabel || ''}
+                  onChange={(e) => onUpdateAgentDetails(agent.id, { voiceLabel: e.target.value })}
+                  className="text-sm h-9"
+                />
             </div>
         )}
       </div>

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
 import { aiAgents as initialAgents } from '@/data/mock';
@@ -6,6 +7,7 @@ export type AgentWithSettings = (typeof initialAgents)[0] & {
   purpose: string;
   systemInstructions: string;
   voiceCloned?: boolean;
+  voiceLabel?: string;
 };
 
 export const useAgentManagement = () => {
@@ -39,6 +41,7 @@ export const useAgentManagement = () => {
         systemInstructions,
         active: a.active || false,
         voiceCloned: false,
+        voiceLabel: '',
       };
     });
 
@@ -146,7 +149,7 @@ export const useAgentManagement = () => {
   
   const handleUpdateAgentDetails = (
     agentId: string, 
-    details: Partial<Pick<AgentWithSettings, 'name' | 'purpose' | 'systemInstructions'>>
+    details: Partial<Omit<AgentWithSettings, 'id' | 'icon' | 'active'>>
   ) => {
     setAgents(prevAgents =>
       prevAgents.map(a =>
