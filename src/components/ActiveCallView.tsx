@@ -40,6 +40,8 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
   const {
     isMuted,
     setIsMuted,
+    isSpeakerMuted,
+    setIsSpeakerMuted,
     isRingerMuted,
     setIsRingerMuted,
     scrollContainerRef,
@@ -140,6 +142,8 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
           <ActiveCallControls
             isMuted={isMuted}
             onToggleMute={() => setIsMuted(!isMuted)}
+            isSpeakerMuted={isSpeakerMuted}
+            onToggleSpeakerMute={() => setIsSpeakerMuted(!isSpeakerMuted)}
             agentId={agentId}
             onForward={onForward}
             onIntervene={onIntervene}
@@ -155,4 +159,3 @@ const ActiveCallView: React.FC<ActiveCallViewProps> = ({ number, contactName, st
 };
 
 export default ActiveCallView;
-

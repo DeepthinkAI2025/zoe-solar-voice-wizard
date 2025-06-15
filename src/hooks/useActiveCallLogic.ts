@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { Mic, MicOff, Phone, Volume2, Bluetooth } from 'lucide-react';
 
@@ -16,6 +17,7 @@ interface UseActiveCallLogicProps {
 
 export const useActiveCallLogic = ({ agentId, contactName, startMuted }: UseActiveCallLogicProps) => {
     const [isMuted, setIsMuted] = useState(false);
+    const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
     const [isRingerMuted, setIsRingerMuted] = useState(startMuted ?? false);
     const [audioOutput, setAudioOutput] = useState('speaker');
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -33,6 +35,7 @@ export const useActiveCallLogic = ({ agentId, contactName, startMuted }: UseActi
 
     return {
         isMuted, setIsMuted,
+        isSpeakerMuted, setIsSpeakerMuted,
         isRingerMuted, setIsRingerMuted,
         scrollContainerRef,
         callerName,

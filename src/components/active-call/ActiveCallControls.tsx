@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { PhoneOff, Mic, MicOff, Share, UserCheck, type LucideIcon } from 'lucide-react';
+import { PhoneOff, Mic, MicOff, Share, UserCheck, type LucideIcon, VolumeX, Volume2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 interface AudioDevice {
@@ -17,6 +18,8 @@ interface AudioDevice {
 interface ActiveCallControlsProps {
   isMuted: boolean;
   onToggleMute: () => void;
+  isSpeakerMuted: boolean;
+  onToggleSpeakerMute: () => void;
   agentId?: string;
   onForward?: () => void;
   onIntervene?: () => void;
@@ -29,6 +32,8 @@ interface ActiveCallControlsProps {
 const ActiveCallControls: React.FC<ActiveCallControlsProps> = ({
   isMuted,
   onToggleMute,
+  isSpeakerMuted,
+  onToggleSpeakerMute,
   agentId,
   onForward,
   onIntervene,
@@ -46,10 +51,18 @@ const ActiveCallControls: React.FC<ActiveCallControlsProps> = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center justify-center w-16 h-16 rounded-full bg-white/10 hover:bg-white/20 text-foreground transition-colors">
-            <selectedAudioDevice.icon size={28} />
+            {isSpeakerMuted ? <VolumeX size={28} /> : <selectedAudioDevice.icon size={28} />}
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="bg-popover border-border text-popover-foreground">
+          <DropdownMenuItem
+            onClick={onToggleSpeakerMute}
+            className="flex items-center gap-2 cursor-pointer focus:bg-accent"
+          >
+            {isSpeakerMuted ? <Volume2 className="w-4 h-4 mr-2" /> : <VolumeX className="w-4 h-4 mr-2" />}
+            <span>{isSpeakerMuted ? 'Ton an' : 'Ton aus'}</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           {audioOutputs.map((output) => (
             <DropdownMenuItem
               key={output.id}
