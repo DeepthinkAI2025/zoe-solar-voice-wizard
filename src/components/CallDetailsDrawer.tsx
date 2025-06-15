@@ -83,16 +83,16 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
         <div className="p-4 space-y-6 max-h-[60vh] overflow-y-auto">
           {call.summary && (
             <div>
-              <h3 className="font-semibold text-white mb-2 flex items-center gap-2"><Bot size={16} /> KI-Zusammenfassung</h3>
-              <p className="text-muted-foreground bg-white/5 p-3 rounded-lg text-sm">{call.summary}</p>
+              <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2"><Bot size={16} /> KI-Zusammenfassung</h3>
+              <p className="text-muted-foreground bg-muted p-3 rounded-lg text-sm">{call.summary}</p>
             </div>
           )}
           
           <div>
-            <h3 className="font-semibold text-white mb-2">Audio</h3>
+            <h3 className="font-semibold text-foreground mb-2">Audio</h3>
             <Button
               variant="ghost"
-              className="w-full justify-between items-center bg-white/5 hover:bg-white/10 p-3 rounded-lg h-auto"
+              className="w-full justify-between items-center bg-muted hover:bg-secondary p-3 rounded-lg h-auto"
               onClick={handleTogglePlay}
             >
               <div className="flex items-center gap-2">
@@ -105,8 +105,8 @@ const CallDetailsDrawer: React.FC<CallDetailsDrawerProps> = ({ call, onClose, on
 
           {call.transcript && (
             <div>
-              <h3 className="font-semibold text-white mb-2 flex items-center gap-2"><FileText size={16}/> Gesprächsprotokoll</h3>
-              <div className="space-y-3 bg-white/5 p-3 rounded-lg max-h-48 overflow-y-auto">
+              <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2"><FileText size={16}/> Gesprächsprotokoll</h3>
+              <div className="space-y-3 bg-muted p-3 rounded-lg max-h-48 overflow-y-auto">
                 {call.transcript.map((line, i) => (
                   <p key={i} className="text-muted-foreground text-sm">{line}</p>
                 ))}
